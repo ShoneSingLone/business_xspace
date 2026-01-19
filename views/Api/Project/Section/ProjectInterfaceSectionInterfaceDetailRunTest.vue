@@ -1,6 +1,6 @@
 <style lang="less">
 #ProjectInterfaceSectionInterfaceDetailEditor {
-	height: 1px;
+	height: 100%;
 	overflow: auto;
 
 	.result-wrapper {
@@ -69,6 +69,7 @@
 </template>
 <script lang="ts">
 export default async function () {
+	debugger;
 	return defineComponent({
 		inject: ["APP", "inject_project", "inject_interface_section_interface_detail"],
 		props: {

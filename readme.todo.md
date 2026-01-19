@@ -1,4 +1,5 @@
 - [] wiki url like 可以点击
+- [] wiki 增加字段赋值，点击复制对应文字
 - [] wiki 的历史记录
 - [] url 编码问题 encodeURI
 - [] 用户登录有通知

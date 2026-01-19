@@ -33,7 +33,7 @@ module.exports = {
 
 	return_to_list_action: ["返回列表", "Return to List"],
 
-	longTipsLicenseExpired: [
+	long_tips_license_expired: [
 		"您使用的license已于 {date} 过期，如需继续使用，请联系管理员处理！",
 		"The license you are using has expired on {date}. If you wish to continue using it, please contact the administrator for assistance!"
 	],
@@ -64,7 +64,7 @@ module.exports = {
 
 	name_info: ["名称", "name"],
 
-	resourcePool: ["resourcePool", "resourcePool"],
+	resource_pool: ["resource_pool", "resource_pool"],
 
 	availablePartitionName: ["availablePartitionName", "AvailablePartitioname"],
 
@@ -74,7 +74,7 @@ module.exports = {
 
 	input_email_addr: ["请输入Email", "Please enter your email address"],
 
-	"form.rules.msg.wordLessThan": ["字数应少于{size}", "Word count should be less than {size}"],
+	form_rules_msg_word_less_than: ["字数应少于{size}", "Word count should be less than {size}"],
 
 	msgEnterTheCorrectIPv4Address: [
 		"请输入正确的IPv4地址",

@@ -5,7 +5,7 @@
 			<xTabPane label="编辑" name="editor"> </xTabPane>
 			<xTabPane label="测试" name="run_test"> </xTabPane>
 		</xTabs>
-		<div class="flex1 height1px overflow-auto">
+		<div class="flex1 overflow-auto">
 			<transition name="fade" mode="out-in" tag="div" class="flex vertical flex1 height100">
 				<ProjectInterfaceSectionInterfaceDetailPreview
 					v-if="cptProjectInterfaceTab === 'preview'"
