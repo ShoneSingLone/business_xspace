@@ -1,17 +1,17 @@
 <style lang="less">
 #ProjectInterfaceSectionInterfaceDetailPreviewForm {
 	/* 响应数据 */
-	.xItemDesc-wrapper {
+	.xDesc-wrapper {
 		padding: 0;
 	}
 	.backup-response {
-		&.xItemDesc-wrapper {
+		&.xDesc-wrapper {
 			height: 100%;
 			display: flex;
 			align-items: flex-start;
 			position: relative;
 
-			.xItemDesc-wrapper_content {
+			.xDesc-wrapper_content {
 				height: 100%;
 				position: absolute;
 				overflow: visible;
@@ -40,16 +40,16 @@
 			<xForm
 				style="--xItem-label-width: 100px"
 				id="ProjectInterfaceSectionInterfaceDetailPreviewForm">
-				<xItemDesc :item="cptDescItems.接口名称" span="full" />
-				<xItemDesc :item="cptDescItems.接口" span="full" />
-				<xItemDesc :item="cptDescItems.状态" />
-				<xItemDesc :item="cptDescItems.更新时间" />
-				<xItemDesc :item="cptDescItems.维护人" />
-				<xItemDesc :item="cptDescItems.分类" />
-				<xItemDesc :item="cptDescItems.Tag" span="full" />
-				<xItemDesc :item="cptDescItems.code" />
-				<xItemDesc :item="cptDescItems.备份response" class="backup-response" />
-				<xItemDesc :item="cptDescItems.useProxy" span="full" />
+				<xDesc :item="cptDescItems.接口名称" span="full" />
+				<xDesc :item="cptDescItems.接口" span="full" />
+				<xDesc :item="cptDescItems.状态" />
+				<xDesc :item="cptDescItems.更新时间" />
+				<xDesc :item="cptDescItems.维护人" />
+				<xDesc :item="cptDescItems.分类" />
+				<xDesc :item="cptDescItems.Tag" span="full" />
+				<xDesc :item="cptDescItems.code" />
+				<xDesc :item="cptDescItems.备份response" class="backup-response" />
+				<xDesc :item="cptDescItems.useProxy" span="full" />
 			</xForm>
 			<!-- <pre>
 				<code>
