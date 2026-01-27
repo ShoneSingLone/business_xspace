@@ -1,5 +1,6 @@
 <style lang="less">
 #ProjectInterfaceSectionInterfaceDetailEditor {
+	height: 100%;
 }
 </style>
 <template>
@@ -226,7 +227,13 @@ export default async function () {
 					},
 					witchEnv: {
 						label: i18n("转发到"),
-						itemType: "YapiItemProxyEnv"
+						itemType: "YapiItemProxyEnv",
+						rule: [
+							_rules.validator(({ val }) => {
+								/* 如果isProxy为true，则必须选择转发环境 */
+								return vm.formData.isProxy && !val;
+							})
+						]
 					},
 					res_body_type: {
 						label: i18n("响应类型"),

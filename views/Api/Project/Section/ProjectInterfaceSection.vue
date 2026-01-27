@@ -673,7 +673,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									}
 									return false;
 								} else if (prop == "witchEnv") {
+									console.log(i.witchEnv);
 									if (searchParams.includes("unset")) {
+										if (!i.isProxy) {
+											return true;
+										}
 										if (!i.witchEnv) {
 											return true;
 										}
