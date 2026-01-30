@@ -7,8 +7,8 @@
 	<div class="CloudDiskMine flex1 flex vertical">
 		<div class="play-list flex1">
 			<div>{{ cptPercent }}</div>
-			<div>{{ _.$bytesToSize(cloudDiskSizeUsed) }}</div>
-			<div>{{ _.$bytesToSize(cloudDiskSizeTotal) }}</div>
+			<div>{{ _.$convertByteUnit(cloudDiskSizeUsed) }}</div>
+			<div>{{ _.$convertByteUnit(cloudDiskSizeTotal) }}</div>
 			<div class="flex flex1 vertical overflow-auto">
 				<CloudDiskResourceAudioItem
 					v-for="(item, index) in APP.stateAudio.audioArray"

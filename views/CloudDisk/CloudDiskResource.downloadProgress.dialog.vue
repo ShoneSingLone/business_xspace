@@ -44,7 +44,7 @@ export default async function () {
 		},
 		computed: {
 			cptTitle({ item }) {
-				return `${item.name} - ${_.$bytesToSize(this.total)}`;
+				return `${item.name} - ${_.$convertByteUnit(this.total)}`;
 			}
 		},
 		watch: {

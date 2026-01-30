@@ -103,7 +103,7 @@ export default async function () {
 				return _.$dateFormat(this.item.add_time);
 			},
 			cptSize() {
-				return _.$bytesToSize(this.item.size);
+				return _.$convertByteUnit(this.item.size);
 			}
 		},
 		methods: {
