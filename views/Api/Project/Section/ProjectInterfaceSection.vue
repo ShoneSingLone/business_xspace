@@ -363,7 +363,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						clearable: true,
 						multiple: true,
 						options: [],
-						optonsRender({ options }) {
+						optionsRender({ options }) {
 							return _.map(options, option => {
 								return h(
 									"xOption",
@@ -397,7 +397,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						clearable: true,
 						multiple: true,
 						options: _opts.yapi.httpMethod,
-						optonsRender({ vm, options }) {
+						optionsRender({ vm, options }) {
 							return _.map(options, (item, key) => {
 								return h(
 									"xOption",
