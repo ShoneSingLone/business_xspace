@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="tiny" class="x-xspace-app">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>XSpace</title>
+	</head>
+	<body class="x-loading">
+		<div id="app"></div>
+		<script id="src-root" data-app-name="xspace" data-loading-img="_xspace-loading"></script>
+		<script id="src-root-preload">
+			const entry_js = document.getElementById("src-root");
+			if ("shonesinglone.github.io" === location.hostname) {
+				window._AJAX_URL_PREFIX = "https://www.singlone.work/s/1";
+				entry_js.src = "../common/libs/seed.js";
+			} else {
+				entry_js.src = "/static/common/libs/seed.js";
+				window._AJAX_URL_PREFIX = "";
+			}
+
+			const preload = document.getElementById("src-root-preload");
+			preload.parentNode.removeChild(preload);
+		</script>
+	</body>
+</html>
