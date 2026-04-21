@@ -113,7 +113,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					});
 				},
 				cellRenderer({ cellData }) {
-					const item = _.find(_opts.yapi.httpMethod, { value: cellData });
+					const item = _.find(_opts.xspace.httpMethod, { value: cellData });
 					if (item) {
 						return hxTag(
 							{
@@ -396,7 +396,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						itemType: "xItemSelect",
 						clearable: true,
 						multiple: true,
-						options: _opts.yapi.httpMethod,
+						options: _opts.xspace.httpMethod,
 						optionsRender({ vm, options }) {
 							return _.map(options, (item, key) => {
 								return h(

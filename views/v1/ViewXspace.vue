@@ -25,10 +25,10 @@
 
       <!-- Windows Layer -->
       <WindowContainer 
-        v-for="win in windowManager.state.windows" 
+        v-for="win in ModalManager.state.windows" 
         :key="win.id"
         :window="win"
-        :window-manager="windowManager"
+        :window-manager="ModalManager"
         :system="systemForWindows"
       />
 
@@ -42,7 +42,7 @@
 
 <script lang="ts">
 export default async function ({ PRIVATE_GLOBAL }) {
-  const windowManager = await _.$importVue('@/utils/windowManager.vue');
+  const ModalManager = await _.$importVue('@/utils/ModalManager.vue');
 
   return {
     inject: ['APP'],
@@ -55,28 +55,28 @@ export default async function ({ PRIVATE_GLOBAL }) {
     },
     provide() {
       return {
-        windowManager: this.windowManager,
+        ModalManager: this.ModalManager,
         system: {
           apps: this.apps,
           shortcuts: this.shortcuts,
-          openWindows: this.windowManager.state.windows,
-          activeWindowId: this.windowManager.state.activeId,
+          openWindows: this.ModalManager.state.windows,
+          activeWindowId: this.ModalManager.state.activeId,
           pinnedApps: this.pinnedApps,
           pinApp: this.pinApp,
           unpinApp: this.unpinApp,
           addShortcut: this.addShortcut,
           removeShortcut: this.removeShortcut,
           openApp: this.openApp,
-          focusWindow: (id) => this.windowManager.focus(id),
-          closeWindow: (id) => this.windowManager.close(id),
-          minimizeWindow: (id) => this.windowManager.minimize(id),
-          toggleMaximize: (id) => this.windowManager.toggleMaximize(id)
+          focusWindow: (id) => this.ModalManager.focus(id),
+          closeWindow: (id) => this.ModalManager.close(id),
+          minimizeWindow: (id) => this.ModalManager.minimize(id),
+          toggleMaximize: (id) => this.ModalManager.toggleMaximize(id)
         }
       };
     },
     data() {
       return {
-        windowManager,
+        ModalManager,
         apps: [
           { id: 'api', name: 'API Manager', icon: '_database', color: '#6750A4', component: '@/views/Api/Project/Project.vue' },
           { id: 'cicd', name: 'CI/CD', icon: '_ci', color: '#625B71', component: '@/views/CiCd/CiCd.vue' },
@@ -149,7 +149,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
         // 加载组件
         const component = () => _.$importVue(app.component);
 
-        this.windowManager.open({
+        this.ModalManager.open({
           appId,
           title: data?.name || app.name,
           component,

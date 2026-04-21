@@ -126,7 +126,7 @@ ${httprequestoptions}
 		methods: {
 			async saveAsBackupData() {
 				try {
-					const { data } = await _api.yapi.interface_up({
+					const { data } = await _api.xspace.interface_up({
 						id: interface_id,
 						resBackupJson: JSON.stringify(this.response.data, null, 2)
 					});
@@ -150,7 +150,7 @@ ${httprequestoptions}
 						project_id,
 						usecaseCode: this.form.editor.value
 					};
-					await _api.yapi.interface_usecase_upsert(dataForm);
+					await _api.xspace.interface_usecase_upsert(dataForm);
 					this.APP.updateGroupProjectList();
 					_.$msg("更新成功");
 				} catch (error) {
@@ -159,7 +159,7 @@ ${httprequestoptions}
 			},
 			async setEditorValue() {
 				try {
-					const res = await _api.yapi.interface_usecase_get_all(interface_id);
+					const res = await _api.xspace.interface_usecase_get_all(interface_id);
 					if (!res.errcode) {
 						const { data } = res;
 						if (data.length > 0) {

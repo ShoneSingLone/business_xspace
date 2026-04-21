@@ -28,7 +28,7 @@ export default async function ({ diffView }) {
 		methods: {
 			renderContentItem() {
 				if (diffView.length === 0) {
-					return h("YapiPlaceholderView", {
+					return h("xspacePlaceholderView", {
 						view: "GroupSectionLogWindowDiff"
 					});
 				} else {

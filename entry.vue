@@ -14,16 +14,16 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		{
 			/* 涉及具体的上传接口，不能做通用的处理 */
 			TuiEditor: "@/components/TuiEditor/TuiEditor.vue",
-			YapiItemInterfaceImportType: "@/components/YapiItemInterfaceImportType.vue",
-			YapiApiRequestBodyPreviewer: "@/components/YapiApiRequestBodyPreviewer.vue",
-			yapiItemReqBodyParams: "@/components/yapiItemReqBodyParams.vue",
-			YapiItemProxyEnv: "@/components/YapiItemProxyEnv.vue",
-			YapiItemAvatar: "@/components/YapiItemAvatar.vue",
-			YapiItemUac: "@/components/YapiItemUac.vue",
-			YapiItemKeyValTable: "@/components/YapiItemKeyValTable.vue",
-			YapiItemPathParams: "@/components/YapiItemPathParams.vue",
-			YapiProjectCard: "@/components/YapiProjectCard.vue",
-			YapiPlaceholderView: "@/components/YapiPlaceholderView.vue",
+			XspaceItemInterfaceImportType: "@/components/XspaceItemInterfaceImportType.vue",
+			XspaceApiRequestBodyPreviewer: "@/components/XspaceApiRequestBodyPreviewer.vue",
+			XspaceItemReqBodyParams: "@/components/XspaceItemReqBodyParams.vue",
+			XspaceItemProxyEnv: "@/components/XspaceItemProxyEnv.vue",
+			XspaceItemAvatar: "@/components/XspaceItemAvatar.vue",
+			XspaceItemUac: "@/components/XspaceItemUac.vue",
+			XspaceItemKeyValTable: "@/components/XspaceItemKeyValTable.vue",
+			XspaceItemPathParams: "@/components/XspaceItemPathParams.vue",
+			XspaceProjectCard: "@/components/XspaceProjectCard.vue",
+			XspacePlaceholderView: "@/components/XspacePlaceholderView.vue",
 			ProjectInterfaceSectionInterfaceDetailEditorDesc:
 				"@/views/Api/Project/Section/ProjectInterfaceSectionInterfaceDetailEditorDesc.vue"
 		},
@@ -48,7 +48,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		/*通用下拉项*/
 		"@/utils/opts.vue",
 		/* 项目独有样式 */
-		"@/yapi.defaul.style.vue"
+		"@/xspace.defaul.style.vue"
 	]);
 	/* app entry  */
 	const router = new VueRouter({ routes });
@@ -56,7 +56,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	const GUEST_STATUS = 1;
 	const MEMBER_STATUS = 2;
 	/*  */
-	_.$yapiRouter = router;
+	_.$xspaceRouter = router;
 
 	router.beforeEach(function (to, from, next) {
 		if (to.path === "/404" && !to.params?.from) {
@@ -94,22 +94,25 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			vm.refreshUserInfo = _.$asyncDebounce(vm, async function refreshUserInfo() {
 				try {
 					if (!vm.user.isLogin) {
-						const res = await _api.yapi.userStatus();
+						const res = await _api.xspace.userStatus();
 						const { data: userInfo } = res;
 						await vm._setUser(userInfo);
 					}
 
 					if (vm.user.isLogin) {
-						const res = await _api.yapi.userSearch({});
+						const res = await _api.xspace.userSearch({});
 						const { data: all_user } = res;
 						vm.all_user = all_user;
 						/* TODO: 跳转到首页 或者note应用*/
 						if (vm.$route.path === "/note") {
 							return;
 						}
-						await vm.ifUrlNoGroupIdGetAndAddIdToUrl();
-						if (vm.cptProjectId) {
-							await vm.updateGroupProjectList();
+						// 对v1路由特殊处理，不需要group_id
+						if (vm.$route.path !== "/v1") {
+							await vm.ifUrlNoGroupIdGetAndAddIdToUrl();
+							if (vm.cptProjectId) {
+								await vm.updateGroupProjectList();
+							}
 						}
 						if (vm.$route.path === "/login") {
 							vm.$router.push("/api/group");
@@ -164,7 +167,45 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				/* group */
 				groupList: [],
 				groupMemberList: [],
-				groupProjectList: []
+				groupProjectList: [],
+				
+					apps: [
+					  { id: 'api', name: 'API Manager', icon: 'Database', color: '#6750A4', component: 'ApiManager' },
+					  { id: 'cicd', name: 'CI/CD', icon: 'Repeat', color: '#625B71', component: 'CicdManager' },
+					  { id: 'note', name: 'Documents', icon: 'FileText', color: '#7D5260', component: 'NoteManager' },
+					  { id: 'im', name: 'Chat', icon: 'MessageSquare', color: '#006A6A', component: 'ImManager' },
+					  { id: 'rtc', name: 'Meeting', icon: 'Video', color: '#B3261E', component: 'RtcManager' },
+					  { id: 'office', name: 'Cloud Storage', icon: 'Cloud', color: '#0061A4', component: 'OfficeManager' },
+					  { id: 'hoppscotch', name: 'API Test', icon: 'Send', color: '#4F6600', component: 'Hoppscotch' },
+					  { id: 'explore', name: 'Explore', icon: 'Compass', color: '#984061', component: 'Explore' },
+					  { id: 'user', name: 'User', icon: 'User', color: '#006874', component: 'UserManager' },
+					  // Hidden apps for dynamic resource windows
+					  { id: 'group', name: 'Group', icon: 'Folder', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'project', name: 'Project', icon: 'Folder', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'api_folder', name: 'API Folder', icon: 'Folder', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'doc_folder', name: 'Doc Folder', icon: 'Folder', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'folder', name: 'Folder', icon: 'Folder', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'api_endpoint', name: 'API', icon: 'Code', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'doc', name: 'Document', icon: 'FileText', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'code', name: 'Code', icon: 'Code', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'member_list', name: 'Members', icon: 'Users', color: '#6750A4', component: 'ApiManager', hidden: true },
+					  { id: 'setting', name: 'Settings', icon: 'Settings', color: '#6750A4', component: 'ApiManager', hidden: true },
+					] ,
+					shortcuts: [
+					  { id: 'api', appId: 'api', name: 'API Manager', icon: 'Database', color: '#6750A4' },
+					  { id: 'explore', appId: 'explore', name: 'Explore', icon: 'Compass', color: '#984061' },
+					  { id: 'note', appId: 'note', name: 'Documents', icon: 'FileText', color: '#7D5260' },
+					] ,
+					openWindows: [] ,
+					activeWindowId: null ,
+					nextZIndex: 10,
+					theme: 'light' ,
+					lastOpenedAppId: null ,
+					pinnedApps: ['api', 'explore'],
+					isAuthenticated: false,
+					currentUser: null,
+				  
+
 			};
 		},
 		methods: {
@@ -252,7 +293,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					return;
 				}
 				if (!_.$isArrayFill(this.groupList)) {
-					this.updateGroupList();
+					await this.updateGroupList();
 				}
 				const ensureGroupId = () => {
 					if (!this.cptGroupId) {
@@ -263,10 +304,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						}
 					}
 				};
+				ensureGroupId();
 			},
 			async logoutActions() {
 				try {
-					const { data } = await _api.yapi.userLogout();
+					const { data } = await _api.xspace.userLogout();
 					if (data === "ok") {
 						_.$lStorage.x_token = "";
 						await this._setUser({
@@ -285,17 +327,17 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				}
 			},
 			async updateGroupList() {
-				let { data: groupList } = await _api.yapi.groupMine();
+				let { data: groupList } = await _api.xspace.groupMine();
 				this.groupList = groupList;
 			},
 			async updateGroupProjectList() {
 				const {
 					data: { list: groupProjectList }
-				} = await _api.yapi.getProjectByGroupId(this.cptGroupId);
+				} = await _api.xspace.getProjectByGroupId(this.cptGroupId);
 				this.groupProjectList = groupProjectList;
 			},
 			async updateGroupMemberList() {
-				const { data: groupMemberList } = await _api.yapi.groupGetMemberListBy(
+				const { data: groupMemberList } = await _api.xspace.groupGetMemberListBy(
 					this.cptGroupId
 				);
 				this.groupMemberList = groupMemberList;
@@ -355,6 +397,15 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	// --xItem-wrapper-width: 240px;
 }
 
+/* Global transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+
 .flash-when {
 	transition:
 		opacity,
@@ -366,7 +417,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	}
 }
 
-:root[data-theme="tiny"].x-yapi-app {
+:root[data-theme="tiny"].x-xspace-app {
 	color-scheme: light;
 	--el-color-white: #ffffff;
 	--el-color-black: #000000;

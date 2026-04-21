@@ -44,7 +44,7 @@ export default async function () {
 			async getTableData() {
 				try {
 					_.$loading(true);
-					const { errcode, data } = await _api.yapi.userSearch();
+					const { errcode, data } = await _api.xspace.userSearch();
 					if (!errcode) {
 						_.$setTableData(this.configsTable, {
 							list: _.map(data, rowData => {
@@ -123,7 +123,7 @@ export default async function () {
 							label: i18n("角色"),
 							prop: "role",
 							cellRenderer({ cellData }) {
-								return _.$val2L(cellData, _opts.yapi.role);
+								return _.$val2L(cellData, _opts.xspace.role);
 							}
 						},
 						defTable.colActions({

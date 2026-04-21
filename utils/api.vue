@@ -1,6 +1,6 @@
 <script lang="ts">
 export default async function () {
-	if (!window._api.yapi) {
+	if (!window._api.xspace) {
 		(function () {
 			_.$ajax.requestInjector = function (req) {
 				req.url = Vue._common_utils.appendToken(req.url);
@@ -10,7 +10,7 @@ export default async function () {
 				if (response?.errcode == 40011) {
 					/* 登录过期 */
 					_.$msgError("登录过期，请重新登录");
-					_.$yapiRouter.push("/login");
+					_.$xspaceRouter.push("/login");
 				} else if (response?.errcode === 10001) {
 					_.$msg.error("登录已失效，请重新登录");
 					_.$router.push("/login");
@@ -22,10 +22,10 @@ export default async function () {
 				return response;
 			};
 
-			window._api.yapi = {
+			window._api.xspace = {
 				async system_dicts(typeObject = {}) {
 					const typeArray = Object.keys(typeObject);
-					const _this = window._api.yapi;
+					const _this = window._api.xspace;
 					_this.typesCache = _this.typesCache || {};
 					const needRequest = [];
 					_.each(typeArray, type => {
@@ -77,7 +77,7 @@ export default async function () {
 				},
 				/**
 				 *  wiki左侧的菜单
-				 *  http://192.168.0.107:3002/static/business_yapi/yapi.html#/api/project?project_id=319&group_id=431&project_tab_name=%E6%8E%A5%E5%8F%A3&interface_type=interface&interface_id=591&project_interface_tab=1&project_setting_tab=3/#/api/project?project_id=319&group_id=431&interface_type=interface&interface_id=591&project_interface_tab=1&project_setting_tab=3&project_tab_name=接口
+				 *  http://192.168.0.107:3002/static/business_xspace/xspace.html#/api/project?project_id=319&group_id=431&project_tab_name=%E6%8E%A5%E5%8F%A3&interface_type=interface&interface_id=591&project_interface_tab=1&project_setting_tab=3/#/api/project?project_id=319&group_id=431&interface_type=interface&interface_id=591&project_interface_tab=1&project_setting_tab=3&project_tab_name=接口
 				 */
 				wiki_menu(data) {
 					return _.$ajax.post("/api/wiki/menu", {
@@ -86,7 +86,7 @@ export default async function () {
 				},
 				/**
 				 *  文档 list
-				 *  http://192.168.0.107:3002/static/business_yapi/yapi.html#/api/project?project_id=319&group_id=431&project_tab_name=%E6%8E%A5%E5%8F%A3&interface_type=interface&interface_id=589&project_interface_tab=1&project_setting_tab=3/#/api/project?project_id=319&group_id=431&interface_type=interface&interface_id=589&project_interface_tab=1&project_setting_tab=3&project_tab_name=接口
+				 *  http://192.168.0.107:3002/static/business_xspace/xspace.html#/api/project?project_id=319&group_id=431&project_tab_name=%E6%8E%A5%E5%8F%A3&interface_type=interface&interface_id=589&project_interface_tab=1&project_setting_tab=3/#/api/project?project_id=319&group_id=431&interface_type=interface&interface_id=589&project_interface_tab=1&project_setting_tab=3&project_tab_name=接口
 				 */
 				wikiList(data) {
 					return _.$ajax.post("/api/wiki/list", {
@@ -435,11 +435,23 @@ export default async function () {
 				},
 				async apiCicdJobList(data) {
 					return _.$ajax.get(`/api/cicd/job_list`, { data });
+				},
+				/**
+				 *  保存桌面工作空间状态
+				 */
+				async saveDesktopState(data) {
+					return _.$ajax.post(`/api/desktop/save_state`, { data });
+				},
+				/**
+				 *  加载桌面工作空间状态
+				 */
+				async loadDesktopState() {
+					return _.$ajax.get(`/api/desktop/load_state`);
 				}
 			};
 		})();
 	}
 
-	return window._api.yapi;
+	return window._api.xspace;
 }
 </script>

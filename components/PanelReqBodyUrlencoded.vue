@@ -2,7 +2,7 @@
 <template>
 	<div>
 		<xBtn @click="() => addNewQuery()" class="mt4">添加</xBtn>
-		<div class="width100 yapiItemReqBodyParams-table-height x-padding" ref="columns">
+		<div class="width100 XspaceItemReqBodyParams-table-height x-padding" ref="columns">
 			<xTableVir :columns="columns" :data="cptReqQuery" />
 		</div>
 	</div>

@@ -36,7 +36,7 @@ export default async function ({ row, onSuccess }) {
 						state.msgArray.unshift(msg);
 					});
 					/* 发送clone仓库的请求 */
-					_api.yapi.apiCicdGitInitRepo({
+					_api.xspace.apiCicdGitInitRepo({
 						git_address: row.git_address
 					});
 				} catch (error) {

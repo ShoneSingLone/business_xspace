@@ -21,13 +21,13 @@
 </template>
 <script lang="ts">
 export default async function () {
-	const TAB_KEY_PROJECT_LIST = Vue._yapi_var.TAB_KEY_PROJECT_LIST;
-	const TAB_KEY_MEMBER_LIST = Vue._yapi_var.TAB_KEY_MEMBER_LIST;
-	const TAB_KEY_GROUP_LOG = Vue._yapi_var.TAB_KEY_GROUP_LOG;
-	const TAB_KEY_GROUP_WIKI = Vue._yapi_var.TAB_KEY_GROUP_WIKI;
+	const TAB_KEY_PROJECT_LIST = Vue._xspace_var.TAB_KEY_PROJECT_LIST;
+	const TAB_KEY_MEMBER_LIST = Vue._xspace_var.TAB_KEY_MEMBER_LIST;
+	const TAB_KEY_GROUP_LOG = Vue._xspace_var.TAB_KEY_GROUP_LOG;
+	const TAB_KEY_GROUP_WIKI = Vue._xspace_var.TAB_KEY_GROUP_WIKI;
 
-	const ADMIN = Vue._yapi_var.ADMIN;
-	const OWNER = Vue._yapi_var.OWNER;
+	const ADMIN = Vue._xspace_var.ADMIN;
+	const OWNER = Vue._xspace_var.OWNER;
 
 	return defineComponent({
 		inject: ["APP", "Group"],
@@ -178,7 +178,7 @@ export default async function () {
 				const vm = this;
 				return hDiv({ class: "flex like-float" }, [
 					_.map(projectArray, (projectData, index) => {
-						return h("YapiProjectCard", {
+						return h("xspaceProjectCard", {
 							onChange() {
 								vm.APP.updateGroupProjectList();
 							},

@@ -97,7 +97,7 @@ export default async function ({ refreshTableData, rowData }) {
 							...rowData,
 							...vm.cptFormData
 						};
-						await _api.yapi.i18nUpsertOne({ i18n });
+						await _api.xspace.i18nUpsertOne({ i18n });
 						refreshTableData();
 						vm.closeModal();
 					}

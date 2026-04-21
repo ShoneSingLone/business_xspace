@@ -57,7 +57,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
   return {
     props: {
       window: { type: Object, required: true },
-      windowManager: { type: Object, required: true },
+      ModalManager: { type: Object, required: true },
       system: { type: Object, required: true }
     },
     computed: {
@@ -91,16 +91,16 @@ export default async function ({ PRIVATE_GLOBAL }) {
     },
     methods: {
       handleFocus() {
-        this.windowManager.focus(this.window.id);
+        this.ModalManager.focus(this.window.id);
       },
       handleClose() {
-        this.windowManager.close(this.window.id);
+        this.ModalManager.close(this.window.id);
       },
       handleMinimize() {
-        this.windowManager.minimize(this.window.id);
+        this.ModalManager.minimize(this.window.id);
       },
       handleToggleMaximize() {
-        this.windowManager.toggleMaximize(this.window.id);
+        this.ModalManager.toggleMaximize(this.window.id);
       },
       
       // Drag & Resize Logic
@@ -126,7 +126,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
           nextX = Math.max(-this.window.width + 100, Math.min(nextX, winWidth - 100));
           nextY = Math.max(0, Math.min(nextY, winHeight - 40));
 
-          this.windowManager.updateRect(this.window.id, { x: nextX, y: nextY });
+          this.ModalManager.updateRect(this.window.id, { x: nextX, y: nextY });
         };
 
         const onMouseUp = () => {
@@ -160,7 +160,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
             updates.height = initialHeight + deltaY;
           }
 
-          this.windowManager.updateRect(this.window.id, updates);
+          this.ModalManager.updateRect(this.window.id, updates);
         };
 
         const onMouseUp = () => {

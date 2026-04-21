@@ -6,6 +6,7 @@ export default async function () {
 		}
 	};
 	return [
+		_.$newRoute("/v1", "@/views/v1/ViewXspace.vue"),
 		_.$newRoute("/demo_test", "@/views/demo/test.vue"),
 		_.$newRoute("/cicd", "@/views/CiCd/ViewCiCd.vue", {
 			redirect: "/cicd/task_list",
@@ -42,6 +43,13 @@ export default async function () {
 		_.$newRoute("/hoppscotch", "@/views/hoppscotch/ViewHoppscotch.vue"),
 		_.$newRoute("/explore", "@/views/explore/ViewExplore.vue"),
 		_.$newRoute("/login", "@/views/Login/Login.vue"),
+		_.$newRoute("/docflow", "@/views/DocFlow/ViewDocFlow.vue", {
+			redirect: "/docflow/list",
+			children: [
+				_.$newRoute("/docflow/list", "@/views/DocFlow/views/DocFlowList.vue"),
+				_.$newRoute("/docflow/document/:id", "@/views/DocFlow/views/DocFlowDocument.vue")
+			]
+		}),
 		_.$newRoute("/", ComponentRouterView, {
 			redirect: "/api/group"
 		}),

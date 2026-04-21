@@ -13,9 +13,9 @@ export default async function () {
 				item_role: defItem({
 					itemType: "xItemSelect",
 					options: [
-						{ label: "组长", value: Vue._yapi_var.OWNER },
-						{ label: "开发者", value: Vue._yapi_var.DEV },
-						{ label: "访客", value: Vue._yapi_var.GUEST }
+						{ label: "组长", value: Vue._xspace_var.OWNER },
+						{ label: "开发者", value: Vue._xspace_var.DEV },
+						{ label: "访客", value: Vue._xspace_var.GUEST }
 					],
 					onEmitValue({ val: role, xItem }) {
 						const { rowIndex, rowData } = xItem.payload;
@@ -39,7 +39,7 @@ export default async function () {
 									style: "--xItem-wrapper-width:32px;",
 									configs: {
 										value: rowData.uid || "",
-										itemType: "YapiItemAvatar",
+										itemType: "xspaceItemAvatar",
 										disabled: true
 									}
 								}),
@@ -125,7 +125,7 @@ export default async function () {
 					url: "@/views/Api/Group/Section/MemberList/GroupSectionMemberList.AddMember.vue",
 					parent: vm,
 					async onOk({ member_uids, role, dialogVm }) {
-						const { data } = await _api.yapi.project_add_member({
+						const { data } = await _api.xspace.project_add_member({
 							id: vm.APP.cptProject?._id,
 							member_uids,
 							role
@@ -141,7 +141,7 @@ export default async function () {
 			},
 			async removeMember(row) {
 				const vm = this;
-				const { data } = await _api.yapi.project_del_member({
+				const { data } = await _api.xspace.project_del_member({
 					id: vm.APP.cptProject._id,
 					member_uid: row.uid
 				});
@@ -154,7 +154,7 @@ export default async function () {
 				_.$loading(true);
 				try {
 					if (role) {
-						await _api.yapi.project_change_member_role({
+						await _api.xspace.project_change_member_role({
 							id: group_id,
 							member_uid: uid,
 							role
@@ -179,7 +179,7 @@ export default async function () {
 				return true;
 			},
 			cptAuth() {
-				if (this.APP.user?.role === Vue._yapi_var.ADMIN) {
+				if (this.APP.user?.role === Vue._xspace_var.ADMIN) {
 					return true;
 				}
 				return _.some(this.APP?.cptProject?.members, member => {

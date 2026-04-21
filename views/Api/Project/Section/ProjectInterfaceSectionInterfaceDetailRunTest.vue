@@ -121,7 +121,7 @@ export default async function () {
 					},
 					method: {
 						itemType: "xItemSelect",
-						options: _opts.yapi.httpMethod
+						options: _opts.xspace.httpMethod
 					},
 					path: {
 						$vSlots: {
@@ -233,7 +233,7 @@ export default async function () {
 				}/mock/${project_id}${apiURL}`;
 
 				try {
-					const { data } = await _api.yapi.interface_usecase_get_all(interface_id);
+					const { data } = await _api.xspace.interface_usecase_get_all(interface_id);
 					if (data.length > 0) {
 						await this.setFormEditorValue(data[0].usecaseCode);
 						this.currentUseCase = data[0];
@@ -285,7 +285,7 @@ export default async function () {
 						project_id,
 						usecaseCode: this.form.editor.value
 					};
-					await _api.yapi.interface_usecase_upsert(dataForm);
+					await _api.xspace.interface_usecase_upsert(dataForm);
 					this.APP.updateGroupProjectList();
 					_.$msg("更新成功");
 				} catch (error) {

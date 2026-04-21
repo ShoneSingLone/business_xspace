@@ -62,7 +62,7 @@ export default async function ({ project_id, onSuccess }) {
 							return;
 						}
 						try {
-							const { errcode, message } = await _api.yapi.apiCicdGitAddressAdd({
+							const { errcode, message } = await _api.xspace.apiCicdGitAddressAdd({
 								project_id: project_id,
 								..._.$pickFormValues(vm.form)
 							});

@@ -84,7 +84,7 @@ export default async function ({}) {
 						if (thisItem) {
 							throw new Error("已存在");
 						}
-						await _api.yapi.i18nUpsertOne({ i18n: i18nItem });
+						await _api.xspace.i18nUpsertOne({ i18n: i18nItem });
 						vm.count++;
 					} catch (error) {
 						console.error(error);

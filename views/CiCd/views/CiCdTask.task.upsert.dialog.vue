@@ -52,7 +52,7 @@ export default async function ({
 
 	await (async () => {
 		try {
-			const { data } = await _api.yapi.apiCicdGitBranchInfo({
+			const { data } = await _api.xspace.apiCicdGitBranchInfo({
 				git_repo_id
 			});
 			git_repo = data.git_repo;
@@ -97,7 +97,7 @@ export default async function ({
 									class: "ml4",
 									icon: "refresh",
 									async onClick() {
-										const { data } = await _api.yapi.apiCicdGitBranchInfo({
+										const { data } = await _api.xspace.apiCicdGitBranchInfo({
 											git_repo_id,
 											is_pull: true
 										});
@@ -141,7 +141,7 @@ export default async function ({
 						msg() {
 							if (this.value === "ARCHIVE_FILE") {
 								return h("xMd", {
-									md: `以数组形式提供需要打包的文件路径，如：/data/www/yapi/frontend/dist/`
+									md: `以数组形式提供需要打包的文件路径，如：/data/www/xspace/frontend/dist/`
 								});
 							}
 							return null;
@@ -190,7 +190,7 @@ export default async function ({
 							if (error) {
 								return;
 							}
-							const { errcode, data, message } = await _api.yapi.apiCicdTaskAdd({
+							const { errcode, data, message } = await _api.xspace.apiCicdTaskAdd({
 								...row,
 								cicd_id,
 								..._.$pickFormValues(vm.form)

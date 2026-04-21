@@ -1,6 +1,6 @@
-# Boundless Static Business Yapi
+# Boundless Static Business xspace
 
-这是一个基于 YAPI 的开源项目，旨在提供一个强大且灵活的接口管理平台。该项目结合了现代 Web 技术，提供了丰富的功能，包括接口文档管理、测试、Mock 服务等。
+这是一个基于 xspace 的开源项目，旨在提供一个强大且灵活的接口管理平台。该项目结合了现代 Web 技术，提供了丰富的功能，包括接口文档管理、测试、Mock 服务等。
 
 ## 功能特性
 
@@ -25,8 +25,8 @@
 1. **克隆仓库**：
 
     ```bash
-    git clone https://gitee.com/ShoneSingLone/boundless_static_business_yapi.git
-    cd boundless_static_business_yapi
+    git clone https://gitee.com/ShoneSingLone/boundless_static_business_xspace.git
+    cd boundless_static_business_xspace
     ```
 
 2. **安装依赖**：
@@ -40,7 +40,7 @@
 3. **配置数据库**：确保 MongoDB 已安装并运行，然后在项目根目录下创建 `.env` 文件，配置数据库连接：
 
     ```env
-    MONGO_URI=mongodb://localhost:27017/yapi
+    MONGO_URI=mongodb://localhost:27017/xspace
     ```
 
 4. **启动项目**：
@@ -51,7 +51,7 @@
     yarn dev
     ```
 
-5. **访问项目**：打开浏览器，访问 `http://localhost:3000`，即可看到 YAPI 的界面。
+5. **访问项目**：打开浏览器，访问 `http://localhost:3000`，即可看到 xspace 的界面。
 
 ## 使用说明
 

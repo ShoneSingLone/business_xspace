@@ -1,6 +1,6 @@
 <template>
 	<div class="login-register-form">
-		<h2 class="login-title">YAPI</h2>
+		<h2 class="login-title">xspace</h2>
 		<xTabs v-model="loginWrapActiveKey">
 			<xTabPane label="登录" name="1">
 				<LoginForm />

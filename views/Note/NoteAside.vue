@@ -207,8 +207,8 @@ export default async function () {
 				}
 
 				try {
-					await _api.yapi.wiki_upsert_one(dragItem);
-					await _api.yapi.wikiResetMenuOrder({
+					await _api.xspace.wiki_upsert_one(dragItem);
+					await _api.xspace.wikiResetMenuOrder({
 						order: menuOrderArray,
 						belong_type: inject_note.cptBelongType,
 						belong_id: (() => {

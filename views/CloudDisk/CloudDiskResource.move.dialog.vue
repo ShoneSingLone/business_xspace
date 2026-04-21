@@ -49,7 +49,7 @@ export default async function ({ selected, refreshList }) {
 					async onClick() {
 						_.$loading(true);
 						try {
-							await _api.yapi.resourceCloudDiskMoveDir({
+							await _api.xspace.resourceCloudDiskMoveDir({
 								ids: selected,
 								targetDirId: vm.currentNode.value
 							});

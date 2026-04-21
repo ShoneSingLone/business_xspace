@@ -1,7 +1,7 @@
 <script lang="ts">
 export default async function () {
-	if (!Vue._yapi_use_hooks) {
-		Vue._yapi_use_hooks = {
+	if (!Vue._xspace_use_hooks) {
+		Vue._xspace_use_hooks = {
 			useXmove(options = {}) {
 				const stateStyle = reactive(
 					_.merge(
@@ -34,6 +34,6 @@ export default async function () {
 			}
 		};
 	}
-	return Vue._yapi_use_hooks;
+	return Vue._xspace_use_hooks;
 }
 </script>

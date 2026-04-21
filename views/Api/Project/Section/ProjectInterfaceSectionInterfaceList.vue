@@ -128,7 +128,7 @@ export default async function () {
 			async addInterface() {
 				return _.$openModal({
 					title: "添加接口",
-					url: "@/components/YapiDialogUpsertInterface.vue",
+					url: "@/components/XspaceDialogUpsertInterface.vue",
 					parent: this,
 					project_id: this.APP.cptProjectId,
 					get_interface_list: this.inject_project.get_interface_list
@@ -148,7 +148,7 @@ export default async function () {
 			async changeProxy() {
 				_.$openModal({
 					title: i18n("切换代理"),
-					url: "@/components/YapiChangeProxyDialog.vue",
+					url: "@/components/XspaceChangeProxyDialog.vue",
 					parent: this,
 					selected: Array.from(
 						this.inject_project_interface_section.configsTable.data.set
@@ -158,7 +158,7 @@ export default async function () {
 			async switchingMaintenancePersonnel() {
 				_.$openModal({
 					title: i18n("切换维护人"),
-					url: "@/components/YapiSwitchingMaintenancePersonnel.vue",
+					url: "@/components/XspaceSwitchingMaintenancePersonnel.vue",
 					parent: this,
 					selected: Array.from(
 						this.inject_project_interface_section.configsTable.data.set
@@ -168,7 +168,7 @@ export default async function () {
 			async resetBackupData() {
 				_.$openModal({
 					title: i18n("重置备份"),
-					url: "@/components/YapiResetBackupData.dialog.vue",
+					url: "@/components/XspaceResetBackupData.dialog.vue",
 					parent: this,
 					selected: Array.from(
 						this.inject_project_interface_section.configsTable.data.set
@@ -179,7 +179,7 @@ export default async function () {
 				try {
 					await _.$confirm_important("是否删除当前选择的接口？");
 					_.$loading(true);
-					const res = await _api.yapi.interface_del_by_ids(
+					const res = await _api.xspace.interface_del_by_ids(
 						Array.from(this.inject_project_interface_section.configsTable.data.set)
 					);
 					this.inject_project.get_interface_list();
@@ -193,7 +193,7 @@ export default async function () {
 			async copyInterface() {
 				_.$openModal({
 					title: i18n("复制接口到所选项目"),
-					url: "@/components/YapiCoypInterface.dialog.vue",
+					url: "@/components/XspaceCoypInterface.dialog.vue",
 					parent: this,
 					selected: Array.from(
 						this.inject_project_interface_section.configsTable.data.set

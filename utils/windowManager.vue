@@ -1,6 +1,6 @@
 export default async function ({ PRIVATE_GLOBAL }) {
   /**
-   * WindowManager - 集中式窗口管理器 (单例模式)
+   * ModalManager - 集中式窗口管理器 (单例模式)
    * 负责所有窗口的生命周期管理、层级调度和事件分发
    */
   const { defineComponent, reactive, markRaw } = Vue;
@@ -23,7 +23,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
   const generateId = () => Math.random().toString(36).substring(2, 9);
 
   // 窗口管理器核心方法
-  const windowManager = {
+  const ModalManager = {
     state,
 
     /**
@@ -193,5 +193,5 @@ export default async function ({ PRIVATE_GLOBAL }) {
     }
   };
 
-  return windowManager;
+  return ModalManager;
 }

@@ -105,7 +105,7 @@ export default async function () {
 				form: defItems({
 					method: {
 						itemType: "xItemSelect",
-						options: _opts.yapi.httpMethod
+						options: _opts.xspace.httpMethod
 					},
 					catid: {
 						label: i18n("接口分类"),
@@ -138,7 +138,7 @@ export default async function () {
 						}
 					},
 					pathParams: {
-						itemType: "YapiItemPathParams",
+						itemType: "xspaceItemPathParams",
 						label: i18n("路径参数"),
 						isHide() {
 							return !vm.cptFormDataReqParams.length;
@@ -199,7 +199,7 @@ export default async function () {
 					},
 					req_body_params: {
 						label: i18n("请求参数"),
-						itemType: "yapiItemReqBodyParams"
+						itemType: "XspaceItemReqBodyParams"
 					},
 					uid: { label: i18n("uid") },
 					status: { label: i18n("status") },
@@ -227,7 +227,7 @@ export default async function () {
 					},
 					witchEnv: {
 						label: i18n("转发到"),
-						itemType: "YapiItemProxyEnv",
+						itemType: "xspaceItemProxyEnv",
 						rule: [
 							_rules.validator(({ val }) => {
 								/* 如果isProxy为true，则必须选择转发环境 */
@@ -308,7 +308,7 @@ export default async function () {
 				_.$loading(true);
 				try {
 					const formData = this.formData;
-					const { data } = await _api.yapi.interface_up(formData);
+					const { data } = await _api.xspace.interface_up(formData);
 					if (data) {
 						this.inject_project.get_interface_list();
 						this.inject_interface_section_interface_detail.updateInterface();

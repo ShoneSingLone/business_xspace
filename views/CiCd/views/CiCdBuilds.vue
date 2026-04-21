@@ -141,7 +141,7 @@ export default async function () {
 						try {
 							const {
 								data: { list }
-							} = await _api.yapi.apiCicdJobList({
+							} = await _api.xspace.apiCicdJobList({
 								cicd_id
 							});
 							_.$setTableData(configsTable, { list });
@@ -226,7 +226,7 @@ export default async function () {
 														data: {
 															list: [task]
 														}
-													} = await _api.yapi.apiCicdTaskList({
+													} = await _api.xspace.apiCicdTaskList({
 														task_id: rowData.task_id
 													});
 													const hookUrl = `${location.origin}/api/cicd/task_run?task_token=${task.task_token}&task_id=${task._id}`;

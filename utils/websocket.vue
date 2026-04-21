@@ -25,7 +25,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						});
 						resolve(id);
 					},
-					namespace: `/yapi?uid=${uid}`
+					namespace: `/xspace?uid=${uid}`
 				};
 
 				vm.WS = await _.$importVue("/common/libs/socket.io.vue", wsOptions);

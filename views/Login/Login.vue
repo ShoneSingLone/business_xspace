@@ -10,7 +10,7 @@
 			<div class="flex vertical center middle">
 				<div class="middle flex center">
 					<div class="login-logo">
-						<xIcon icon="_yapi_logo" class="yapi_logo" />
+						<xIcon icon="_xspace_logo" class="xspace_logo" />
 					</div>
 				</div>
 				<LoginWrap />
@@ -115,7 +115,7 @@ body.app-mobile {
 			0 1px 3px rgba(0, 0, 0, 0.08);
 		animation: spin 5s linear infinite;
 
-		.yapi_logo {
+		.xspace_logo {
 			width: 100%;
 			height: 100%;
 		}

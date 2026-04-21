@@ -179,7 +179,7 @@ export default async function () {
 			},
 			async openInsertCategoryDialog(categoryInfo = false) {
 				const DialogTypeVueSFC = await _.$importVue(
-					"@/components/YapiDialogUpsertCategory.vue",
+					"@/components/XspaceDialogUpsertCategory.vue",
 					{
 						parent: this,
 						project_id: this.APP.cptProjectId,
@@ -193,7 +193,7 @@ export default async function () {
 			openInterfaceDialog(categoryInfo) {
 				return _.$openModal({
 					title: "添加接口",
-					url: "@/components/YapiDialogUpsertInterface.vue",
+					url: "@/components/XspaceDialogUpsertInterface.vue",
 					parent: this,
 					project_id: this.APP.cptProjectId,
 					categoryInfo,

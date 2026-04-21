@@ -83,7 +83,7 @@ export default async function () {
 					try {
 						var from = "auto";
 
-						const { data: params, errcode } = await _api.yapi.i18nTranslate(payload);
+						const { data: params, errcode } = await _api.xspace.i18nTranslate(payload);
 						if (!errcode) {
 							const { trans_result } = await translateByBaidu({
 								params,
@@ -146,7 +146,7 @@ export default async function () {
 			async getTableData(pagination = {}) {
 				try {
 					_.$loading(true);
-					const { errcode, data } = await _api.yapi.i18nGetList();
+					const { errcode, data } = await _api.xspace.i18nGetList();
 					if (!errcode) {
 						_.$setTableData(this.configsTable, {
 							list: _.map(data, rowData => {

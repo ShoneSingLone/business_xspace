@@ -49,7 +49,7 @@ export default async function ({ onOk, userId, canModifyAvatar }) {
 				form: defItems({
 					img: {
 						value: "",
-						itemType: "YapiItemAvatar",
+						itemType: "xspaceItemAvatar",
 						disabled: !canModifyAvatar
 					},
 					uid: {
@@ -82,7 +82,7 @@ export default async function ({ onOk, userId, canModifyAvatar }) {
 						label: i18n("角色"),
 						readonly: true,
 						itemType: "xItemSelect",
-						options: _opts.yapi.role
+						options: _opts.xspace.role
 					},
 					type: {
 						value: "",
@@ -152,7 +152,7 @@ export default async function ({ onOk, userId, canModifyAvatar }) {
 							if (error) {
 								return;
 							}
-							await _api.yapi.userChangePassword({
+							await _api.xspace.userChangePassword({
 								uid: userId,
 								password: vm.formPwd.password.value,
 								old_password: vm.formPwd.old_password.value
@@ -185,7 +185,7 @@ export default async function ({ onOk, userId, canModifyAvatar }) {
 					async onClick() {
 						_.$loading(true);
 						try {
-							await _api.yapi.userUpdate({
+							await _api.xspace.userUpdate({
 								uid: userId,
 								username: vm.form.username.value
 							});
@@ -210,7 +210,7 @@ export default async function ({ onOk, userId, canModifyAvatar }) {
 						try {
 							await _.$confirm_important("是否删除当前用户？");
 							_.$loading(true);
-							const res = await _api.yapi.userDel(userId);
+							const res = await _api.xspace.userDel(userId);
 							vm.closeModal();
 							onOk && onOk();
 						} catch (error) {
@@ -228,7 +228,7 @@ export default async function ({ onOk, userId, canModifyAvatar }) {
 				this.fillFormData();
 			},
 			async fillFormData() {
-				const { data: userInfo } = await _api.yapi.userById(userId);
+				const { data: userInfo } = await _api.xspace.userById(userId);
 				_.$fillBackData({
 					form: this.form,
 					data: {

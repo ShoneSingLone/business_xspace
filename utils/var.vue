@@ -1,6 +1,6 @@
 <script lang="ts">
 export default async function () {
-	if (!Vue._yapi_var) {
+	if (!Vue._xspace_var) {
 		const OPEN_BLANK = i18n("新窗口打开");
 		const TAB_KEY_PROJECT_WIKI = i18n("项目文档");
 		const TAB_KEY_PROJECT_SETTING = i18n("项目设置");
@@ -47,7 +47,7 @@ export default async function () {
 		const BODY = "body";
 
 		/* 常量 */
-		Vue._yapi_var = {
+		Vue._xspace_var = {
 			LOG_TYPE: {
 				project: "项目",
 				group: "分组",
@@ -102,6 +102,6 @@ export default async function () {
 			}
 		};
 	}
-	return Vue._yapi_var;
+	return Vue._xspace_var;
 }
 </script>

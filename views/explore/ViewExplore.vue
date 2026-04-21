@@ -1,987 +1,1473 @@
 <style lang="less">
-#ViewExplore {
-	--card-bg: #f5f5f5;
-	--hover-bg: #e8e8e8;
-	--shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.1);
-	--border-radius: 8px;
-	background-color: var(--el-color-white);
-	display: flex;
-	flex-direction: column;
-	height: 100%;
+/* 
+ * index.css 
+ * Apple-style Glassmorphism Design using BEM
+ * 纯原生标准CSS版本
+ */
+:root {
+  --color-bg: #f5f5f7;
+  --color-text: #1d1d1f;
+  --color-text-secondary: #86868b;
+  --color-primary: #0071e3;
+  --color-white: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --blur: 20px;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-	.path-bar {
-		width: 100%;
-	}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
-	/* M3 折叠式路径栏容器 */
-	.m3-path-bar-container {
-		position: relative;
-		width: 100%;
-		background-color: #ffffff;
-		border-bottom: 1px solid #e0e0e0;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-		z-index: 100;
-	}
+html,
+body,
+#spa {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 
-	/* 外部操作按钮组 */
-	.m3-path-bar-actions {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		padding: 8px 16px;
-		gap: 8px;
-		background-color: #f8f9fa;
-	}
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
 
-	/* M3 图标按钮 */
-	.m3-icon-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border: none;
-		border-radius: 50%;
-		background-color: transparent;
-		color: #5f6368;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		font-size: 16px;
-		padding: 0;
-	}
+/* BEM: spa-shell */
+.spa-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
 
-	.m3-icon-btn:hover {
-		background-color: rgba(66, 133, 244, 0.08);
-	}
+.spa-shell__header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border-bottom: 1px solid var(--glass-border);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 50;
+}
 
-	.m3-icon-btn:focus {
-		outline: none;
-		background-color: rgba(66, 133, 244, 0.12);
-	}
+.spa-shell__title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
 
-	/* 折叠式路径抽屉 */
-	.m3-path-drawer {
-		max-height: 0;
-		overflow: hidden;
-		transition: max-height 0.3s ease;
-		background-color: #ffffff;
-		border-bottom: 1px solid #e0e0e0;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-	}
+.spa-shell__actions {
+  display: flex;
+  gap: 8px;
+}
 
-	.m3-path-drawer.is-open {
-		max-height: 200px;
-		overflow: auto;
-	}
+.spa-shell__btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
 
-	/* 路径抽屉头部 */
-	.m3-path-drawer-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 12px 16px;
-		background-color: #f1f3f4;
-		border-bottom: 1px solid #e0e0e0;
-	}
+.spa-shell__btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-	.m3-path-drawer-title {
-		font-size: 14px;
-		font-weight: 600;
-		color: #202124;
-		text-transform: uppercase;
-		letter-spacing: 0.0125em;
-	}
+.spa-shell__btn--primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
 
-	/* 路径抽屉内容 */
-	.m3-path-drawer-content {
-		padding: 16px;
-	}
+.spa-shell__btn--primary:hover {
+  background: #0077ed;
+}
 
-	/* 面包屑样式 */
-	.m3-breadcrumb {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 4px;
-		font-size: 14px;
-	}
+.spa-shell__btn--viewer {
+  color: #fff !important;
+}
 
-	.m3-breadcrumb-item {
-		display: flex;
-		align-items: center;
-		padding: 6px 12px;
-		background-color: #e8f0fe;
-		color: #1967d2;
-		border-radius: 16px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		font-weight: 500;
-		gap: 6px;
-	}
+.spa-shell__btn--viewer:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
 
-	.m3-breadcrumb-item:hover {
-		background-color: #d0e3ff;
-	}
+/* BEM: breadcrumb-bar */
+.breadcrumb-bar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border-bottom: 1px solid var(--glass-border);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
 
-	.m3-breadcrumb-separator {
-		color: #5f6368;
-		font-weight: 600;
-		margin: 0 4px;
-	}
+.breadcrumb-bar::-webkit-scrollbar {
+  display: none;
+}
 
-	/* 响应式设计 */
-	@media (max-width: 768px) {
-		.m3-path-bar-actions {
-			padding: 6px 12px;
-		}
+.breadcrumb-item {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
 
-		.m3-icon-btn {
-			width: 32px;
-			height: 32px;
-			font-size: 14px;
-		}
+.breadcrumb-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text);
+}
 
-		.m3-path-drawer-header,
-		.m3-path-drawer-content {
-			padding: 10px 12px;
-		}
-	}
+.breadcrumb-separator {
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  font-size: 12px;
+}
 
-	.toolbar {
-		height: auto;
-		width: 100%;
-		display: flex;
-		padding: 0 10px 5px 10px;
-		margin-top: 3px;
-		align-items: center;
-		border-bottom: 1px solid #e0e0e0;
-		transition: all 0.2s ease;
+/* BEM: file-browser */
+.file-browser {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 80px;
+}
 
-		.toolbar-content {
-			display: flex;
-			align-items: center;
-			width: 100%;
-			transition: all 0.2s ease;
+.file-list {
+  display: flex;
+  flex-direction: column;
+}
 
-			&.collapsed {
-				display: none;
-			}
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  animation: fadeIn 0.4s ease-out forwards;
+  position: relative;
+}
 
-			.sort-controls {
-				display: flex;
-				align-items: center;
-				margin-right: 15px;
-				gap: 5px;
+.file-item__preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
 
-				.sort-description {
-					font-size: 13px;
-					color: #666;
-				}
+.file-item__icon-wrap i {
+  width: 24px;
+  height: 24px;
+}
 
-				.sort-btn {
-					border-radius: 4px;
-					border: 1px solid transparent;
-					padding: 5px 8px;
-					font-size: 13px;
-					background-color: transparent;
-					color: #333;
-					cursor: pointer;
-					transition: all 100ms ease;
-					font-weight: 500;
-					display: inline-flex;
-					align-items: center;
-					gap: 3px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-					&:hover {
-						background-color: rgba(0, 0, 0, 0.05);
-						border-color: rgba(0, 0, 0, 0.1);
-					}
+.file-item:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
 
-					&:focus {
-						outline: none;
-						background-color: rgba(74, 144, 226, 0.1);
-						border-color: rgba(74, 144, 226, 0.3);
-					}
+.file-item__icon-wrap {
+  width: 48px;
+  height: 48px;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
 
-					&.active {
-						background-color: rgba(74, 144, 226, 0.15);
-						border-color: rgba(74, 144, 226, 0.4);
-						color: #4a90e2;
-					}
+.file-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-					&.sort-level-1 {
-						box-shadow: 0 0 0 2px #4a90e2;
-						border-color: #4a90e2;
-						background-color: rgba(74, 144, 226, 0.2);
-					}
+.file-item__name {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  color: var(--color-text);
+  word-break: break-all;
+  white-space: normal !important; /* 确保在所有模式下都能换行 */
+}
 
-					&.sort-level-2 {
-						box-shadow: 0 0 0 2px #5cb85c;
-						border-color: #5cb85c;
-						background-color: rgba(92, 184, 92, 0.2);
-					}
+.file-item__meta {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
 
-					.sort-order-indicator {
-						font-size: 11px;
-					}
-					.sort-priority-indicator {
-						font-size: 10px;
-						background-color: #4a90e2;
-						color: white;
-						border-radius: 10px;
-						padding: 1px 4px;
-						margin-left: 3px;
-						font-weight: bold;
-					}
-				}
-			}
+.file-item__action {
+  padding: 8px;
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
 
-			.sort-help {
-				margin-right: 15px;
-				color: #666;
-				font-size: 12px;
-			}
+.file-browser__filter {
+  padding: 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  scrollbar-width: none;
+}
 
-			.search-box {
-				margin-left: auto;
-				min-width: 170px;
-				width: 26%;
-				max-width: 400px;
+.file-browser__filter::-webkit-scrollbar {
+  display: none;
+}
 
-				.input {
-					border-radius: var(--border-radius);
-					border: 1px solid #ddd;
-					padding: 6px 10px;
-					width: 100%;
-					font-size: 14px;
+.filter-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
 
-					&:focus {
-						outline: none;
-						border-color: #4a90e2;
-						box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-					}
-				}
-			}
-		}
-	}
+.filter-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
 
-	/* 响应式设计 */
-	@media (max-width: 768px) {
-		.toolbar {
-			flex-wrap: wrap;
-			padding-bottom: 10px;
-			height: auto;
+.filter-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
 
-			.toolbar-content {
-				flex-wrap: wrap;
-				gap: 10px;
-				margin-top: 5px;
+.file-browser__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
 
-				.sort-controls {
-					width: 100%;
-					margin-right: 0;
-					flex-wrap: wrap;
-					justify-content: space-between;
+.file-browser__empty {
+  padding: 48px;
+  text-align: center;
+  opacity: 0.6;
+}
 
-					.sort-btn {
-						flex: 1;
-						min-width: 70px;
-						text-align: center;
-					}
-				}
+.search-bar {
+  padding: 12px 20px;
+  background: var(--color-white);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-				.search-box {
-					width: 100%;
-					min-width: auto;
-					max-width: none;
-				}
-			}
-		}
-	}
+.search-bar__input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+  font-size: 16px;
+}
 
-	.resource-list {
-		flex-grow: 1;
-		overflow: auto;
-		padding: 10px;
-	}
+/* BEM: modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
 
-	.player-opr {
-		background-color: var(--card-bg);
-		padding: 10px;
-		border-top: 1px solid #e0e0e0;
-		display: flex;
-		align-items: center;
+.modal__content {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 340px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
 
-		&.hidden {
-			display: none;
-		}
+.modal__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+}
 
-		.player-info {
-			display: flex;
-			align-items: center;
-			margin-right: 15px;
+.modal__input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  outline: none;
+}
 
-			.song-name {
-				font-size: 14px;
-				font-weight: 500;
-				margin-right: 5px;
-			}
-		}
+.modal__actions {
+  display: flex;
+  gap: 12px;
+}
 
-		.player-controls {
-			display: flex;
-			align-items: center;
-			flex-grow: 1;
+.modal__btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-			.volume-control {
-				display: flex;
-				align-items: center;
-				margin-right: 15px;
-			}
+.modal__btn--cancel {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-			.play-model {
-				margin-right: 15px;
-			}
+.modal__desc {
+  font-size: 12px;
+  opacity: 0.6;
+  text-align: center;
+  margin-bottom: 12px;
+}
 
-			.operation {
-				display: flex;
-				align-items: center;
-			}
-		}
-	}
+.modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal__action {
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal__action:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.modal__action-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal__action-indicator {
+  font-size: 12px;
+  opacity: 0.6;
+  font-family: monospace;
+}
+
+.modal__info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.modal__info-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 8px;
+}
+
+.modal__info-item--block {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal__info-label {
+  opacity: 0.6;
+}
+
+.modal__info-value {
+  font-weight: 500;
+}
+
+.modal__info-value--break {
+  word-break: break-all;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.modal__close-btn {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal__close-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.modal__title--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* BEM: viewer */
+.viewer {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.viewer__header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+}
+
+.viewer__content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.viewer__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.viewer__header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer__title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.viewer__title {
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.viewer__index {
+  font-size: 12px;
+  opacity: 0.5;
+  font-family: monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.viewer__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.viewer__fallback-icon {
+  width: 64px;
+  height: 64px;
+}
+
+.viewer__fallback-text {
+  font-size: 14px;
+}
+
+.viewer__btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.viewer__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.viewer__btn--primary {
+  padding: 8px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: #fff;
+}
+
+.viewer__btn--primary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.viewer-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.viewer-image:active {
+  cursor: grabbing;
+}
+
+.viewer-image__img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.viewer__media {
+  display: block;
+  max-width: 90%;
+  max-height: 80%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+}
+
+.viewer-seek-tip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 70;
+  pointer-events: none;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+  .viewer-seek-tip {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .viewer--video .viewer__media {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 180px);
+  }
+}
+
+.viewer-image__controls {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  padding: 8px 16px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 40;
+}
+
+.viewer-image__btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.viewer-image__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.viewer-image__level {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
+}
+
+.viewer-image__divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Audio Specific */
+.viewer__audio-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.viewer__record-wrap {
+  position: relative;
+  width: 280px;
+  height: 280px;
+}
+
+.viewer__record {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #111;
+  background-image: radial-gradient(
+    circle at center,
+    #333 0%,
+    #111 5%,
+    #333 10%,
+    #111 15%,
+    #333 20%,
+    #111 25%,
+    #333 30%,
+    #111 35%,
+    #333 40%,
+    #111 45%,
+    #333 50%,
+    #111 55%,
+    #333 60%,
+    #111 65%,
+    #333 70%,
+    #111 75%,
+    #333 80%,
+    #111 85%,
+    #333 90%,
+    #111 95%,
+    #333 100%
+  );
+  border: 8px solid #222;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 10s linear infinite;
+  animation-play-state: paused;
+}
+
+.viewer__record--playing {
+  animation-play-state: running;
+}
+
+.viewer__record-center {
+  width: 80px;
+  height: 80px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border: 4px solid #111;
+}
+
+.viewer__audio-controls {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.viewer__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  transition: var(--transition);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.viewer__nav:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%) scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.viewer__nav:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.viewer__nav i {
+  width: 28px;
+  height: 28px;
+}
+
+/* Navigation visibility */
+.viewer__nav {
+  display: none !important;
+}
+
+.viewer-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.viewer-image__img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.1s ease-out;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.viewer-image__img:active {
+  cursor: grabbing;
+}
+
+.viewer-image__img.zoom-mode-1-1 {
+  max-width: none;
+  max-height: none;
+}
+
+.viewer__index {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.viewer__drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.viewer__drawer.hidden {
+  transform: translateX(100%);
+  display: flex !important; /* Override Tailwind hidden to keep animation */
+  visibility: hidden;
+}
+
+.viewer__drawer-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.viewer__drawer-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+}
+
+.viewer__drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewer-drawer__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: white;
+}
+
+.viewer-drawer__item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.viewer-drawer__item--active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.viewer-drawer__item-media {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewer-drawer__item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.viewer-drawer__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.viewer-drawer__item-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.9;
+}
+
+.viewer-drawer__item--active .viewer-drawer__item-name {
+  color: var(--color-primary, #0077ed);
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .viewer__drawer {
+    width: 100%;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.viewer__nav--prev {
+  left: 30px;
+}
+.viewer__nav--next {
+  right: 30px;
+}
+
+.viewer__footer {
+  padding: 20px 40px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 50;
+}
+
+.viewer__footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.viewer__speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.viewer-player {
+  width: 90%;
+  max-width: 500px;
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 32px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  user-select: none;
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.viewer-player--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.viewer-player__media {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.5);
+  margin-bottom: 12px;
+}
+
+.viewer-player__video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.viewer-player__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.viewer-player__progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.viewer-player__progress-container {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+}
+
+.viewer-player__progress-container:hover {
+  height: 6px;
+}
+
+.viewer-player__progress-bar {
+  height: 100%;
+  background: transparent;
+  width: 100%;
+}
+
+.viewer-player__progress-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  width: 0%;
+  position: relative;
+}
+
+.viewer-player__progress-fill::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.viewer-player__progress-container:hover .viewer-player__progress-fill::after {
+  opacity: 1;
+}
+
+.viewer-player__time {
+  font-size: 11px;
+  font-family: monospace;
+  opacity: 0.6;
+  min-width: 40px;
+  text-align: center;
+}
+
+.viewer-player__main-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.viewer-player__bottom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.viewer-player__setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.viewer-player__btn {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+  opacity: 0.7;
+}
+
+.viewer-player__btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.viewer-player__btn--play {
+  width: 56px;
+  height: 56px;
+  background: var(--color-primary, #0077ed);
+  opacity: 1;
+  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.3);
+}
+
+.viewer-player__btn--play:hover {
+  background: #0077ed;
+  transform: scale(1.05);
+}
+
+.viewer-player__volume-slider {
+  width: 60px;
+  cursor: pointer;
+}
+
+.viewer-player__speed-label,
+.viewer-player__volume-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.viewer-player__speed-value {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.viewer-list__item {
+  flex: 0 0 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: transparent;
+  transition: all 0.3s;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewer-list__item:hover {
+  opacity: 1;
+}
+
+.viewer-list__item--active {
+  border-color: #fff;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.viewer-list__item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.viewer-list__item-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+/* --- Grid / Waterfall View Styles --- */
+.file-browser--grid .file-browser__list {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+  padding: 12px !important;
+}
+
+@media (min-width: 600px) {
+  .file-browser--grid .file-browser__list {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .file-browser--grid .file-browser__list {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .file-browser--grid .file-browser__list {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
+
+.file-browser--grid .file-item {
+  display: flex !important;
+  flex-direction: column !important;
+  margin-bottom: 0 !important; /* Grid manages gap */
+  padding: 8px !important;
+  text-align: center !important;
+  gap: 6px !important;
+  height: auto !important;
+  align-self: start !important; /* 关键：确保项高度自适应且不对齐行高 */
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+}
+
+.file-browser--grid .file-item__icon-wrap {
+  margin-right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 80px !important;
+  background: #f8f8f8 !important;
+}
+
+.file-browser--grid .file-item__preview {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: contain !important;
+  border-radius: 4px !important;
+}
+
+.file-browser--grid .file-item__info {
+  width: 100% !important;
+}
+
+.file-browser--grid .file-item__name {
+  white-space: normal !important;
+  text-align: center !important;
+  word-break: break-all !important;
+}
+
+.file-browser--grid .file-item__action {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  opacity: 0 !important;
+}
+
+.file-browser--grid .file-item:hover .file-item__action {
+  opacity: 1 !important;
+}
+.viewer-image__bottom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  padding: 12px 24px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.viewer-image__bottom-controls--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(20px);
+}
+
+.viewer-image__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer-image__divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 4px;
+}
+
+.viewer-image__btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0.7;
+}
+
+.viewer-image__btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.viewer-image__btn--active {
+  color: var(--color-primary);
+  opacity: 1;
+  background: rgba(0, 113, 227, 0.1);
+}
+
+.viewer-image__level {
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 45px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.viewer-image__interval {
+  width: 45px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  padding: 4px 6px;
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+}
+
+.viewer-image__unit {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.viewer-image__interval::-webkit-inner-spin-button {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .viewer-image__bottom-controls {
+    padding: 8px 16px;
+    gap: 8px;
+    bottom: 20px;
+    width: 95%;
+    max-width: 450px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .viewer-image__divider {
+    height: 16px;
+  }
 }
 </style>
 <template>
-	<div id="ViewExplore">
-		<!-- 路径栏 - 折叠式路径导航 -->
-		<div class="m3-path-bar-container">
-			<!-- 外部操作按钮 -->
-			<div class="m3-path-bar-actions flex middle">
-				<button
-					class="m3-icon-btn toolbar-toggle"
-					@click="toggleToolbar"
-					title="切换工具栏">
-					<span class="m3-icon"> <xIcon icon="_sort" /> </span>
-				</button>
-				<button
-					class="m3-icon-btn path-toggle"
-					@click="togglePathDrawer"
-					:title="isPathDrawerOpen ? '收起路径' : '展开路径'">
-					<span class="m3-icon"> <xIcon icon="_path" /> </span>
-				</button>
-				<xGap f />
-				<button
-					class="m3-icon-btn refresh-btn"
-					@click="refreshResource"
-					title="刷新资源列表">
-					<span class="m3-icon"> <xIcon icon="_refresh_explor" /> </span>
-				</button>
-			</div>
-
-			<!-- 折叠式路径抽屉 -->
-			<div class="m3-path-drawer" :class="{ 'is-open': isPathDrawerOpen }">
-				<div class="m3-path-drawer-content">
-					<div class="m3-breadcrumb">
-						<div class="m3-breadcrumb-item" @click="back(-1)">
-							<span class="m3-breadcrumb-text">root</span>
-						</div>
-						<template v-for="(item, index) in pathStack">
-							<span class="m3-breadcrumb-separator" :key="item.name"> /</span>
-							<div class="m3-breadcrumb-item" @click="back(index)" :key="item.name">
-								{{ item }}
-							</div>
-						</template>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 工具栏 -->
-		<div class="toolbar" v-if="!toolbarCollapsed">
-			<div class="toolbar-content" :class="{ collapsed: toolbarCollapsed }">
-				<div class="sort-controls">
-					<div class="sort-description">排序方式：</div>
-					<div v-for="option in sortOptions" :key="option.value" class="sort-btn-group">
-						<button
-							class="sort-btn"
-							:class="getSortBtnClass(option.value)"
-							@click="toggleSortField(option.value)"
-							:title="getSortBtnTitle(option.value)">
-							{{ option.label }}
-							<span class="sort-order-indicator">{{
-								getSortOrderIndicator(option.value)
-							}}</span>
-							<span class="sort-priority-indicator">{{
-								getSortPriorityIndicator(option.value)
-							}}</span>
-						</button>
-					</div>
-				</div>
-				<div class="sort-help">
-					<small
-						>默认排序：先按类型再按名称排序。点击排序字段可设置优先级，最多支持两个字段组合排序</small
-					>
-				</div>
-				<div class="search-box">
-					<xItem v-model.lazy="searchKey" :configs="searchKeyConfigs" />
-				</div>
-			</div>
-		</div>
-
-		<!-- 资源列表 -->
-		<div class="resource-list">
-			<ResourceItem
-				v-for="(resource, index) in cptResource"
-				:key="index"
-				:resource="resource"
-				@subdir="getResource(resource)"
-				@play-media="playMedia(resource)" />
-		</div>
-
-		<!-- 音频播放器 -->
-		<div v-if="stateAudio.songId" class="player-opr">
-			<div class="player-info">
-				<span class="song-name">{{ stateAudio.songId }}</span>
-			</div>
-			<div class="player-controls">
-				<MusicPlayerAudio />
-				<div class="volume-control">
-					<MusicPlayerVolume class="flex1" />
-				</div>
-				<div class="play-model">
-					<MusicPlayerModel />
-				</div>
-				<div class="operation">
-					<MusicPlayerOpration />
-				</div>
-			</div>
-		</div>
-	</div>
+	    <div id="spa"></div>
 </template>
 <script lang="ts">
-export default async function () {
-	const LOOP_TYPE_NAME_ARRAY = ["playOrder", "playRandom", "playLoop", "playSingleLoop"];
-	return defineComponent({
-		components: {
-			MusicPlayerModel: () =>
-				_.$importVue("@/views/explore/execTools/music/MusicPlayerModel.vue"),
-			MusicPlayerVolume: () =>
-				_.$importVue("@/views/explore/execTools/music/MusicPlayerVolume.vue"),
-			MusicPlayerAudio: () =>
-				_.$importVue("@/views/explore/execTools/music/MusicPlayerAudio.vue"),
-			MusicPlayerOpration: () =>
-				_.$importVue("@/views/explore/execTools/music/MusicPlayerOpration.vue"),
-			ResourceItem: () => _.$importVue("@/views/explore/ResourceItem.vue")
-		},
-		setup() {
-			const vm = this;
-			let intervalTimer;
-			const stateAudio = reactive({
-				loopType: 0,
-				songId: "",
-				isPlaying: false, //是否播放中
-				isPause: false, //是否暂停
-				audio: new Audio(),
-				currentTime: 0,
-				ended: false, //是否播放结束
-				duration: 0, //总播放时长,
-				isMute: false, //是否静音
-				volume: (() => {
-					const volume = _.$lStorage["PLAYER-VOLUME"];
-					if (volume) {
-						return Number(volume) * 100;
-					} else {
-						return 100;
-					}
-				})()
-			});
+export default async function ({ PRIVATE_GLOBAL }) {
+	await _.$importVue("@/views/explore/js/spa.util.vue");
+	await _.$importVue("@/views/explore/js/spa.model.vue");
+	await _.$importVue("@/views/explore/js/spa.viewer.list.vue");
+	await _.$importVue("@/views/explore/js/spa.viewer.image.vue");
+	await _.$importVue("@/views/explore/js/spa.viewer.player.vue");
+	await _.$importVue("@/views/explore/js/spa.viewer.vue");
+	await _.$importVue("@/views/explore/js/spa.browser.vue");
+	await _.$importVue("@/views/explore/js/spa.shell.vue");
+	await _.$importVue("@/views/explore/js/spa.vue");
 
-			watch(
-				() => stateAudio.ended,
-				ended => {
-					if (!ended) return;
-					handlePlayEnd();
-				}
-			);
-
-			const cptIconPlayModel = computed(() => {
-				return LOOP_TYPE_NAME_ARRAY[stateAudio.loopType];
-			});
-
-			function handlePlayEnd() {
-				stopSong();
-				const currentSongIndex = _.findIndex(vm.cptResourceOnlyAudio, {
-					name: stateAudio.songId
-				});
-
-				if (currentSongIndex > -1) {
-					playMethods[cptIconPlayModel.value](currentSongIndex);
-				}
-			}
-
-			function setCurrentTime(val) {
-				try {
-					stateAudio.audio.currentTime = val;
-				} catch (error) {
-					console.error(error);
-				} finally {
-				}
-			}
-			function intervalCurrentTime() {
-				stateAudio.currentTime = parseInt(stateAudio.audio.currentTime.toString());
-				stateAudio.duration = parseInt(stateAudio.audio.duration.toString());
-				stateAudio.ended = stateAudio.audio.ended;
-			}
-
-			function palyPrevSong() {
-				const currentSongIndex = _.findIndex(vm.cptResourceOnlyAudio, {
-					name: stateAudio.songId
-				});
-				if (currentSongIndex > -1) {
-					if (currentSongIndex === 0) {
-						playAudio(vm.cptResourceOnlyAudio[vm.cptResourceOnlyAudio.length - 1]);
-					} else {
-						playAudio(vm.cptResourceOnlyAudio[currentSongIndex - 1]);
-					}
-				}
-			}
-			function stopSong() {
-				stateAudio.isPlaying = false;
-				stateAudio.audio.pause();
-				stateAudio.audio.currentTime = 0;
-				stateAudio.currentTime = 0;
-			}
-			function togglePlayOrPause() {
-				if (!stateAudio.songId) return;
-				stateAudio.isPlaying = !stateAudio.isPlaying;
-				if (stateAudio.isPlaying) {
-					stateAudio.audio.play();
-				} else {
-					stateAudio.audio.pause();
-				}
-			}
-
-			function playNextSong() {
-				if (cptIconPlayModel.value === "playSingleLoop") {
-					const currentSongIndex = _.findIndex(vm.cptResourceOnlyAudio, {
-						name: stateAudio.songId
-					});
-					if (currentSongIndex > -1) {
-						playMethods.playLoop(currentSongIndex);
-					}
-				} else {
-					handlePlayEnd();
-				}
-			}
-
-			function playMedia(record) {
-				if (record.type === "audio") {
-					playAudio(record);
-				}
-				if (record.type === "video") {
-					playVideo(record);
-				}
-				if (record.type === "img") {
-					playImg(record);
-				}
-			}
-
-			async function playImg(current_resource) {
-				const { name } = current_resource;
-				const urlList = _.filter(vm.cptResource, { type: "img" });
-				const index = _.findIndex(urlList, { name });
-
-				_.$previewImgs(
-					{
-						urlList: _.map(urlList, resource => {
-							const uri = encodeURIComponent(JSON.stringify(resource.path));
-							return Vue._common_utils.appendToken(
-								_.$ajax.urlWrapper(`/api/resource/get?uri=${uri}`)
-							);
-						}),
-						index
-					},
-					{
-						autoPlay: true
-					}
-				);
-			}
-			async function playVideo(current_resource) {
-				const { name } = current_resource;
-				const all_video_array = _.filter(vm.cptResource, { type: "video" }).map(item => {
-					const uri = encodeURIComponent(JSON.stringify(item.path));
-					return {
-						...item,
-						download_uri: Vue._common_utils.appendToken(
-							_.$ajax.urlWrapper(`/api/resource/get?uri=${uri}`)
-						),
-						uri: Vue._common_utils.appendToken(
-							_.$ajax.urlWrapper(`/api/resource/video?uri=${uri}`)
-						)
-					};
-				});
-				const current_index = _.findIndex(all_video_array, { name });
-				return _.$openModal({
-					title: "Player",
-					url: "@/views/explore/execTools/video/VideoPlayerFullscreen.dialog.vue",
-					current_index,
-					current_resource,
-					all_video_array
-				});
-			}
-
-			async function playAudio(record) {
-				const { path, name } = record;
-				stopSong();
-				function canPlay() {
-					return new Promise(resolve => {
-						stateAudio.audio.onloadedmetadata = async event => {};
-						stateAudio.audio.oncanplaythrough = async event => {
-							console.log("I think I can play through the entire ", event);
-						};
-						stateAudio.audio.oncanplay = function (event) {
-							if (intervalTimer) {
-								clearInterval(intervalTimer);
-							}
-							intervalTimer = setInterval(intervalCurrentTime, 1000);
-							resolve(stateAudio.duration);
-						};
-					});
-				}
-				let uri = encodeURIComponent(JSON.stringify(path));
-				stateAudio.songId = name;
-				stateAudio.audio.src = Vue._common_utils.appendToken(
-					`${window._AJAX_URL_PREFIX || ""}/api/resource/audio?uri=${uri}`
-				);
-				await canPlay();
-				stateAudio.audio.play();
-				stateAudio.isPlaying = true;
-				const audioVolume = stateAudio.volume / 100;
-				stateAudio.audio.volume = audioVolume;
-			}
-			const playMethods = {
-				playLoop(currentSongIndex) {
-					const next = currentSongIndex + 1;
-					if (next > vm.cptResourceOnlyAudio.length - 1) {
-						playAudio(vm.cptResourceOnlyAudio[0]);
-					} else {
-						playAudio(vm.cptResourceOnlyAudio[next]);
-					}
-				},
-				playRandom(currentSongIndex) {
-					let next;
-					/* 如果只有一首，循环一首 */
-					if (vm.cptResourceOnlyAudio.length === 1) {
-						next = 0;
-						playAudio(vm.cptResourceOnlyAudio[0]);
-						return;
-					}
-					const max = vm.cptResourceOnlyAudio.length - 1;
-					const min = 0;
-					const getNext = () => Math.floor(Math.random() * (max - min + 1)) + min;
-					next = getNext();
-					while (next === currentSongIndex) {
-						next = getNext();
-					}
-					playAudio(vm.cptResourceOnlyAudio[next]);
-				},
-				playOrder(currentSongIndex) {
-					const next = currentSongIndex + 1;
-					if (next > vm.cptResourceOnlyAudio.length - 1) {
-						stopSong();
-					} else {
-						playAudio(vm.cptResourceOnlyAudio[next]);
-					}
-				},
-				playSingleLoop(currentSongIndex) {
-					playAudio(vm.cptResourceOnlyAudio[currentSongIndex]);
-				}
-			};
-
-			function toggleVolumeMute() {
-				stateAudio.isMute = !stateAudio.isMute;
-				stateAudio.audio.muted = stateAudio.isMute;
-			}
-
-			const cacheAudioVolume = _.debounce(function (audiovolume) {
-				_.$lStorage["PLAYER-VOLUME"] = audiovolume;
-			}, 1000);
-
-			return {
-				LOOP_TYPE_NAME_ARRAY,
-				playAudio,
-				playMedia,
-				/*  */
-				stateAudio,
-				methodsMusicPlayer: {
-					setCurrentTime,
-					palyPrevSong,
-					stopSong,
-					togglePlayOrPause,
-					playNextSong,
-					toggleVolumeMute,
-					setVolume(n) {
-						n = n > 100 ? 100 : n;
-						n = n < 0 ? 0 : n;
-						stateAudio.volume = n;
-						const audioVolume = n / 100;
-						stateAudio.audio.volume = audioVolume;
-						cacheAudioVolume(audioVolume);
-					},
-					async togglePlayModel() {
-						stateAudio.loopType =
-							(stateAudio.loopType + 1) % LOOP_TYPE_NAME_ARRAY.length;
-					}
-				}
-			};
-		},
-		provide() {
-			return {
-				inject_explore: this
-			};
-		},
-		data() {
-			// 从localStorage读取排序设置，如果没有则使用默认值
-			const savedSortConfig = _.$lStorage["VIEW_EXPLORE_SORT_CONFIG"];
-			const defaultSortConfig = [
-				{ field: "type", order: "asc" },
-				{ field: "name", order: "asc" }
-			];
-
-			let pathStack = [];
-			if (_.$lStorage["VIEW_EXPLORE_PATH_STACK"] === "undefined") {
-				pathStack = [];
-			}
-
-			return {
-				resource: _.$lStorage["VIEW_EXPLORE_RESOURCE"] || [],
-				pathStack,
-				searchKey: "",
-				searchKeyConfigs: defItem({
-					placeholder: "搜索",
-					clearable: true
-				}),
-				sortConfig: savedSortConfig || defaultSortConfig, // 排序配置：支持多个字段
-				sortOptions: [
-					{ label: "名称", value: "name" },
-					{ label: "类型", value: "type" },
-					{ label: "大小", value: "size" },
-					{ label: "修改时间", value: "mtime" }
-				],
-				toolbarCollapsed: _.$lStorage["VIEW_EXPLORE_TOOLBAR_COLLAPSED"] === "true" || false,
-				isPathDrawerOpen: _.$lStorage["VIEW_EXPLORE_PATH_DRAWER_OPEN"] === "true" || false // 路径抽屉的展开状态，使用localStorage持久化
-			};
-		},
-		computed: {
-			cptResource() {
-				let filtered = this.resource;
-				// 组合排序处理
-				return [...filtered].sort((a, b) => {
-					// 按sortConfig中的字段顺序依次比较
-					for (const { field, order } of this.sortConfig) {
-						let compareResult = 0;
-						// 处理名称字段的自然排序
-						if (field === "name") {
-							const aName = String(a.name || "");
-							const bName = String(b.name || "");
-							const aParts = aName.split(/(\d+)/);
-							const bParts = bName.split(/(\d+)/);
-
-							// 比较每一部分
-							for (let i = 0; i < Math.min(aParts.length, bParts.length); i++) {
-								const aPart = aParts[i];
-								const bPart = bParts[i];
-
-								// 如果都是数字，按数值比较
-								if (/^\d+$/.test(aPart) && /^\d+$/.test(bPart)) {
-									const aInt = parseInt(aPart);
-									const bInt = parseInt(bPart);
-									if (aInt !== bInt) {
-										compareResult = order === "asc" ? aInt - bInt : bInt - aInt;
-										break;
-									}
-								} else {
-									// 否则按字符串比较
-									const compare = aPart.localeCompare(bPart);
-									if (compare !== 0) {
-										compareResult = order === "asc" ? compare : -compare;
-										break;
-									}
-								}
-							}
-
-							// 如果一个是另一个的前缀，比较长度
-							if (compareResult === 0) {
-								compareResult =
-									order === "asc"
-										? aParts.length - bParts.length
-										: bParts.length - aParts.length;
-							}
-						} else {
-							// 其他字段（type/size/mtime）直接比较
-							const aValue = a[field] || "";
-							const bValue = b[field] || "";
-							if (aValue !== bValue) {
-								compareResult = aValue > bValue ? 1 : -1;
-								compareResult = order === "asc" ? compareResult : -compareResult;
-							}
-						}
-
-						// 如果当前字段比较结果不为0，则返回该结果
-						if (compareResult !== 0) return compareResult;
-					}
-					// 所有字段都相同，保持原顺序
-					return 0;
-				});
-			},
-			cptResourceOnlyAudio() {
-				return _.filter(this.cptResource, { type: "audio" });
-			}
-		},
-		mounted() {
-			// 从localStorage获取保存的路径和资源数据
-			const savedPathStack = _.$lStorage["VIEW_EXPLORE_PATH_STACK"] || [];
-			const savedResource = _.$lStorage["VIEW_EXPLORE_RESOURCE"] || [];
-
-			// 如果不是根目录且有保存的资源数据，则使用保存的数据
-			if (savedPathStack.length > 0 && savedResource.length > 0) {
-				this.pathStack = savedPathStack;
-				this.resource = savedResource;
-			} else {
-				// 根目录或没有保存的数据，重新获取
-				this.getResource();
-			}
-		},
-		methods: {
-			back(index) {
-				// 保存当前搜索关键词
-				const currentSearchKey = this.searchKey;
-				if (index === -1) {
-					this.getResource({ path: [] });
-				} else {
-					this.getResource({ path: this.pathStack.slice(0, index + 1) });
-				}
-				// 恢复搜索关键词
-				this.searchKey = currentSearchKey;
-			},
-			// 切换路径抽屉的展开/收起状态
-			togglePathDrawer() {
-				this.isPathDrawerOpen = !this.isPathDrawerOpen;
-				// 保存到localStorage
-				_.$lStorage["VIEW_EXPLORE_PATH_DRAWER_OPEN"] = this.isPathDrawerOpen;
-			},
-			// 获取排序按钮的CSS类
-			getSortBtnClass(field) {
-				const sortIndex = this.sortConfig.findIndex(item => item.field === field);
-				if (sortIndex === -1) {
-					return {};
-				}
-				return {
-					"sort-btn": true,
-					active: true,
-					[`sort-level-${sortIndex + 1}`]: true
-				};
-			},
-			// 获取排序方向指示器
-			getSortOrderIndicator(field) {
-				const sortItem = this.sortConfig.find(item => item.field === field);
-				if (!sortItem) {
-					return "";
-				}
-				return sortItem.order === "asc" ? "↑" : "↓";
-			},
-			// 获取排序优先级指示器
-			getSortPriorityIndicator(field) {
-				const sortIndex = this.sortConfig.findIndex(item => item.field === field);
-				if (sortIndex === -1) {
-					return "";
-				}
-				return `(${sortIndex + 1})`;
-			},
-			// 获取排序按钮的提示信息
-			getSortBtnTitle(field) {
-				const sortIndex = this.sortConfig.findIndex(item => item.field === field);
-				if (sortIndex === -1) {
-					return `${this.sortOptions.find(opt => opt.value === field).label}排序`;
-				}
-				const orderText = this.sortConfig[sortIndex].order === "asc" ? "升序" : "降序";
-				return `${
-					this.sortOptions.find(opt => opt.value === field).label
-				}${orderText} (优先级${sortIndex + 1})`;
-			},
-			// 切换排序字段
-			toggleSortField(field) {
-				const existingIndex = this.sortConfig.findIndex(item => item.field === field);
-
-				if (existingIndex === -1) {
-					// 如果字段不在排序配置中，添加到末尾
-					this.sortConfig.push({ field, order: "asc" });
-				} else {
-					// 如果字段已在排序配置中，切换排序方向
-					this.sortConfig[existingIndex].order =
-						this.sortConfig[existingIndex].order === "asc" ? "desc" : "asc";
-
-					// 如果不是唯一的排序字段且不在首位，调整其优先级到首位
-					if (this.sortConfig.length > 1 && existingIndex !== 0) {
-						const [sortItem] = this.sortConfig.splice(existingIndex, 1);
-						this.sortConfig.unshift(sortItem);
-					}
-				}
-
-				// 限制最大排序字段数为2
-				if (this.sortConfig.length > 2) {
-					this.sortConfig.pop();
-				}
-
-				// 保存排序配置到localStorage
-				this.saveSortConfig();
-			},
-			// 保存排序配置到localStorage
-			saveSortConfig() {
-				_.$lStorage["VIEW_EXPLORE_SORT_CONFIG"] = this.sortConfig;
-			},
-			async getResource(item = {}) {
-				_.$loading(true);
-				try {
-					this.pathStack = item.path;
-					const is_directory = item.type === "directory";
-					// 检查是否是从搜索结果中点击的文件夹
-					// 如果是通过subdir事件调用（文件夹点击），则不携带搜索参数
-					const res = await _api.yapi.resourceLs({
-						path: this.pathStack,
-						search_key: is_directory ? "" : this.searchKey // 从搜索结果点击文件夹时不携带搜索参数
-					});
-
-					if (!res.errcode) {
-						this.resource = res.data;
-					}
-				} catch (error) {
-					console.error(error);
-				} finally {
-					_.$loading(false);
-				}
-			},
-			toggleToolbar() {
-				this.toolbarCollapsed = !this.toolbarCollapsed;
-				_.$lStorage["VIEW_EXPLORE_TOOLBAR_COLLAPSED"] = this.toolbarCollapsed;
-			},
-			// 刷新当前路径的资源数据
-			refreshResource() {
-				this.getResource({ path: this.pathStack });
-			}
-		},
-		watch: {
-			pathStack(val) {
-				_.$lStorage["VIEW_EXPLORE_PATH_STACK"] = val;
-			},
-			resource(val) {
-				_.$lStorage["VIEW_EXPLORE_RESOURCE"] = val;
-			},
-			// 监听搜索关键词变化，重新获取资源
-			searchKey: _.debounce(function () {
-				this.getResource({ path: this.pathStack });
-			}, 3000)
+	return {
+		mounted(){
+			var $ = window.$ || window.jQuery;
+			window.spa.initModule($(this.$el));
 		}
-	});
+	};
 }
 </script>

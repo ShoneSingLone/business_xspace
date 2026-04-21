@@ -103,7 +103,7 @@ export default async function ({ domainData, originData, dataSync }) {
 									name: cat.name,
 									desc: cat.desc
 								};
-								const res = await _api.yapi.interface_add_cat(params);
+								const res = await _api.xspace.interface_add_cat(params);
 
 								if (res?.errcode === 0) {
 									cat.id = res.data._id;
@@ -135,7 +135,7 @@ export default async function ({ domainData, originData, dataSync }) {
 
 					/* 如果有公用前缀 */
 					if (basePath) {
-						await _api.yapi.project_update({
+						await _api.xspace.project_update({
 							id: project_id,
 							basepath: basePath
 							/* token */
@@ -170,7 +170,7 @@ export default async function ({ domainData, originData, dataSync }) {
 							/* 只新增 */
 							if (dataSync === "normal") {
 								// normal
-								let res = await _api.yapi.interface_add(interfaceInfo);
+								let res = await _api.xspace.interface_add(interfaceInfo);
 								if (res.errcode) {
 									if (res.errcode === 40022) {
 										vm.existNum++;
@@ -184,7 +184,7 @@ export default async function ({ domainData, originData, dataSync }) {
 								/* 覆盖、智能合并 */
 								// merge good
 								interfaceInfo.dataSync = dataSync;
-								let res = await _api.yapi.interface_upsert(interfaceInfo);
+								let res = await _api.xspace.interface_upsert(interfaceInfo);
 								if (res.errcode) {
 									_.$msgError(res);
 								} else {

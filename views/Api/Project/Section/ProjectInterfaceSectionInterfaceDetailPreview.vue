@@ -62,7 +62,7 @@
 			<xCard header="ReqHeaders">
 				<xForm col="1" style="--xItem-label-width: 100px">
 					<!-- cptHeadersParams:{{ cptHeadersParams }} -->
-					<YapiApiRequestBodyPreviewer :item="cptHeadersParams" />
+					<XspaceApiRequestBodyPreviewer :item="cptHeadersParams" />
 				</xForm>
 			</xCard>
 			<xGap t />
@@ -70,7 +70,7 @@
 				<xForm col="1" style="--xItem-label-width: 100px">
 					<!-- sourceReqBodyOther:{{ sourceReqBodyOther }} -->
 					<PanelReqBodyJson :value="req_body_other" :readonly="true" />
-					<!-- <YapiApiRequestBodyPreviewer :item="sourceReqBodyOther" /> -->
+					<!-- <XspaceApiRequestBodyPreviewer :item="sourceReqBodyOther" /> -->
 				</xForm>
 			</xCard>
 		</xCard>
@@ -121,7 +121,7 @@ export default async function () {
 						onClick() {
 							_.$openModal({
 								title: i18n("复制接口到所选项目"),
-								url: "@/components/YapiCoypInterface.dialog.vue",
+								url: "@/components/XspaceCoypInterface.dialog.vue",
 								parent: vm,
 								selected: [vm.interfaceInfo._id]
 							});

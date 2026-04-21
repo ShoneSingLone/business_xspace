@@ -57,7 +57,7 @@ export default async function () {
 					if (!_.$isInput(vm.$route.query.wiki)) {
 						return;
 					}
-					const res = await _api.yapi.wikiDetail({ _id: vm.$route.query.wiki });
+					const res = await _api.xspace.wikiDetail({ _id: vm.$route.query.wiki });
 					if (!res.errcode) {
 						vm.currentWiki = res.data;
 						callback && callback();
@@ -99,7 +99,7 @@ export default async function () {
 						belong_id: this.cptBelongId,
 						search_params
 					};
-					const { data } = await _api.yapi.wiki_menu(payload);
+					const { data } = await _api.xspace.wiki_menu(payload);
 					const { list, orderArray } = data;
 					this.tree_data = this.buildTree(list, orderArray);
 

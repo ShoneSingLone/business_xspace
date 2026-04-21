@@ -184,7 +184,7 @@
 			</div>
 			<div class="flex1 overflow-auto chat-dialog mt mb" ref="refChatContent">
 				<div ref="refChatContentWrapper" class="chat-messages">
-					<YapiChatContentItem
+					<xspaceChatContentItem
 						class="content-item"
 						:item="item"
 						v-for="item in contentArray"
@@ -220,7 +220,7 @@ export default async function () {
 	return defineComponent({
 		inject: ["APP", "inject_im"],
 		components: {
-			YapiChatContentItem: () => _.$importVue("@/components/YapiChatContentItem.vue")
+			xspaceChatContentItem: () => _.$importVue("@/components/XspaceChatContentItem.vue")
 		},
 		setup() {
 			onMounted(() => {
@@ -275,7 +275,7 @@ export default async function () {
 				try {
 					const {
 						data: { list }
-					} = await _api.yapi.wikiList(this.cptBelongParams);
+					} = await _api.xspace.wikiList(this.cptBelongParams);
 					this.contentArray = list;
 					this.setPosition();
 				} catch (error) {
@@ -297,11 +297,11 @@ export default async function () {
 					_.$loading(true);
 					const params = _.merge(this.cptBelongParams, {
 						title: "chat_content",
-						type: Vue._yapi_var.ARTICLE,
+						type: Vue._xspace_var.ARTICLE,
 						p_id: vm.pid,
 						markdown: String(vm.newChatContent)
 					});
-					await _api.yapi.wiki_upsert_one(params);
+					await _api.xspace.wiki_upsert_one(params);
 					vm.$nextTick(() => {
 						vm.newChatContent = "";
 					});

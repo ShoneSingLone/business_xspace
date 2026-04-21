@@ -37,7 +37,7 @@ export default async function () {
 							prefix() {
 								return h("xIcon", {
 									icon: "_MailOutlined",
-									style: Vue._yapi_var.stylesLoginFormIcon
+									style: Vue._xspace_var.stylesLoginFormIcon
 								});
 							}
 						}
@@ -59,7 +59,7 @@ export default async function () {
 							prefix() {
 								return h("xIcon", {
 									icon: "_LockOutlined",
-									style: Vue._yapi_var.stylesLoginFormIcon
+									style: Vue._xspace_var.stylesLoginFormIcon
 								});
 							}
 						}
@@ -83,7 +83,7 @@ export default async function () {
 						console.error("未通过验证");
 					} else {
 						const formData = _.$pickFormValues(vm.configsForm);
-						const res = await _api.yapi.userLogin(formData);
+						const res = await _api.xspace.userLogin(formData);
 
 						if (res?.data?.x_token) {
 							_.$lStorage.x_token = res?.data?.x_token;

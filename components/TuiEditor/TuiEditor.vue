@@ -14,7 +14,7 @@ export default async function () {
 			const { result: basecode } = _a.target;
 			/* 上传服务器，返回id */
 			/* todo process loading  */
-			const { data } = await _api.yapi.saveImgByBase64({
+			const { data } = await _api.xspace.saveImgByBase64({
 				basecode,
 				useFor: "wiki",
 				name,
@@ -34,7 +34,7 @@ export default async function () {
 		formData.append("useFor", "wiki");
 
 		/* todo process loading  */
-		const { data } = await _api.yapi.apiResourceSingleUpload({
+		const { data } = await _api.xspace.apiResourceSingleUpload({
 			formData,
 			callback(eventName, payload) {
 				console.log(eventName, payload);

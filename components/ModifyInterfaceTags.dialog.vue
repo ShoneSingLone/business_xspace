@@ -110,7 +110,7 @@ export default async function ({ selected, allInterface }) {
 							params.tag = _.difference(tag, this.cptFormData.tag);
 						}
 					}
-					return await _api.yapi.interface_up(params);
+					return await _api.xspace.interface_up(params);
 				} catch (error) {
 					_.$msgError("修改失败");
 				} finally {

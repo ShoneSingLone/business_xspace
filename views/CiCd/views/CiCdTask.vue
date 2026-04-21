@@ -58,7 +58,7 @@ export default async function () {
 					// isHidePagination: true,
 					async onQuery(pagination = {}) {
 						try {
-							const { errcode, data } = await _api.yapi.apiCicdTaskList({
+							const { errcode, data } = await _api.xspace.apiCicdTaskList({
 								cicd_id
 							});
 							if (_.$isSame(errcode, 0)) {
@@ -120,7 +120,7 @@ export default async function () {
 													}
 												});
 
-												/* try { const res = await _api.yapi.apiCicdTaskRun({ task_id: rowData._id, cicd_id, task_token: rowData.task_token }); _.$msg("触发成功"); } catch (error) { _.$msgError(error); } */
+												/* try { const res = await _api.xspace.apiCicdTaskRun({ task_id: rowData._id, cicd_id, task_token: rowData.task_token }); _.$msg("触发成功"); } catch (error) { _.$msgError(error); } */
 											}
 										}
 									]
@@ -150,7 +150,7 @@ export default async function () {
 						}
 					});
 
-					/* try { const res = await _api.yapi.apiCicdTaskRun({ task_id: rowData._id, cicd_id, task_token: rowData.task_token }); _.$msg("触发成功"); } catch (error) { _.$msgError(error); } */
+					/* try { const res = await _api.xspace.apiCicdTaskRun({ task_id: rowData._id, cicd_id, task_token: rowData.task_token }); _.$msg("触发成功"); } catch (error) { _.$msgError(error); } */
 				}
 			}
 			return {

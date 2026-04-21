@@ -68,7 +68,7 @@ export default async function ({ OPTIONS: { wiki } }) {
 								vm.configs_log_list,
 								pagination
 							);
-							const { data: list_total_data } = await _api.yapi.get_log_list({
+							const { data: list_total_data } = await _api.xspace.get_log_list({
 								query_params: { key: vm.searchText, type: "wiki_log" },
 								type: "wiki_doc",
 								typeid,

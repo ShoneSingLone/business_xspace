@@ -95,7 +95,7 @@ export default async function () {
 					importBy: {
 						value: "2",
 						label: "导入方式",
-						itemType: "YapiItemInterfaceImportType"
+						itemType: "xspaceItemInterfaceImportType"
 					}
 				})
 			};

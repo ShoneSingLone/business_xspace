@@ -1,9 +1,9 @@
 <template>
 	<header class="AppLayoutHeader flex middle">
-		<span class="flex middle YapiLogo pointer" @click="goToGroup">
+		<span class="flex middle xspaceLogo pointer" @click="goToGroup">
 			<xIcon :icon="icon" :style="logoStyle" />
 		</span>
-		<YapiBreadcrumbNavigation />
+		<XspaceBreadcrumbNavigation />
 		<CollabUserContainer />
 		<xGap f />
 		<TransitionGroup name="fade" mode="out-in" tag="div" class="flex middle">
@@ -68,7 +68,7 @@
 				<xIcon icon="_user_manager" />
 			</a>
 		</TransitionGroup>
-		<YapiToolUserBar />
+		<xspaceToolUserBar />
 	</header>
 </template>
 
@@ -79,9 +79,9 @@ export default async function () {
 		name: "AppLayoutHeader",
 		components: {
 			CollabUserContainer: () => _.$importVue("@/views/Api/Header/CollabUserContainer.vue"),
-			YapiToolUserBar: () => _.$importVue("@/components/YapiToolUserBar.vue"),
-			YapiBreadcrumbNavigation: () =>
-				_.$importVue("@/components/YapiBreadcrumbNavigation.vue")
+			xspaceToolUserBar: () => _.$importVue("@/components/XspaceToolUserBar.vue"),
+			XspaceBreadcrumbNavigation: () =>
+				_.$importVue("@/components/XspaceBreadcrumbNavigation.vue")
 		},
 		data() {
 			return {};
@@ -107,9 +107,9 @@ export default async function () {
 			},
 			icon() {
 				if (["/api/group", "/wiki", "/xI"].includes(this.$route.path)) {
-					return "_yapi_logo";
+					return "_xspace_logo";
 				}
-				return "_yapi_logo";
+				return "_xspace_logo";
 			},
 			logoStyle() {
 				return { width: "48px", height: "48px" };
@@ -145,7 +145,7 @@ export default async function () {
 	box-shadow: var(--el-box-shadow-lighter);
 	z-index: 1;
 
-	.YapiLogo {
+	.xspaceLogo {
 		box-shadow: var(--el-box-shadow-lighter);
 		// border: 1px solid gray;
 		border-radius: 50%;

@@ -41,7 +41,7 @@ export default async function () {
 	background-color: var(--el-color-white);
 	box-shadow: var(--el-box-shadow-lighter);
 	z-index: 1;
-	.YapiLogo {
+	.xspaceLogo {
 		box-shadow: var(--el-box-shadow-lighter);
 		// border: 1px solid gray;
 		border-radius: 50%;

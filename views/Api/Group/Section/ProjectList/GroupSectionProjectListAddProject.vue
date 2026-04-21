@@ -19,7 +19,7 @@
 <script lang="ts">
 export default async function ({ onOk }) {
 	const { useDialogProps } = await _.$importVue("/common/utils/hooks.vue");
-	const { DEV, OWNER, ADMIN, PRIVATE, PUBLIC } = Vue._yapi_var;
+	const { DEV, OWNER, ADMIN, PRIVATE, PUBLIC } = Vue._xspace_var;
 
 	function useProjectForm(vm) {
 		const group_id = defItem({
@@ -188,7 +188,7 @@ export default async function ({ onOk }) {
 								value: group_id
 							});
 							const group_name = group.label;
-							const { data } = await _api.yapi.project_add({
+							const { data } = await _api.xspace.project_add({
 								name,
 								basepath,
 								group_id,
@@ -212,7 +212,7 @@ export default async function ({ onOk }) {
 			renderDeleteGroup() {
 				const vm = this;
 				/* 只有超级管理员能删除分组 */
-				if (this.APP.user.role === Vue._yapi_var.ADMIN) {
+				if (this.APP.user.role === Vue._xspace_var.ADMIN) {
 					return h(
 						"xAlert",
 						{

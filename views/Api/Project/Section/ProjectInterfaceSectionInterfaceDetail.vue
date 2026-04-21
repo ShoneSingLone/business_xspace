@@ -88,7 +88,7 @@ export default async function () {
 				try {
 					const id = this.APP.cptInterfaceId;
 					if (id) {
-						let { data: interfaceInfo } = await _api.yapi.interface_get_by_id({
+						let { data: interfaceInfo } = await _api.xspace.interface_get_by_id({
 							id
 						});
 						this.interfaceInfo = interfaceInfo;

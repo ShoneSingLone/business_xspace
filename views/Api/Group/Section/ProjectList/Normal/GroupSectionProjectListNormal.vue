@@ -36,7 +36,7 @@ export default async function () {
 		},
 		computed: {
 			isShow() {
-				return this.APP.cptCurrentGroup?.type !== Vue._yapi_var.PRIVATE;
+				return this.APP.cptCurrentGroup?.type !== Vue._xspace_var.PRIVATE;
 			}
 		}
 	});

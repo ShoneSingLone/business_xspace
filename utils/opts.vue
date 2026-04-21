@@ -61,9 +61,9 @@ export default async function () {
 		}
 	};
 
-	if (!window._opts.yapi) {
+	if (!window._opts.xspace) {
 		/*枚举选项*/
-		window._opts.yapi = {
+		window._opts.xspace = {
 			httpMethod: _.map(HTTP_METHOD, (item, prop) => ({
 				label: prop,
 				value: prop,
@@ -77,6 +77,6 @@ export default async function () {
 			]
 		};
 	}
-	return window._opts.yapi;
+	return window._opts.xspace;
 }
 </script>

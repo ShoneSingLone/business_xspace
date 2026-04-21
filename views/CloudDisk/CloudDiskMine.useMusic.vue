@@ -191,7 +191,7 @@ export default async function () {
 						if (!metaInfo) {
 							const {
 								data: { title, artist, album, image }
-							} = await _api.yapi.audioDetail({
+							} = await _api.xspace.audioDetail({
 								id: _id
 							});
 							/*

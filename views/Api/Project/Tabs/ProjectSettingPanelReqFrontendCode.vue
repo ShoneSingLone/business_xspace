@@ -74,7 +74,7 @@ export default async function () {
 								requestCode: this.form.editor.value,
 								id: this.APP.cptProjectId
 							};
-							await _api.yapi.project_update(dataForm);
+							await _api.xspace.project_update(dataForm);
 							this.APP.updateGroupProjectList();
 							_.$msg("更新成功");
 						} catch (error) {

@@ -86,7 +86,7 @@ export default async function () {
 					img: {
 						value: p._id || "",
 						usedBy: "project",
-						itemType: "YapiItemAvatar",
+						itemType: "xspaceItemAvatar",
 						label: i18n("头像")
 					},
 					group_id: {
@@ -189,7 +189,7 @@ export default async function () {
 							}
 						}).then(async () => {
 							try {
-								const res = await _api.yapi.project_del({
+								const res = await _api.xspace.project_del({
 									id: vm.APP.cptProjectId
 								});
 								if (res.errcode === 0) {
@@ -258,7 +258,7 @@ export default async function () {
 										}
 									});
 								},
-								url: "@/components/YapiItemProxyEnvManager.vue",
+								url: "@/components/XspaceItemProxyEnvManager.vue",
 								parent: this
 							},
 							{ fullscreen: true }
@@ -290,7 +290,7 @@ export default async function () {
 						...this.cptParams,
 						id: this.APP.cptProjectId
 					};
-					await _api.yapi.project_update(dataForm);
+					await _api.xspace.project_update(dataForm);
 					this.APP.updateGroupProjectList();
 					_.$msg("更新成功");
 				} catch (error) {

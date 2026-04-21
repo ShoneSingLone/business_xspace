@@ -24,7 +24,7 @@ export default async function () {
 			/*通用下拉项*/
 			"@/utils/opts.vue",
 			/* 项目独有样式 */
-			"@/yapi.defaul.style.vue"
+			"@/xspace.defaul.style.vue"
 		])
 	]);
 	/* app entry  */
@@ -33,7 +33,7 @@ export default async function () {
 	const GUEST_STATUS = 1;
 	const MEMBER_STATUS = 2;
 	/*  */
-	_.$yapiRouter = router;
+	_.$xspaceRouter = router;
 
 	// router.beforeEach(function (to, from) {});
 
@@ -101,12 +101,12 @@ export default async function () {
 				async function refreshUserInfo() {
 					try {
 						if (!vm.user.isLogin) {
-							const { data: userInfo } = await _api.yapi.userStatus();
+							const { data: userInfo } = await _api.xspace.userStatus();
 							vm._setUser(userInfo);
 						}
 
 						if (vm.user.isLogin) {
-							const { data: all_user } = await _api.yapi.userSearch({});
+							const { data: all_user } = await _api.xspace.userSearch({});
 							vm.all_user = all_user;
 
 							/* TODO: 跳转到首页 或者应用*/
@@ -194,7 +194,7 @@ export default async function () {
 						orderby: this.listSortBy,
 						name: this.homeListSearchKey || ""
 					};
-					const { data } = await _api.yapi.resourceCloudDiskFileList(params);
+					const { data } = await _api.xspace.resourceCloudDiskFileList(params);
 					this.resourceList = data;
 					this.mSetResources();
 				} catch (error) {
@@ -251,7 +251,7 @@ export default async function () {
 				this.selectedItems = [];
 			},
 			async loadDirs() {
-				const { data } = await _api.yapi.resourceCloudDiskGetDirs();
+				const { data } = await _api.xspace.resourceCloudDiskGetDirs();
 				const { TREE, NODES_OBJ: dirs } = _.$arrayToTree({
 					rootId: "0",
 					data,
@@ -418,7 +418,7 @@ export default async function () {
 			 */
 			async logoutActions() {
 				try {
-					const { data } = await _api.yapi.userLogout();
+					const { data } = await _api.xspace.userLogout();
 					if (data === "ok") {
 						_.$lStorage.x_token = "";
 						this._setUser({

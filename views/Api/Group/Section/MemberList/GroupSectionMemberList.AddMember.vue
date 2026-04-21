@@ -28,7 +28,7 @@ export default async function ({ onOk }) {
 			return {
 				form: {
 					member_uids: defItem({
-						itemType: "YapiItemUac",
+						itemType: "xspaceItemUac",
 						value: [],
 						label: i18n("用户"),
 						rules: [_rules.required()]
@@ -40,9 +40,9 @@ export default async function ({ onOk }) {
 						minWidth: 80,
 						label: i18n("权限"),
 						options: [
-							{ label: "组长", value: Vue._yapi_var.OWNER },
-							{ label: "开发者", value: Vue._yapi_var.DEV },
-							{ label: "访客", value: Vue._yapi_var.GUEST }
+							{ label: "组长", value: Vue._xspace_var.OWNER },
+							{ label: "开发者", value: Vue._xspace_var.DEV },
+							{ label: "访客", value: Vue._xspace_var.GUEST }
 						]
 					})
 				}
@@ -99,7 +99,7 @@ export default async function ({ onOk }) {
 			renderDeleteGroup() {
 				const vm = this;
 				/* 只有超级管理员能删除分组 */
-				if (this.APP.user.role === Vue._yapi_var.ADMIN) {
+				if (this.APP.user.role === Vue._xspace_var.ADMIN) {
 					return h(
 						"xAlert",
 						{

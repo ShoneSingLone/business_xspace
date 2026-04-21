@@ -110,7 +110,7 @@ Total：${listData.length}
 							appKey: _.$lStorage.appKey
 						});
 						i18n.enUs = dst;
-						await _api.yapi.i18nUpsertOne({ i18n });
+						await _api.xspace.i18nUpsertOne({ i18n });
 						newRows.push(i18n);
 						_.$setTableData(this.configsTable, {
 							list: newRows

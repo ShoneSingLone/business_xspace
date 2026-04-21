@@ -75,7 +75,7 @@ export default async function ({ makeNewDir, item, refreshList, action }) {
 			async rename() {
 				_.$loading(true);
 				try {
-					await _api.yapi.resourceCloudDiskRename({
+					await _api.xspace.resourceCloudDiskRename({
 						name: this.form.name.value,
 						id: item._id
 					});

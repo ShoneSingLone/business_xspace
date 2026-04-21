@@ -1,6 +1,6 @@
-# Boundless Static Business Yapi
+# Boundless Static Business xspace
 
-This is an open-source project based on YAPI, designed to provide a powerful and flexible API management platform. The
+This is an open-source project based on xspace, designed to provide a powerful and flexible API management platform. The
 project integrates modern web technologies and offers a wide range of features, including API documentation management,
 test tools, Mock services, and more.
 
@@ -27,8 +27,8 @@ test tools, Mock services, and more.
 1. **Clone the Repository**:
 
     ```bash
-    git clone https://gitee.com/ShoneSingLone/boundless_static_business_yapi.git
-    cd boundless_static_business_yapi
+    git clone https://gitee.com/ShoneSingLone/boundless_static_business_xspace.git
+    cd boundless_static_business_xspace
     ```
 
 2. **Install Dependencies**:
@@ -43,7 +43,7 @@ test tools, Mock services, and more.
    directory and configure the database connection:
 
     ```env
-    MONGO_URI=mongodb://localhost:27017/yapi
+    MONGO_URI=mongodb://localhost:27017/xspace
     ```
 
 4. **Start the Project**:
@@ -54,7 +54,7 @@ test tools, Mock services, and more.
     yarn dev
     ```
 
-5. **Access the Project**: Open a browser and navigate to `http://localhost:3000` to view the YAPI interface.
+5. **Access the Project**: Open a browser and navigate to `http://localhost:3000` to view the xspace interface.
 
 ## Usage Instructions
 

@@ -52,7 +52,7 @@ export default async function () {
 		},
 		computed: {
 			isShow() {
-				return this.$route.query.group_view_tab_name === Vue._yapi_var.TAB_KEY_GROUP_LOG;
+				return this.$route.query.group_view_tab_name === Vue._xspace_var.TAB_KEY_GROUP_LOG;
 			}
 		},
 		methods: {
@@ -85,7 +85,7 @@ export default async function () {
 					const { page, size } = this.configsTable.pagination;
 					const {
 						data: { list, total }
-					} = await _api.yapi.get_log_list({
+					} = await _api.xspace.get_log_list({
 						typeid: this.APP.cptGroupId,
 						type: "group",
 						page,
@@ -105,7 +105,7 @@ export default async function () {
 				return _.$timeAgo(time);
 			},
 			getTitle(type) {
-				return `${Vue._yapi_var.LOG_TYPE[type]}动态`;
+				return `${Vue._xspace_var.LOG_TYPE[type]}动态`;
 			},
 			hasDiff(data) {
 				return _.isPlainObject(data);

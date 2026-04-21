@@ -42,7 +42,7 @@ export default async function () {
 					// isHidePagination: true,
 					async onQuery(pagination = {}) {
 						try {
-							const { errcode, data } = await _api.yapi.apiCicdGitAddressList({
+							const { errcode, data } = await _api.xspace.apiCicdGitAddressList({
 								project_id: vm.APP.cptProjectId
 							});
 							if (_.$isSame(errcode, 0)) {

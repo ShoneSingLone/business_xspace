@@ -18,9 +18,9 @@ export default async function () {
 				item_role: defItem({
 					itemType: "xItemSelect",
 					options: [
-						{ label: "组长", value: Vue._yapi_var.OWNER },
-						{ label: "开发者", value: Vue._yapi_var.DEV },
-						{ label: "访客", value: Vue._yapi_var.GUEST }
+						{ label: "组长", value: Vue._xspace_var.OWNER },
+						{ label: "开发者", value: Vue._xspace_var.DEV },
+						{ label: "访客", value: Vue._xspace_var.GUEST }
 					],
 					onEmitValue({ val: role, xItem }) {
 						const { rowIndex, rowData } = xItem.payload;
@@ -43,7 +43,7 @@ export default async function () {
 									staticClass: "mr4 ml4",
 									configs: {
 										value: rowData.uid || "",
-										itemType: "YapiItemAvatar",
+										itemType: "xspaceItemAvatar",
 										disabled: true
 									}
 								}),
@@ -134,7 +134,7 @@ export default async function () {
 					url: "@/views/Api/Group/Section/MemberList/GroupSectionMemberList.AddMember.vue",
 					parent: vm,
 					async onOk({ member_uids, role, dialogVm }) {
-						const { data } = await _api.yapi.groupAddMember({
+						const { data } = await _api.xspace.groupAddMember({
 							id: vm.APP.cptCurrentGroup._id,
 							member_uids,
 							role
@@ -150,7 +150,7 @@ export default async function () {
 			},
 			async removeMember(row) {
 				const vm = this;
-				const { data } = await _api.yapi.group_del_member({
+				const { data } = await _api.xspace.group_del_member({
 					id: vm.APP.cptCurrentGroup._id,
 					member_uid: row.uid
 				});
@@ -162,7 +162,7 @@ export default async function () {
 				_.$loading(true);
 				try {
 					if (role) {
-						await _api.yapi.groupChangeMemberRole({
+						await _api.xspace.groupChangeMemberRole({
 							id: group_id,
 							member_uid: uid,
 							role
@@ -181,10 +181,10 @@ export default async function () {
 				return _common_utils.avatar_url(id);
 			},
 			isShow() {
-				return this.$route.query.group_view_tab_name === Vue._yapi_var.TAB_KEY_MEMBER_LIST;
+				return this.$route.query.group_view_tab_name === Vue._xspace_var.TAB_KEY_MEMBER_LIST;
 			},
 			cptAuth() {
-				return [Vue._yapi_var.OWNER, Vue._yapi_var.ADMIN].includes(
+				return [Vue._xspace_var.OWNER, Vue._xspace_var.ADMIN].includes(
 					this.APP.cptCurrentGroup?.role
 				);
 			}
