@@ -13,24 +13,16 @@
       </div>
 
       <!-- Desktop Icons Grid -->
-      <div class="v1-workspace__icons">
+      <div class="v1-workspace__icons" @dragover="onDragOver" @drop="onDrop" @dragenter="onDragEnter" @dragleave="onDragLeave">
         <DesktopIcon 
-          v-for="shortcut in shortcuts" 
+          v-for="(shortcut, index) in shortcuts" 
           :key="shortcut.id" 
           :app="shortcut" 
+          :index="index"
           @click="openApp(shortcut.appId, false, shortcut.data)"
           @unpin="removeShortcut(shortcut.id)"
         />
       </div>
-
-      <!-- Windows Layer -->
-      <WindowContainer 
-        v-for="win in ModalManager.state.windows" 
-        :key="win.id"
-        :window="win"
-        :window-manager="ModalManager"
-        :system="systemForWindows"
-      />
 
       <!-- Bottom Dock -->
       <div class="v1-workspace__dock-wrapper">
@@ -42,8 +34,6 @@
 
 <script lang="ts">
 export default async function ({ PRIVATE_GLOBAL }) {
-  const ModalManager = await _.$importVue('@/utils/ModalManager.vue');
-
   return {
     inject: ['APP'],
     components: {
@@ -51,34 +41,26 @@ export default async function ({ PRIVATE_GLOBAL }) {
       TopBar: () => _.$importVue('@/views/v1/components/TopBar.vue'),
       DesktopIcon: () => _.$importVue('@/views/v1/components/DesktopIcon.vue'),
       Dock: () => _.$importVue('@/views/v1/components/Dock.vue'),
-      WindowContainer: () => _.$importVue('@/views/v1/components/WindowContainer.vue')
     },
     provide() {
       return {
-        ModalManager: this.ModalManager,
+        ModalManager: _.$ModalManager,
         system: {
           apps: this.apps,
           shortcuts: this.shortcuts,
-          openWindows: this.ModalManager.state.windows,
-          activeWindowId: this.ModalManager.state.activeId,
           pinnedApps: this.pinnedApps,
           pinApp: this.pinApp,
           unpinApp: this.unpinApp,
           addShortcut: this.addShortcut,
           removeShortcut: this.removeShortcut,
-          openApp: this.openApp,
-          focusWindow: (id) => this.ModalManager.focus(id),
-          closeWindow: (id) => this.ModalManager.close(id),
-          minimizeWindow: (id) => this.ModalManager.minimize(id),
-          toggleMaximize: (id) => this.ModalManager.toggleMaximize(id)
+          openApp: this.openApp
         }
       };
     },
     data() {
       return {
-        ModalManager,
         apps: [
-          { id: 'api', name: 'API Manager', icon: '_database', color: '#6750A4', component: '@/views/Api/Project/Project.vue' },
+          { id: 'api', name: 'API Manager', icon: '_database', color: '#6750A4', component: '@/views/v1/components/modules/ApiManager.vue' },
           { id: 'cicd', name: 'CI/CD', icon: '_ci', color: '#625B71', component: '@/views/CiCd/CiCd.vue' },
           { id: 'note', name: 'Documents', icon: '_article', color: '#7D5260', component: '@/views/Note/Note.vue' },
           { id: 'im', name: 'Chat', icon: '_contact', color: '#006A6A', component: '@/views/Im/Im.vue' },
@@ -87,40 +69,89 @@ export default async function ({ PRIVATE_GLOBAL }) {
           { id: 'explore', name: 'Explore', icon: 'search', color: '#984061', component: '@/views/Explore/Explore.vue' },
           { id: 'user', name: 'User', icon: 'user', color: '#006874', component: '@/views/User/User.vue' },
         ],
-        shortcuts: [
-          { id: 'api', appId: 'api', name: 'API Manager', icon: '_database', color: '#6750A4' },
-          { id: 'explore', appId: 'explore', name: 'Explore', icon: 'search', color: '#984061' },
-          { id: 'note', appId: 'note', name: 'Documents', icon: '_article', color: '#7D5260' }
-        ],
+        shortcuts: [],
         theme: 'light',
         lastOpenedAppId: null,
         pinnedApps: ['api', 'explore']
       };
     },
-    computed: {
-      isAuthenticated() {
-        return this.APP?.user?.isLogin;
-      },
-      systemForWindows() {
-        return {
-          apps: this.apps
-        };
-      }
+    async mounted() {
+      await this.loadShortcuts();
     },
     methods: {
+      async loadShortcuts() {
+        try {
+          const response = await _api.xspace.get('/user/shortcuts');
+          if (response.data && response.data.length > 0) {
+            this.shortcuts = response.data;
+          } else {
+            // 设置默认快捷方式
+            this.shortcuts = [
+              { id: 'api', appId: 'api', name: 'API Manager', icon: '_database', color: '#6750A4' },
+              { id: 'explore', appId: 'explore', name: 'Explore', icon: 'search', color: '#984061' },
+              { id: 'note', appId: 'note', name: 'Documents', icon: '_article', color: '#7D5260' },
+            ];
+            await this.saveShortcuts();
+          }
+        } catch (error) {
+          console.error('Failed to load shortcuts:', error);
+          // 设置默认快捷方式
+          this.shortcuts = [
+            { id: 'api', appId: 'api', name: 'API Manager', icon: '_database', color: '#6750A4' },
+            { id: 'explore', appId: 'explore', name: 'Explore', icon: 'search', color: '#984061' },
+            { id: 'note', appId: 'note', name: 'Documents', icon: '_article', color: '#7D5260' },
+          ];
+        }
+      },
+      async saveShortcuts() {
+        try {
+          await _api.xspace.put('/user/shortcuts', { shortcuts: this.shortcuts });
+        } catch (error) {
+          console.error('Failed to save shortcuts:', error);
+        }
+      },
+      onDragStart(e, index) {
+        if (e.dataTransfer) {
+          e.dataTransfer.setData('text/plain', index.toString());
+          e.dataTransfer.effectAllowed = 'move';
+        }
+      },
       onDragOver(e) {
         e.preventDefault();
         if (e.dataTransfer) {
           e.dataTransfer.dropEffect = 'move';
         }
       },
-      onDrop(e) {
+      onDragEnter(e) {
+        e.preventDefault();
+      },
+      onDragLeave(e) {
+        e.preventDefault();
+      },
+      async onDrop(e) {
         e.preventDefault();
         const action = e.dataTransfer?.getData('action');
         const appId = e.dataTransfer?.getData('text/plain');
         
         if (action === 'unpin' && appId) {
           this.unpinApp(appId);
+        } else {
+          // 处理快捷方式拖拽排序
+          const draggedIndex = parseInt(e.dataTransfer?.getData('text/plain') || '-1');
+          if (draggedIndex !== -1) {
+            const targetElement = e.target.closest('.desktop-icon');
+            if (targetElement) {
+              const targetIndex = parseInt(targetElement.getAttribute('data-index') || '-1');
+              if (targetIndex !== -1 && draggedIndex !== targetIndex) {
+                // 重新排序快捷方式
+                const newShortcuts = [...this.shortcuts];
+                const [draggedItem] = newShortcuts.splice(draggedIndex, 1);
+                newShortcuts.splice(targetIndex, 0, draggedItem);
+                this.shortcuts = newShortcuts;
+                await this.saveShortcuts();
+              }
+            }
+          }
         }
       },
       pinApp(appId) {
@@ -131,31 +162,50 @@ export default async function ({ PRIVATE_GLOBAL }) {
       unpinApp(appId) {
         this.pinnedApps = this.pinnedApps.filter(id => id !== appId);
       },
-      addShortcut(shortcut) {
+      async addShortcut(shortcut) {
         if (!this.shortcuts.find(s => s.id === shortcut.id)) {
           this.shortcuts.push(shortcut);
+          await this.saveShortcuts();
         }
       },
-      removeShortcut(id) {
+      async removeShortcut(id) {
         const index = this.shortcuts.findIndex(s => s.id === id);
         if (index > -1) {
           this.shortcuts.splice(index, 1);
+          await this.saveShortcuts();
         }
       },
       async openApp(appId, forceNew = false, data) {
         const app = this.apps.find(a => a.id === appId);
         if (!app) return;
+        debugger
 
-        // 加载组件
-        const component = () => _.$importVue(app.component);
-
-        this.ModalManager.open({
-          appId,
+        // 使用 _.$ModalManager.open() 打开窗口
+        _.$ModalManager.open({
+          id: appId + (forceNew ? '_' + Math.random().toString(36).substr(2, 9) : ''),
+          url: app.component,
           title: data?.name || app.name,
-          component,
-          data,
-          singleton: !forceNew
+          data: data,
+          mask: false, // 不使用遮罩，允许点击其他窗口
+          modalConfigs: {
+            minimizable: true,
+            fullscreen: true,
+            resize: true,
+            keyboard: false,
+            center: false,
+            responsiveMaximize: false
+          }
         });
+      }
+    },
+    computed: {
+      isAuthenticated() {
+        return this.APP?.user?.isLogin;
+      },
+      systemForWindows() {
+        return {
+          apps: this.apps
+        };
       }
     }
   };

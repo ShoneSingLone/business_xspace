@@ -6,7 +6,7 @@
       class="v1-window"
       :class="windowClassList"
       :style="windowStyle"
-      @mousedown="system.focusWindow(window.id)">
+      @mousedown="focusWindow">
       <div ref="handleRef" class="v1-window__titlebar">
         <div class="v1-window__title">
           <div class="v1-window__app-icon" :style="{ color: appColor }">
@@ -94,7 +94,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
     },
     computed: {
       isActive() {
-        return this.system.activeWindowId === this.window.id;
+        return _.$ModalManager.getFocusedId() === this.window.id;
       },
       appInfo() {
         return this.system.apps.find(a => a.id === this.window.appId) || {};
@@ -159,13 +159,13 @@ export default async function ({ PRIVATE_GLOBAL }) {
     },
     methods: {
       handleClose() {
-        this.system.closeWindow(this.window.id);
+        _.$ModalManager.close(this.window.id);
       },
       handleMinimize() {
-        this.system.minimizeWindow(this.window.id);
+        _.$ModalManager.minimize(this.window.id);
       },
       handleMaximize() {
-        this.system.toggleMaximize(this.window.id);
+        _.$ModalManager.maximize(this.window.id);
       },
       pinToDesktop() {
         const app = this.system.apps.find(a => a.id === this.window.appId);
@@ -180,7 +180,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
         });
       },
       focusWindow() {
-        this.system.focusWindow(this.window.id);
+        _.$ModalManager.toTop(this.window.id);
       }
     },
     mounted() {
@@ -201,7 +201,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
           startY = e.clientY;
           startWindowX = this.x;
           startWindowY = this.y;
-          this.system.focusWindow(this.window.id);
+          _.$ModalManager.toTop(this.window.id);
           this.isDragging = true;
         });
 

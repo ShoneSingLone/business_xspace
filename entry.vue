@@ -417,7 +417,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	}
 }
 
-:root[data-theme="tiny"].x-xspace-app {
+:root.x-xspace-app {
 	color-scheme: light;
 	--el-color-white: #ffffff;
 	--el-color-black: #000000;
@@ -517,6 +517,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	--xItem-wrapper-width: 400px;
 	--bg-color: #f5f8f7;
 	--body-bg-color: #f4f9fd;
+
+	--xModal-border-radius:16px;
 
 	.x-app-body {
 		.el-table-v2 {

@@ -1,18 +1,12 @@
 <template>
   <div 
-    v-show="!window.isMinimized"
     class="window-container" 
-    :class="{ 
-      'is-focused': window.isFocused,
-      'is-maximized': window.isMaximized 
-    }"
     :style="cptWindowStyle"
     @mousedown="handleFocus">
     
     <!-- Title Bar (Drag Handle) -->
     <div 
       class="window-container__titlebar" 
-      @mousedown="startDrag"
       @dblclick="handleToggleMaximize">
       <div class="window-container__title">
         <div class="window-container__icon" :style="{ color: appColor }">
@@ -26,7 +20,7 @@
           <xIcon icon="minus" size="18" />
         </button>
         <button class="window-container__control-btn" @click="handleToggleMaximize" title="Toggle Maximize">
-          <xIcon :icon="window.isMaximized ? 'copy-document' : 'full-screen'" size="16" />
+          <xIcon icon="full-screen" size="16" />
         </button>
         <button class="window-container__control-btn window-container__control-btn--close" @click="handleClose" title="Close">
           <xIcon icon="close" size="18" />
@@ -36,19 +30,8 @@
 
     <!-- Content Area -->
     <div class="window-container__content">
-      <component 
-        :is="window.component" 
-        v-bind="window.props" 
-        :window-data="window.data"
-        @close="handleClose" />
+      <!-- 内容由 ModalManager 内部管理 -->
     </div>
-
-    <!-- Resize Handles (Only if not maximized) -->
-    <template v-if="!window.isMaximized">
-      <div class="window-container__resize-handle window-container__resize-handle--r" @mousedown.stop="startResize($event, 'r')"></div>
-      <div class="window-container__resize-handle window-container__resize-handle--b" @mousedown.stop="startResize($event, 'b')"></div>
-      <div class="window-container__resize-handle window-container__resize-handle--br" @mousedown.stop="startResize($event, 'br')"></div>
-    </template>
   </div>
 </template>
 
@@ -62,22 +45,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
     },
     computed: {
       cptWindowStyle() {
-        if (this.window.isMaximized) {
-          return {
-            zIndex: this.window.zIndex,
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            borderRadius: '0'
-          };
-        }
+        // 适配新的 ModalManager 窗口实例结构
         return {
-          zIndex: this.window.zIndex,
-          top: `${this.window.y}px`,
-          left: `${this.window.x}px`,
-          width: `${this.window.width}px`,
-          height: `${this.window.height}px`
+          zIndex: this.window.viewerZIndex || 1000,
+          position: 'fixed'
         };
       },
       appIcon() {
@@ -91,7 +62,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
     },
     methods: {
       handleFocus() {
-        this.ModalManager.focus(this.window.id);
+        this.ModalManager.toTop(this.window.id);
       },
       handleClose() {
         this.ModalManager.close(this.window.id);
@@ -100,78 +71,18 @@ export default async function ({ PRIVATE_GLOBAL }) {
         this.ModalManager.minimize(this.window.id);
       },
       handleToggleMaximize() {
-        this.ModalManager.toggleMaximize(this.window.id);
+        this.ModalManager.maximize(this.window.id);
       },
       
       // Drag & Resize Logic
       startDrag(e) {
-        if (this.window.isMaximized) return;
-        this.handleFocus();
-        
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const initialX = this.window.x;
-        const initialY = this.window.y;
-
-        const onMouseMove = (moveEvent) => {
-          const deltaX = moveEvent.clientX - startX;
-          const deltaY = moveEvent.clientY - startY;
-          
-          let nextX = initialX + deltaX;
-          let nextY = initialY + deltaY;
-
-          // Boundary checks (ensure titlebar is accessible)
-          const winWidth = window.innerWidth;
-          const winHeight = window.innerHeight;
-          nextX = Math.max(-this.window.width + 100, Math.min(nextX, winWidth - 100));
-          nextY = Math.max(0, Math.min(nextY, winHeight - 40));
-
-          this.ModalManager.updateRect(this.window.id, { x: nextX, y: nextY });
-        };
-
-        const onMouseUp = () => {
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-          document.body.style.userSelect = '';
-        };
-
-        document.body.style.userSelect = 'none';
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        // 暂时禁用拖拽功能，因为新的 ModalManager 可能不支持
+        return;
       },
 
       startResize(e, direction) {
-        this.handleFocus();
-        
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const initialWidth = this.window.width;
-        const initialHeight = this.window.height;
-
-        const onMouseMove = (moveEvent) => {
-          const deltaX = moveEvent.clientX - startX;
-          const deltaY = moveEvent.clientY - startY;
-          
-          const updates = {};
-          if (direction.includes('r')) {
-            updates.width = initialWidth + deltaX;
-          }
-          if (direction.includes('b')) {
-            updates.height = initialHeight + deltaY;
-          }
-
-          this.ModalManager.updateRect(this.window.id, updates);
-        };
-
-        const onMouseUp = () => {
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-          document.body.style.userSelect = '';
-        };
-
-        document.body.style.userSelect = 'none';
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        // 暂时禁用 resize 功能，因为新的 ModalManager 可能不支持
+        return;
       }
     }
   };

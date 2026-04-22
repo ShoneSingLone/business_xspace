@@ -64,7 +64,7 @@
                 v-for="win in getAppWindows(app.id)"
                 :key="win.id"
                 class="dock__preview-item"
-                :class="{ 'dock__preview-item--active': system.activeWindowId === win.id && !win.isMinimized }"
+                :class="{ 'dock__preview-item--active': _.$ModalManager.getFocusedId() === win.id && !win.isMinimized }"
                 role="button"
                 tabindex="0"
                 @click.stop="activateWindow(win.id)">
@@ -73,7 +73,7 @@
                 <span class="dock__preview-item-meta">
                   <span class="dock__preview-item-title">{{ win.title }}</span>
                   <span class="dock__preview-item-subtitle">
-                    {{ win.isMinimized ? '最小化' : (system.activeWindowId === win.id ? '当前窗口' : '已打开') }}
+                    {{ win.isMinimized ? '最小化' : (_.$ModalManager.getFocusedId() === win.id ? '当前窗口' : '已打开') }}
                   </span>
                 </span>
                 <span class="dock__preview-item-actions">
@@ -197,7 +197,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
       dockApps() {
         const apps = this.system && this.system.apps ? this.system.apps : [];
         const pinnedApps = this.system && this.system.pinnedApps ? this.system.pinnedApps : [];
-        const openWindows = this.system && this.system.openWindows ? this.system.openWindows : [];
+        const openWindows = this.system && _.$ModalManager.getAllInstances() ? _.$ModalManager.getAllInstances() : [];
         const seen = {};
         const orderedIds = [];
 
@@ -251,7 +251,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
         };
       },
       getAppWindows(appId) {
-        const openWindows = this.system && this.system.openWindows ? this.system.openWindows : [];
+        const openWindows = this.system && _.$ModalManager.getAllInstances() ? _.$ModalManager.getAllInstances() : [];
         return openWindows
           .filter(win => win.appId === appId)
           .slice()
@@ -262,7 +262,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
         return pinnedApps.includes(appId);
       },
       isAppActive(appId) {
-        const activeWindowId = this.system ? this.system.activeWindowId : null;
+        const activeWindowId = this.system ? this._.$ModalManager.getFocusedId() : null;
         const activeWindow = this.getAppWindows(appId).find(win => win.id === activeWindowId);
         return !!activeWindow && !activeWindow.isMinimized;
       },
@@ -275,24 +275,24 @@ export default async function ({ PRIVATE_GLOBAL }) {
         }
 
         const win = windows[0];
-        if (this.system.activeWindowId === win.id && !win.isMinimized) {
-          this.system.minimizeWindow(win.id);
+        if (this._.$ModalManager.getFocusedId() === win.id && !win.isMinimized) {
+          _.$ModalManager.minimize(win.id);
         } else {
           this.activateWindow(win.id);
         }
       },
       activateWindow(windowId) {
-        const win = (this.system.openWindows || []).find(item => item.id === windowId);
+        const win = (_.$ModalManager.getAllInstances() || []).find(item => item.id === windowId);
         if (!win) return;
 
         win.isMinimized = false;
-        this.system.focusWindow(windowId);
+        _.$ModalManager.toTop(windowId);
       },
       minimizeWindow(windowId) {
-        this.system.minimizeWindow(windowId);
+        _.$ModalManager.minimize(windowId);
       },
       closeWindow(windowId) {
-        this.system.closeWindow(windowId);
+        _.$ModalManager.close(windowId);
       },
       togglePinned(appId) {
         if (this.isPinned(appId)) {

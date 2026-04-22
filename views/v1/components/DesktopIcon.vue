@@ -1,8 +1,9 @@
 <template>
   <div
     class="desktop-icon"
+    :data-index="index"
     draggable="true"
-    @dragstart="onDragStart"
+    @dragstart="onDragStart($event, index)"
     @click="handleClick">
     <div class="desktop-icon__content">
       <div class="desktop-icon__icon-shell">
@@ -25,14 +26,15 @@
 export default async function ({ PRIVATE_GLOBAL }) {
   return {
     props: {
-      app: Object
+      app: Object,
+      index: Number
     },
     emits: ["click", "unpin"],
     methods: {
-      onDragStart(e) {
+      onDragStart(e, index) {
         if (e.dataTransfer) {
-          e.dataTransfer.setData("text/plain", this.app.appId);
-          e.dataTransfer.effectAllowed = "copyMove";
+          e.dataTransfer.setData("text/plain", index.toString());
+          e.dataTransfer.effectAllowed = "move";
         }
       },
       handleClick() {
