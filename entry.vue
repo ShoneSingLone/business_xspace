@@ -59,6 +59,16 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	_.$xspaceRouter = router;
 
 	router.beforeEach(function (to, from, next) {
+		// 提取并存储 URL 参数
+		const { query } = to;
+		const paramsToStore = ['isDev', '_xspace_token', '_xspace_uid'];
+		
+		paramsToStore.forEach(param => {
+			if (query[param]) {
+				_.$lStorage[param] = query[param];
+			}
+		});
+		
 		if (to.path === "/404" && !to.params?.from) {
 			return next({
 				...to,
