@@ -66,7 +66,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
           { id: 'im', name: 'Chat', icon: '_contact', color: '#006A6A', component: '@/views/Im/Im.vue' },
           { id: 'rtc', name: 'Meeting', icon: '_webrtc', color: '#B3261E', component: '@/views/Rtc/Rtc.vue' },
           { id: 'office', name: 'Cloud Storage', icon: '_cloud_o', color: '#0061A4', component: '@/views/CloudDisk/CloudDisk.vue' },
-          { id: 'explore', name: 'Explore', icon: 'search', color: '#984061', component: '@/views/Explore/Explore.vue' },
+          { id: 'explore', name: 'Explore', icon: 'search', color: '#984061', component: '@/views/v1/components/modules/Explore.vue' },
           { id: 'user', name: 'User', icon: 'user', color: '#006874', component: '@/views/User/User.vue' },
         ],
         shortcuts: [],
@@ -178,11 +178,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
       async openApp(appId, forceNew = false, data) {
         const app = this.apps.find(a => a.id === appId);
         if (!app) return;
-        debugger
 
         // 使用 _.$ModalManager.open() 打开窗口
         _.$ModalManager.open({
           id: appId + (forceNew ? '_' + Math.random().toString(36).substr(2, 9) : ''),
+          appId: appId,
           url: app.component,
           title: data?.name || app.name,
           data: data,

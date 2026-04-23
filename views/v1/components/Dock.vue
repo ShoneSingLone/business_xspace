@@ -262,7 +262,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
         return pinnedApps.includes(appId);
       },
       isAppActive(appId) {
-        const activeWindowId = this.system ? this._.$ModalManager.getFocusedId() : null;
+        const activeWindowId = _.$ModalManager.getFocusedId();
         const activeWindow = this.getAppWindows(appId).find(win => win.id === activeWindowId);
         return !!activeWindow && !activeWindow.isMinimized;
       },
@@ -275,18 +275,19 @@ export default async function ({ PRIVATE_GLOBAL }) {
         }
 
         const win = windows[0];
-        if (this._.$ModalManager.getFocusedId() === win.id && !win.isMinimized) {
+        if (_.$ModalManager.getFocusedId() === win.id && !win.isMinimized) {
           _.$ModalManager.minimize(win.id);
         } else {
           this.activateWindow(win.id);
         }
       },
       activateWindow(windowId) {
-        const win = (_.$ModalManager.getAllInstances() || []).find(item => item.id === windowId);
-        if (!win) return;
-
-        win.isMinimized = false;
-        _.$ModalManager.toTop(windowId);
+        const win = _.$ModalManager.getInstance(windowId);
+        if (win && win.isMinimized) {
+          _.$ModalManager.restore(windowId);
+        } else {
+          _.$ModalManager.toTop(windowId);
+        }
       },
       minimizeWindow(windowId) {
         _.$ModalManager.minimize(windowId);

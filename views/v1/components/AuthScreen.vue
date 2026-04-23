@@ -1,6 +1,24 @@
 <template>
   <div class="auth-screen">
-    <div class="auth-screen__container">
+    <!-- Loading State -->
+    <div v-if="isAuthenticating" class="auth-screen__loading">
+      <div class="auth-screen__loading-container">
+        <div class="auth-screen__loading-ring">
+          <div class="auth-screen__loading-ring-inner"></div>
+          <div class="auth-screen__loading-ring-outer"></div>
+        </div>
+        <div class="auth-screen__loading-dots">
+          <span class="auth-screen__loading-dot"></span>
+          <span class="auth-screen__loading-dot"></span>
+          <span class="auth-screen__loading-dot"></span>
+        </div>
+        <p class="auth-screen__loading-text">正在验证身份...</p>
+        <p class="auth-screen__loading-hint">请稍候，我们正在检查您的登录状态</p>
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <div v-else class="auth-screen__container">
       <div class="auth-screen__brand">
         <span class="auth-screen__brand-dot"></span>
         <span class="auth-screen__brand-text">xspace</span>
@@ -17,7 +35,35 @@ export default async function ({ PRIVATE_GLOBAL }) {
   return {
     components: {
       LoginForm: () => _.$importVue('@/views/Login/LoginForm.vue')
-    }
+    },
+    data() {
+      return {
+        isAuthenticating: true
+      };
+    },
+    async mounted() {
+      await this.checkAuthStatus();
+    },
+    methods: {
+      async checkAuthStatus() {
+        try {
+          // 模拟认证检查延迟，实际应用中应该调用 API 检查登录状态
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // 检查用户是否已经登录
+          // 如果已登录，v1 主界面会自动切换显示，这里不需要手动跳转
+          if (!this.APP?.user?.isLogin) {
+            // 用户未登录，显示登录表单
+            this.isAuthenticating = false;
+          }
+        } catch (error) {
+          console.error('认证检查失败:', error);
+          // 检查失败时显示登录表单
+          this.isAuthenticating = false;
+        }
+      }
+    },
+    inject: ['APP']
   };
 }
 </script>
@@ -35,6 +81,116 @@ export default async function ({ PRIVATE_GLOBAL }) {
     radial-gradient(circle at 84% 10%, rgba(99, 179, 237, 0.14) 0%, rgba(99, 179, 237, 0) 28%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.2) 100%),
     var(--body-bg-color, #f4f9fd);
+
+  &__loading {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  &__loading-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+
+    &-inner,
+    &-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+
+    &-inner {
+      border-top-color: var(--el-color-primary, #3182ce);
+      border-right-color: var(--el-color-primary, #3182ce);
+      animation: spinInner 1.5s linear infinite;
+    }
+
+    &-outer {
+      border-bottom-color: var(--el-color-primary-light-5, #93c5fd);
+      border-left-color: var(--el-color-primary-light-5, #93c5fd);
+      animation: spinOuter 2s linear infinite;
+    }
+  }
+
+  &__loading-dots {
+    display: flex;
+    gap: 8px;
+
+    & > span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--el-color-primary, #3182ce);
+      animation: bounceDot 1.4s ease-in-out infinite both;
+
+      &:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0s;
+      }
+    }
+  }
+
+  &__loading-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--el-text-color-primary, #303133);
+    margin: 0;
+  }
+
+  &__loading-hint {
+    font-size: 0.875rem;
+    color: var(--el-text-color-secondary, #909399);
+    margin: 0;
+  }
+}
+
+@keyframes spinInner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinOuter {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes bounceDot {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .auth-screen__container {

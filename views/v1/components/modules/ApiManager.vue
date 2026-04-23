@@ -8,27 +8,70 @@ export default async function ({ PRIVATE_GLOBAL }) {
     path: "/API Workspaces",
     children: [
       {
-        id: "global_resources",
-        name: "Global Resources",
-        type: "folder",
-        updatedAt: "2026-04-01T10:00:00Z",
-        path: "/API Workspaces/Global Resources",
+        id: "personal_space",
+        name: "个人空间",
+        type: "personal",
+        role: "owner",
+        updatedAt: "2026-04-01T12:00:00Z",
+        path: "/API Workspaces/个人空间",
+        visibility: "private",
         children: [
           {
-            id: "gr_models",
-            name: "Data Models",
-            type: "doc_folder",
-            updatedAt: "2026-04-01T10:00:00Z",
-            path: "/API Workspaces/Global Resources/Data Models",
+            id: "ps_my_projects",
+            name: "我的项目",
+            type: "folder",
+            updatedAt: "2026-04-01T12:00:00Z",
+            path: "/API Workspaces/个人空间/我的项目",
             children: [
               {
-                id: "gr_user_model",
-                name: "UserSchema.json",
-                type: "code",
-                updatedAt: "2026-04-01T10:00:00Z",
-                path: "/API Workspaces/Global Resources/Data Models/UserSchema.json",
-                content:
-                  '{\n  "type": "object",\n  "properties": {\n    "id": { "type": "string" },\n    "name": { "type": "string" },\n    "email": { "type": "string", "format": "email" }\n  },\n  "required": ["id", "name"]\n}',
+                id: "ps_proj_private",
+                name: "个人项目",
+                type: "project",
+                role: "owner",
+                updatedAt: "2026-04-01T11:00:00Z",
+                path: "/API Workspaces/个人空间/我的项目/个人项目",
+                visibility: "private",
+                description: "个人开发项目",
+                tags: ["个人", "开发"],
+                children: [
+                  {
+                    id: "ps_p_api",
+                    name: "API",
+                    type: "api_folder",
+                    updatedAt: "2026-04-01T10:00:00Z",
+                    path: "/API Workspaces/个人空间/我的项目/个人项目/API",
+                    children: [],
+                  },
+                  {
+                    id: "ps_p_docs",
+                    name: "文档",
+                    type: "doc_folder",
+                    updatedAt: "2026-04-01T10:00:00Z",
+                    path: "/API Workspaces/个人空间/我的项目/个人项目/文档",
+                    children: [],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: "ps_followed",
+            name: "关注的项目",
+            type: "folder",
+            updatedAt: "2026-04-01T12:00:00Z",
+            path: "/API Workspaces/个人空间/关注的项目",
+            children: [
+              {
+                id: "ps_follow_proj",
+                name: "关注项目 Demo",
+                type: "project",
+                role: "viewer",
+                updatedAt: "2026-03-30T09:00:00Z",
+                path: "/API Workspaces/个人空间/关注的项目/关注项目 Demo",
+                visibility: "internal",
+                description: "关注的公共项目",
+                tags: ["关注"],
+                followed: true,
               },
             ],
           },
@@ -38,60 +81,20 @@ export default async function ({ PRIVATE_GLOBAL }) {
         id: "group_backend",
         name: "Backend Team",
         type: "group",
+        role: "admin",
         updatedAt: "2026-03-31T10:00:00Z",
         path: "/API Workspaces/Backend Team",
+        visibility: "internal",
+        description: "Core backend services team handling microservices.",
+        createdBy: "Admin",
+        createdAt: "2025-01-01",
+        stats: {
+          projectCount: 3,
+          docCount: 15,
+          memberCount: 8,
+          activityDays: 7,
+        },
         children: [
-          {
-            id: "gb_info",
-            name: "Group Info",
-            type: "setting",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Group Info",
-            content: {
-              description: "Core backend services team handling microservices.",
-              createdBy: "Admin",
-              createdAt: "2025-01-01",
-            },
-          },
-          {
-            id: "gb_members",
-            name: "Group Members",
-            type: "member_list",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Group Members",
-            content: [
-              {
-                id: 1,
-                name: "Alice Smith",
-                role: "Admin",
-                email: "alice@example.com",
-              },
-              {
-                id: 2,
-                name: "Bob Jones",
-                role: "Developer",
-                email: "bob@example.com",
-              },
-            ],
-          },
-          {
-            id: "gb_docs",
-            name: "Group Docs",
-            type: "doc_folder",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Group Docs",
-            children: [
-              {
-                id: "gb_doc_1",
-                name: "Architecture.md",
-                type: "doc",
-                updatedAt: "2026-03-31T10:00:00Z",
-                path: "/API Workspaces/Backend Team/Group Docs/Architecture.md",
-                content:
-                  "# Architecture\n\nOur system is based on Node.js microservices communicating via gRPC.",
-              },
-            ],
-          },
           {
             id: "gb_projects",
             name: "Projects",
@@ -103,8 +106,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
                 id: "proj_main",
                 name: "Main API",
                 type: "project",
+                role: "owner",
                 updatedAt: "2026-03-31T10:00:00Z",
                 path: "/API Workspaces/Backend Team/Projects/Main API",
+                visibility: "internal",
+                description: "核心 API 服务",
+                tags: ["核心", "API"],
                 children: [
                   {
                     id: "pm_api",
@@ -185,6 +192,171 @@ export default async function ({ PRIVATE_GLOBAL }) {
                   },
                 ],
               },
+              {
+                id: "proj_auth",
+                name: "Auth Service",
+                type: "project",
+                role: "developer",
+                updatedAt: "2026-03-29T14:00:00Z",
+                path: "/API Workspaces/Backend Team/Projects/Auth Service",
+                visibility: "internal",
+                description: "认证授权服务",
+                tags: ["认证", "安全"],
+              },
+              {
+                id: "proj_payment",
+                name: "Payment API",
+                type: "project",
+                role: "developer",
+                updatedAt: "2026-03-28T16:00:00Z",
+                path: "/API Workspaces/Backend Team/Projects/Payment API",
+                visibility: "private",
+                description: "支付服务 API",
+                tags: ["支付"],
+              },
+            ],
+          },
+          {
+            id: "gb_members",
+            name: "Group Members",
+            type: "member_list",
+            updatedAt: "2026-03-31T10:00:00Z",
+            path: "/API Workspaces/Backend Team/Group Members",
+            content: [
+              { id: 1, name: "Alice Smith", role: "owner", email: "alice@example.com" },
+              { id: 2, name: "Bob Jones", role: "admin", email: "bob@example.com" },
+              { id: 3, name: "Charlie Brown", role: "developer", email: "charlie@example.com" },
+              { id: 4, name: "David Wilson", role: "developer", email: "david@example.com" },
+              { id: 5, name: "Eve Davis", role: "guest", email: "eve@example.com" },
+            ],
+          },
+          {
+            id: "gb_docs",
+            name: "Group Docs",
+            type: "doc_folder",
+            updatedAt: "2026-03-31T10:00:00Z",
+            path: "/API Workspaces/Backend Team/Group Docs",
+            children: [
+              {
+                id: "gb_doc_1",
+                name: "Architecture.md",
+                type: "doc",
+                updatedAt: "2026-03-31T10:00:00Z",
+                path: "/API Workspaces/Backend Team/Group Docs/Architecture.md",
+                content: "# Architecture\n\nOur system is based on Node.js microservices communicating via gRPC.",
+              },
+              {
+                id: "gb_doc_2",
+                name: "API Guidelines.md",
+                type: "doc",
+                updatedAt: "2026-03-30T09:00:00Z",
+                path: "/API Workspaces/Backend Team/Group Docs/API Guidelines.md",
+                content: "# API 设计规范\n\n遵循 RESTful 设计原则...",
+              },
+            ],
+          },
+          {
+            id: "gb_settings",
+            name: "Group Settings",
+            type: "setting",
+            updatedAt: "2026-03-31T10:00:00Z",
+            path: "/API Workspaces/Backend Team/Group Settings",
+            content: {
+              name: "Backend Team",
+              description: "Core backend services team handling microservices.",
+              visibility: "internal",
+              defaultRole: "guest",
+              allowExternalShare: true,
+            },
+          },
+          {
+            id: "gb_log",
+            name: "Activity Log",
+            type: "log",
+            updatedAt: "2026-03-31T10:00:00Z",
+            path: "/API Workspaces/Backend Team/Activity Log",
+            content: [
+              { time: "2026-03-31 10:00", action: "更新项目", user: "Alice", target: "Main API" },
+              { time: "2026-03-31 09:30", action: "添加成员", user: "Bob", target: "Eve Davis" },
+              { time: "2026-03-31 09:00", action: "创建文档", user: "Charlie", target: "API Guidelines.md" },
+              { time: "2026-03-30 18:00", action: "发布 API", user: "David", target: "GET /users" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "group_frontend",
+        name: "Frontend Team",
+        type: "group",
+        role: "member",
+        updatedAt: "2026-03-30T15:00:00Z",
+        path: "/API Workspaces/Frontend Team",
+        visibility: "internal",
+        description: "Frontend development team.",
+        createdBy: "Admin",
+        createdAt: "2025-02-15",
+        stats: {
+          projectCount: 2,
+          docCount: 8,
+          memberCount: 5,
+          activityDays: 30,
+        },
+        children: [
+          {
+            id: "gf_projects",
+            name: "Projects",
+            type: "folder",
+            updatedAt: "2026-03-30T15:00:00Z",
+            path: "/API Workspaces/Frontend Team/Projects",
+            children: [
+              {
+                id: "proj_webapp",
+                name: "Web App",
+                type: "project",
+                role: "developer",
+                updatedAt: "2026-03-30T14:00:00Z",
+                path: "/API Workspaces/Frontend Team/Projects/Web App",
+                visibility: "internal",
+                description: "主前端应用",
+                tags: ["前端", "Vue"],
+              },
+            ],
+          },
+          {
+            id: "gf_members",
+            name: "Group Members",
+            type: "member_list",
+            updatedAt: "2026-03-30T15:00:00Z",
+            path: "/API Workspaces/Frontend Team/Group Members",
+            content: [
+              { id: 6, name: "Frank Lee", role: "owner", email: "frank@example.com" },
+              { id: 7, name: "Grace Chen", role: "developer", email: "grace@example.com" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "global_resources",
+        name: "Global Resources",
+        type: "folder",
+        updatedAt: "2026-04-01T10:00:00Z",
+        path: "/API Workspaces/Global Resources",
+        children: [
+          {
+            id: "gr_models",
+            name: "Data Models",
+            type: "doc_folder",
+            updatedAt: "2026-04-01T10:00:00Z",
+            path: "/API Workspaces/Global Resources/Data Models",
+            children: [
+              {
+                id: "gr_user_model",
+                name: "UserSchema.json",
+                type: "code",
+                updatedAt: "2026-04-01T10:00:00Z",
+                path: "/API Workspaces/Global Resources/Data Models/UserSchema.json",
+                content: '{\n  "type": "object",\n  "properties": {\n    "id": { "type": "string" },\n    "name": { "type": "string" },\n    "email": { "type": "string", "format": "email" }\n  },\n  "required": ["id", "name"]\n}',
+              },
             ],
           },
         ],
@@ -208,7 +380,9 @@ export default async function ({ PRIVATE_GLOBAL }) {
         selectedFile: null,
         searchQuery: "",
         showPreview: true,
+        viewMode: "list", // list | grid
         expandedFolders: new Set([mockApiData.id]),
+        selectedNodeId: mockApiData.id,
         // Sort State
         sortField: "name",
         sortDirection: "asc",
@@ -219,6 +393,13 @@ export default async function ({ PRIVATE_GLOBAL }) {
         responseTime: null,
         // Editors State
         editingContent: null,
+        // Context Menu State
+        contextMenu: {
+          show: false,
+          x: 0,
+          y: 0,
+          node: null,
+        },
       };
     },
     computed: {
@@ -272,6 +453,36 @@ export default async function ({ PRIVATE_GLOBAL }) {
       },
     },
     methods: {
+      // LocalStorage Utils
+      loadExpandedFolders() {
+        try {
+          const saved = localStorage.getItem("apiManager_expandedFolders");
+          return saved ? new Set(JSON.parse(saved)) : new Set([this.mockApiData.id]);
+        } catch {
+          return new Set([this.mockApiData.id]);
+        }
+      },
+      saveExpandedFolders() {
+        try {
+          localStorage.setItem("apiManager_expandedFolders", JSON.stringify([...this.expandedFolders]));
+        } catch (e) {
+          console.error("Failed to save expanded folders:", e);
+        }
+      },
+      loadSelectedNodeId() {
+        try {
+          return localStorage.getItem("apiManager_selectedNodeId") || this.mockApiData.id;
+        } catch {
+          return this.mockApiData.id;
+        }
+      },
+      saveSelectedNodeId(nodeId) {
+        try {
+          localStorage.setItem("apiManager_selectedNodeId", nodeId);
+        } catch (e) {
+          console.error("Failed to save selected node:", e);
+        }
+      },
       // Utils
       formatDate(dateString) {
         try {
@@ -283,6 +494,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
       },
       isFolderType(type) {
         return [
+          "personal",
           "group",
           "project",
           "api_folder",
@@ -344,9 +556,78 @@ export default async function ({ PRIVATE_GLOBAL }) {
         } else {
           this.expandedFolders.add(folderId);
         }
+        this.saveExpandedFolders();
+      },
+      // Context Menu Methods
+      showContextMenu(node, e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.contextMenu = {
+          show: true,
+          x: e.clientX,
+          y: e.clientY,
+          node,
+        };
+      },
+      hideContextMenu() {
+        this.contextMenu.show = false;
+      },
+      handleContextMenuAction(action) {
+        const { node } = this.contextMenu;
+        if (!node) return;
+
+        switch (action) {
+          case "rename":
+            this.renameNode(node);
+            break;
+          case "move":
+            this.moveNode(node);
+            break;
+          case "delete":
+            this.deleteNode(node);
+            break;
+          case "copyLink":
+            this.copyNodeLink(node);
+            break;
+          case "openNewTab":
+            this.openNodeInNewTab(node);
+            break;
+        }
+        this.hideContextMenu();
+      },
+      renameNode(node) {
+        const newName = prompt("Enter new name:", node.name);
+        if (newName && newName.trim()) {
+          node.name = newName.trim();
+          _.$msg("Renamed successfully");
+        }
+      },
+      moveNode(node) {
+        _.$msg("Move functionality not implemented yet");
+      },
+      deleteNode(node) {
+        if (confirm(`Are you sure you want to delete "${node.name}"?`)) {
+          const parent = this.findParentNode(this.mockApiData, node.id);
+          if (parent && parent.children) {
+            parent.children = parent.children.filter((child) => child.id !== node.id);
+            _.$msg("Deleted successfully");
+          }
+        }
+      },
+      copyNodeLink(node) {
+        const link = `${window.location.origin}${window.location.pathname}?nodeId=${node.id}`;
+        navigator.clipboard.writeText(link).then(() => {
+          _.$msg("Link copied to clipboard");
+        });
+      },
+      openNodeInNewTab(node) {
+        const link = `${window.location.origin}${window.location.pathname}?nodeId=${node.id}`;
+        window.open(link, "_blank");
       },
       getIcon(type) {
         switch (type) {
+          case "personal":
+            return "user";
           case "group":
             return "folder";
           case "project":
@@ -369,12 +650,16 @@ export default async function ({ PRIVATE_GLOBAL }) {
             return "settings";
           case "cicd":
             return "activity";
+          case "log":
+            return "history";
           default:
             return "file";
         }
       },
       getIconColor(type) {
         switch (type) {
+          case "personal":
+            return "api-manager__icon api-manager__icon--personal";
           case "group":
             return "api-manager__icon api-manager__icon--group";
           case "project":
@@ -397,6 +682,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
             return "api-manager__icon api-manager__icon--setting";
           case "cicd":
             return "api-manager__icon api-manager__icon--cicd";
+          case "log":
+            return "api-manager__icon api-manager__icon--log";
           default:
             return "api-manager__icon api-manager__icon--default";
         }
@@ -496,7 +783,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 </script>
 
 <template>
-	<div class="api-manager">
+	<div class="api-manager" @click="hideContextMenu">
 		<!-- Top Bar -->
 		<div class="api-manager__topbar">
 			<!-- Toolbar Row -->
@@ -544,6 +831,23 @@ export default async function ({ PRIVATE_GLOBAL }) {
 
 					<div class="api-manager__divider" aria-hidden="true"></div>
 
+					<div class="api-manager__view-toggle">
+						<button
+							@click="viewMode = 'list'"
+							class="api-manager__view-toggle-btn"
+							:class="{ 'api-manager__view-toggle-btn--active': viewMode === 'list' }"
+							title="List View">
+							<xIcon icon="list" :size="18" />
+						</button>
+						<button
+							@click="viewMode = 'grid'"
+							class="api-manager__view-toggle-btn"
+							:class="{ 'api-manager__view-toggle-btn--active': viewMode === 'grid' }"
+							title="Grid View">
+							<xIcon icon="grid" :size="18" />
+						</button>
+					</div>
+
 					<button
 						@click="showPreview = !showPreview"
 						class="api-manager__toggle-btn"
@@ -572,10 +876,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							class="api-manager__tree-item"
 							:class="{ 'api-manager__tree-item--active': activeNode.id === mockApiData.id }"
 							style="padding-left: 8px"
-							@click="handleOpenNode(mockApiData)">
+							@click.stop="handleOpenNode(mockApiData)"
+							@contextmenu="showContextMenu(mockApiData, $event)">
 							<span
 								class="api-manager__tree-toggle"
-								@click="e => toggleFolder(mockApiData.id, e)">
+								@click.stop="e => toggleFolder(mockApiData.id, e)">
 								<xIcon 
 													type="chevron-down"
 													v-if="expandedFolders.has(mockApiData.id)"
@@ -602,10 +907,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 										class="api-manager__tree-item"
 										:class="{ 'api-manager__tree-item--active': activeNode.id === child.id }"
 										style="padding-left: 20px"
-										@click="handleOpenNode(child)">
+										@click.stop="handleOpenNode(child)"
+										@contextmenu="showContextMenu(child, $event)">
 										<span
 											class="api-manager__tree-toggle"
-											@click="e => toggleFolder(child.id, e)">
+											@click.stop="e => toggleFolder(child.id, e)">
 											<template
 												v-if="
 													isFolderType(child.type) &&
@@ -640,10 +946,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 													class="api-manager__tree-item"
 													:class="{ 'api-manager__tree-item--active': activeNode.id === subchild.id }"
 													style="padding-left: 32px"
-													@click="handleOpenNode(subchild)">
+													@click.stop="handleOpenNode(subchild)"
+													@contextmenu="showContextMenu(subchild, $event)">
 													<span
 														class="api-manager__tree-toggle"
-														@click="e => toggleFolder(subchild.id, e)">
+														@click.stop="e => toggleFolder(subchild.id, e)">
 														<template
 															v-if="
 																isFolderType(subchild.type) &&
@@ -684,18 +991,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 																class="api-manager__tree-item"
 																:class="{ 'api-manager__tree-item--active': activeNode.id === subsubchild.id }"
 																style="padding-left: 44px"
-																@click="
-																	handleOpenNode(subsubchild)
-																">
+																@click.stop="handleOpenNode(subsubchild)"
+																@contextmenu="showContextMenu(subsubchild, $event)">
 																<span
 																	class="api-manager__tree-toggle"
-																	@click="
-																		e =>
-																			toggleFolder(
-																				subsubchild.id,
-																				e
-																			)
-																	">
+																	@click.stop="e => toggleFolder(subsubchild.id, e)">
 																	<template
 																		v-if="
 																			isFolderType(
@@ -752,9 +1052,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 																			style="
 																				padding-left: 56px;
 																			"
-																			@click="
-																				handleOpenNode(leaf)
-																			">
+																			@click.stop="handleOpenNode(leaf)"
+																			@contextmenu="showContextMenu(leaf, $event)">
 																			<span
 																				class="api-manager__tree-toggle api-manager__tree-toggle--spacer"
 																				aria-hidden="true"></span>
@@ -812,8 +1111,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 
 				<!-- Folder View -->
 				<template v-if="isFolderType(activeNode.type)">
-					<!-- Table Header -->
-					<div class="api-manager__table-header">
+					<!-- Table Header (only for list view) -->
+					<div v-if="viewMode === 'list'" class="api-manager__table-header">
 						<div
 							class="api-manager__table-header-cell api-manager__table-header-cell--name"
 							@click="handleSort('name')">
@@ -861,8 +1160,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						</div>
 					</div>
 
-					<!-- File List -->
-					<div class="api-manager__file-list" @click="selectedFile = null">
+					<!-- File List (List View) -->
+					<div v-if="viewMode === 'list'" class="api-manager__file-list" @click="selectedFile = null">
 						<div
 							v-if="filteredAndSortedFiles.length === 0"
 							class="api-manager__empty-state">
@@ -891,6 +1190,41 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								</div>
 								<div class="api-manager__file-cell api-manager__file-cell--type">
 									{{ file.type.replace("_", " ") }}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Grid View -->
+					<div v-if="viewMode === 'grid'" class="api-manager__file-grid">
+						<div
+							v-if="filteredAndSortedFiles.length === 0"
+							class="api-manager__empty-state">
+							<xIcon icon="folder" :size="48" class="api-manager__empty-icon" />
+							<p>This folder is empty</p>
+						</div>
+						<div v-else class="api-manager__file-grid-inner">
+							<div
+								v-for="file in filteredAndSortedFiles"
+								:key="file.id"
+								@click.stop="selectedFile = file"
+								@dblclick.stop="handleOpenNode(file)"
+								class="api-manager__file-card"
+								:class="{ 'api-manager__file-card--selected': selectedFile?.id === file.id }">
+								<div class="api-manager__file-card-icon">
+									<xIcon 
+										:type="getIcon(file.type)"
+										:size="32"
+										:class="getIconColor(file.type)" />
+								</div>
+								<div class="api-manager__file-card-content">
+									<h4 class="api-manager__file-card-name">{{ file.name }}</h4>
+									<p class="api-manager__file-card-meta">
+										{{ file.type.replace("_", " ") }}
+									</p>
+									<p class="api-manager__file-card-date">
+										{{ formatDate(file.updatedAt) }}
+									</p>
 								</div>
 							</div>
 						</div>
@@ -1241,6 +1575,35 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						</div>
 					</div>
 				</template>
+			</div>
+
+			<!-- Context Menu -->
+			<div
+				v-if="contextMenu.show"
+				class="api-manager__context-menu"
+				:style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+				@click.stop>
+				<div class="api-manager__context-menu-item" @click="handleContextMenuAction('rename')">
+					<xIcon icon="edit" :size="14" />
+					<span>Rename</span>
+				</div>
+				<div class="api-manager__context-menu-item" @click="handleContextMenuAction('move')">
+					<xIcon icon="move" :size="14" />
+					<span>Move</span>
+				</div>
+				<div class="api-manager__context-menu-item api-manager__context-menu-item--danger" @click="handleContextMenuAction('delete')">
+					<xIcon icon="delete" :size="14" />
+					<span>Delete</span>
+				</div>
+				<div class="api-manager__context-menu-divider"></div>
+				<div class="api-manager__context-menu-item" @click="handleContextMenuAction('copyLink')">
+					<xIcon icon="copy" :size="14" />
+					<span>Copy Link</span>
+				</div>
+				<div class="api-manager__context-menu-item" @click="handleContextMenuAction('openNewTab')">
+					<xIcon icon="external-link" :size="14" />
+					<span>Open in New Tab</span>
+				</div>
 			</div>
 
 			<!-- Preview Pane (Only for Folders) -->
@@ -2174,6 +2537,36 @@ export default async function ({ PRIVATE_GLOBAL }) {
     color: var(--color-on-primary-container);
   }
 
+  &__view-toggle {
+    display: flex;
+    background: var(--color-surface-container);
+    border: 1px solid color-mix(in srgb, var(--color-outline-variant) 55%, transparent);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  &__view-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+    border: 0;
+    background: transparent;
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background: var(--color-surface-variant);
+    }
+
+    &--active {
+      background: var(--color-surface-container-lowest);
+      color: var(--color-primary);
+    }
+  }
+
   &__search-input,
   &__field-input,
   &__select-shell {
@@ -2300,6 +2693,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
   }
 
   &__method-badge--get,
+  &__icon--personal,
   &__icon--group,
   &__icon--member-list {
     color: var(--el-color-primary);
@@ -2344,6 +2738,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
 
   &__icon--project {
     color: var(--el-color-primary-dark-2);
+  }
+
+  &__icon--log {
+    color: var(--el-color-info);
   }
 
   &__icon--code {
@@ -2398,6 +2796,121 @@ export default async function ({ PRIVATE_GLOBAL }) {
     &:hover {
       background: var(--el-color-danger-light-9);
     }
+  }
+
+  &__context-menu {
+    position: fixed;
+    z-index: 1000;
+    min-width: 160px;
+    background: var(--color-surface-container-lowest);
+    border: 1px solid color-mix(in srgb, var(--color-outline-variant) 55%, transparent);
+    border-radius: 12px;
+    box-shadow: var(--el-box-shadow);
+    overflow: hidden;
+  }
+
+  &__context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--color-on-surface);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: var(--color-surface-variant);
+    }
+
+    &--danger {
+      color: var(--el-color-danger);
+
+      &:hover {
+        background: var(--el-color-danger-light-9);
+      }
+    }
+  }
+
+  &__context-menu-divider {
+    height: 1px;
+    margin: 4px 0;
+    background: color-mix(in srgb, var(--color-outline-variant) 55%, transparent);
+  }
+
+  &__file-grid {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  &__file-grid-inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+
+  &__file-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--color-surface-container-lowest);
+    border: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-surface-variant) 30%, transparent);
+      border-color: color-mix(in srgb, var(--color-outline-variant) 55%, transparent);
+    }
+
+    &--selected {
+      background: color-mix(in srgb, var(--color-primary-container) 30%, transparent);
+      border-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+    }
+  }
+
+  &__file-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--color-surface-variant);
+    margin-bottom: 12px;
+    align-self: flex-start;
+  }
+
+  &__file-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__file-card-name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__file-card-meta {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-on-surface-variant);
+  }
+
+  &__file-card-date {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-on-surface-variant);
+    margin-top: auto;
   }
 }
 </style>

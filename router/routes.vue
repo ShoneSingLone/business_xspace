@@ -5,8 +5,20 @@ export default async function () {
 			return h("router-view");
 		}
 	};
-	return [
+
+	const isDevEnv = () => {
+		try {
+			return localStorage.isDev === "DEV";
+		} catch {
+			return false;
+		}
+	};
+
+	const routes = [
 		_.$newRoute("/v1", "@/views/v1/ViewXspace.vue"),
+		_.$newRoute("/v1/api-manager", "@/views/v1/single/ApiManagerDev.vue", {
+			name: "v1-api-manager"
+		}),
 		_.$newRoute("/demo_test", "@/views/demo/test.vue"),
 		_.$newRoute("/cicd", "@/views/CiCd/ViewCiCd.vue", {
 			redirect: "/cicd/task_list",
@@ -67,5 +79,8 @@ export default async function () {
 			redirect: "/404"
 		}
 	];
+
+
+	return routes;
 }
 </script>
