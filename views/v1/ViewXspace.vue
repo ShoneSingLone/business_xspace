@@ -81,7 +81,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
     methods: {
       async loadShortcuts() {
         try {
-          const response = await _api.xspace.get('/user/shortcuts');
+          const response = await _api.xspace.getUserShortcuts();
           if (response.data && response.data.length > 0) {
             this.shortcuts = response.data;
           } else {
@@ -105,10 +105,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
       },
       async saveShortcuts() {
         try {
-          // 检查_api.xspace.put是否存在
-          if (_api && _api.xspace && _api.xspace.put) {
-            await _api.xspace.put('/user/shortcuts', { shortcuts: this.shortcuts });
-          }
+          await _api.xspace.saveUserShortcuts(this.shortcuts);
         } catch (error) {
           console.error('Failed to save shortcuts:', error);
         }

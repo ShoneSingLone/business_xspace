@@ -23,21 +23,13 @@ export default async function () {
 			};
 
 			window._api.xspace = {
-			// 通用GET请求方法
-			async get(url, data) {
-				return _.$ajax.get(url, { data });
+			// 获取用户快捷方式
+			async getUserShortcuts() {
+				return _.$ajax.get("/api/user/shortcuts");
 			},
-			// 通用POST请求方法
-			async post(url, data) {
-				return _.$ajax.post(url, { data });
-			},
-			// 通用PUT请求方法
-			async put(url, data) {
-				return _.$ajax.put(url, { data });
-			},
-			// 通用DELETE请求方法
-			async delete(url, data) {
-				return _.$ajax.delete(url, { data });
+			// 保存用户快捷方式
+			async saveUserShortcuts(shortcuts) {
+				return _.$ajax.put("/api/user/shortcuts", { data: { shortcuts } });
 			},
 			async system_dicts(typeObject = {}) {
 				const typeArray = Object.keys(typeObject);
