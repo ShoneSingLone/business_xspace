@@ -1,378 +1,21 @@
 <script lang="ts">
 export default async function ({ PRIVATE_GLOBAL }) {
-  const mockApiData = {
-    id: "root",
-    name: "API Workspaces",
-    type: "folder",
-    updatedAt: "2026-03-31T10:00:00Z",
-    path: "/API Workspaces",
-    children: [
-      {
-        id: "personal_space",
-        name: "个人空间",
-        type: "personal",
-        role: "owner",
-        updatedAt: "2026-04-01T12:00:00Z",
-        path: "/API Workspaces/个人空间",
-        visibility: "private",
-        children: [
-          {
-            id: "ps_my_projects",
-            name: "我的项目",
-            type: "folder",
-            updatedAt: "2026-04-01T12:00:00Z",
-            path: "/API Workspaces/个人空间/我的项目",
-            children: [
-              {
-                id: "ps_proj_private",
-                name: "个人项目",
-                type: "project",
-                role: "owner",
-                updatedAt: "2026-04-01T11:00:00Z",
-                path: "/API Workspaces/个人空间/我的项目/个人项目",
-                visibility: "private",
-                description: "个人开发项目",
-                tags: ["个人", "开发"],
-                children: [
-                  {
-                    id: "ps_p_api",
-                    name: "API",
-                    type: "api_folder",
-                    updatedAt: "2026-04-01T10:00:00Z",
-                    path: "/API Workspaces/个人空间/我的项目/个人项目/API",
-                    children: [],
-                  },
-                  {
-                    id: "ps_p_docs",
-                    name: "文档",
-                    type: "doc_folder",
-                    updatedAt: "2026-04-01T10:00:00Z",
-                    path: "/API Workspaces/个人空间/我的项目/个人项目/文档",
-                    children: [],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "ps_followed",
-            name: "关注的项目",
-            type: "folder",
-            updatedAt: "2026-04-01T12:00:00Z",
-            path: "/API Workspaces/个人空间/关注的项目",
-            children: [
-              {
-                id: "ps_follow_proj",
-                name: "关注项目 Demo",
-                type: "project",
-                role: "viewer",
-                updatedAt: "2026-03-30T09:00:00Z",
-                path: "/API Workspaces/个人空间/关注的项目/关注项目 Demo",
-                visibility: "internal",
-                description: "关注的公共项目",
-                tags: ["关注"],
-                followed: true,
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "group_backend",
-        name: "Backend Team",
-        type: "group",
-        role: "admin",
-        updatedAt: "2026-03-31T10:00:00Z",
-        path: "/API Workspaces/Backend Team",
-        visibility: "internal",
-        description: "Core backend services team handling microservices.",
-        createdBy: "Admin",
-        createdAt: "2025-01-01",
-        stats: {
-          projectCount: 3,
-          docCount: 15,
-          memberCount: 8,
-          activityDays: 7,
-        },
-        children: [
-          {
-            id: "gb_projects",
-            name: "Projects",
-            type: "folder",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Projects",
-            children: [
-              {
-                id: "proj_main",
-                name: "Main API",
-                type: "project",
-                role: "owner",
-                updatedAt: "2026-03-31T10:00:00Z",
-                path: "/API Workspaces/Backend Team/Projects/Main API",
-                visibility: "internal",
-                description: "核心 API 服务",
-                tags: ["核心", "API"],
-                children: [
-                  {
-                    id: "pm_api",
-                    name: "API Management",
-                    type: "api_folder",
-                    updatedAt: "2026-03-31T10:00:00Z",
-                    path: "/API Workspaces/Backend Team/Projects/Main API/API Management",
-                    children: [
-                      {
-                        id: "api_get_users",
-                        name: "GET /users",
-                        type: "api",
-                        updatedAt: "2026-03-31T10:00:00Z",
-                        path: "/API Workspaces/Backend Team/Projects/Main API/API Management/GET users",
-                        content: {
-                          method: "GET",
-                          endpoint: "/users",
-                          description: "Get a list of all users",
-                          params: [
-                            { name: "page", type: "number", default: 1 },
-                          ],
-                        },
-                      },
-                      {
-                        id: "api_post_users",
-                        name: "POST /users",
-                        type: "api",
-                        updatedAt: "2026-03-31T10:00:00Z",
-                        path: "/API Workspaces/Backend Team/Projects/Main API/API Management/POST users",
-                        content: {
-                          method: "POST",
-                          endpoint: "/users",
-                          description: "Create a new user",
-                          body: '{\n  "name": "string",\n  "email": "string"\n}',
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    id: "pm_docs",
-                    name: "Documentation",
-                    type: "doc_folder",
-                    updatedAt: "2026-03-31T10:00:00Z",
-                    path: "/API Workspaces/Backend Team/Projects/Main API/Documentation",
-                    children: [],
-                  },
-                  {
-                    id: "pm_cicd",
-                    name: "CI/CD Pipeline",
-                    type: "cicd",
-                    updatedAt: "2026-03-31T10:00:00Z",
-                    path: "/API Workspaces/Backend Team/Projects/Main API/CI/CD Pipeline",
-                    content: {
-                      status: "passing",
-                      lastRun: "2026-03-31T09:00:00Z",
-                      stages: ["Build", "Test", "Deploy"],
-                    },
-                  },
-                  {
-                    id: "pm_settings",
-                    name: "Project Settings",
-                    type: "setting",
-                    updatedAt: "2026-03-31T10:00:00Z",
-                    path: "/API Workspaces/Backend Team/Projects/Main API/Project Settings",
-                    content: {
-                      env: "Production",
-                      version: "1.2.0",
-                      baseUrl: "https://api.example.com",
-                    },
-                  },
-                  {
-                    id: "pm_members",
-                    name: "Project Members",
-                    type: "member_list",
-                    updatedAt: "2026-03-31T10:00:00Z",
-                    path: "/API Workspaces/Backend Team/Projects/Main API/Project Members",
-                    content: [{ id: 1, name: "Alice Smith", role: "Owner" }],
-                  },
-                ],
-              },
-              {
-                id: "proj_auth",
-                name: "Auth Service",
-                type: "project",
-                role: "developer",
-                updatedAt: "2026-03-29T14:00:00Z",
-                path: "/API Workspaces/Backend Team/Projects/Auth Service",
-                visibility: "internal",
-                description: "认证授权服务",
-                tags: ["认证", "安全"],
-              },
-              {
-                id: "proj_payment",
-                name: "Payment API",
-                type: "project",
-                role: "developer",
-                updatedAt: "2026-03-28T16:00:00Z",
-                path: "/API Workspaces/Backend Team/Projects/Payment API",
-                visibility: "private",
-                description: "支付服务 API",
-                tags: ["支付"],
-              },
-            ],
-          },
-          {
-            id: "gb_members",
-            name: "Group Members",
-            type: "member_list",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Group Members",
-            content: [
-              { id: 1, name: "Alice Smith", role: "owner", email: "alice@example.com" },
-              { id: 2, name: "Bob Jones", role: "admin", email: "bob@example.com" },
-              { id: 3, name: "Charlie Brown", role: "developer", email: "charlie@example.com" },
-              { id: 4, name: "David Wilson", role: "developer", email: "david@example.com" },
-              { id: 5, name: "Eve Davis", role: "guest", email: "eve@example.com" },
-            ],
-          },
-          {
-            id: "gb_docs",
-            name: "Group Docs",
-            type: "doc_folder",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Group Docs",
-            children: [
-              {
-                id: "gb_doc_1",
-                name: "Architecture.md",
-                type: "doc",
-                updatedAt: "2026-03-31T10:00:00Z",
-                path: "/API Workspaces/Backend Team/Group Docs/Architecture.md",
-                content: "# Architecture\n\nOur system is based on Node.js microservices communicating via gRPC.",
-              },
-              {
-                id: "gb_doc_2",
-                name: "API Guidelines.md",
-                type: "doc",
-                updatedAt: "2026-03-30T09:00:00Z",
-                path: "/API Workspaces/Backend Team/Group Docs/API Guidelines.md",
-                content: "# API 设计规范\n\n遵循 RESTful 设计原则...",
-              },
-            ],
-          },
-          {
-            id: "gb_settings",
-            name: "Group Settings",
-            type: "setting",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Group Settings",
-            content: {
-              name: "Backend Team",
-              description: "Core backend services team handling microservices.",
-              visibility: "internal",
-              defaultRole: "guest",
-              allowExternalShare: true,
-            },
-          },
-          {
-            id: "gb_log",
-            name: "Activity Log",
-            type: "log",
-            updatedAt: "2026-03-31T10:00:00Z",
-            path: "/API Workspaces/Backend Team/Activity Log",
-            content: [
-              { time: "2026-03-31 10:00", action: "更新项目", user: "Alice", target: "Main API" },
-              { time: "2026-03-31 09:30", action: "添加成员", user: "Bob", target: "Eve Davis" },
-              { time: "2026-03-31 09:00", action: "创建文档", user: "Charlie", target: "API Guidelines.md" },
-              { time: "2026-03-30 18:00", action: "发布 API", user: "David", target: "GET /users" },
-            ],
-          },
-        ],
-      },
-      {
-        id: "group_frontend",
-        name: "Frontend Team",
-        type: "group",
-        role: "member",
-        updatedAt: "2026-03-30T15:00:00Z",
-        path: "/API Workspaces/Frontend Team",
-        visibility: "internal",
-        description: "Frontend development team.",
-        createdBy: "Admin",
-        createdAt: "2025-02-15",
-        stats: {
-          projectCount: 2,
-          docCount: 8,
-          memberCount: 5,
-          activityDays: 30,
-        },
-        children: [
-          {
-            id: "gf_projects",
-            name: "Projects",
-            type: "folder",
-            updatedAt: "2026-03-30T15:00:00Z",
-            path: "/API Workspaces/Frontend Team/Projects",
-            children: [
-              {
-                id: "proj_webapp",
-                name: "Web App",
-                type: "project",
-                role: "developer",
-                updatedAt: "2026-03-30T14:00:00Z",
-                path: "/API Workspaces/Frontend Team/Projects/Web App",
-                visibility: "internal",
-                description: "主前端应用",
-                tags: ["前端", "Vue"],
-              },
-            ],
-          },
-          {
-            id: "gf_members",
-            name: "Group Members",
-            type: "member_list",
-            updatedAt: "2026-03-30T15:00:00Z",
-            path: "/API Workspaces/Frontend Team/Group Members",
-            content: [
-              { id: 6, name: "Frank Lee", role: "owner", email: "frank@example.com" },
-              { id: 7, name: "Grace Chen", role: "developer", email: "grace@example.com" },
-            ],
-          },
-        ],
-      },
-      {
-        id: "global_resources",
-        name: "Global Resources",
-        type: "folder",
-        updatedAt: "2026-04-01T10:00:00Z",
-        path: "/API Workspaces/Global Resources",
-        children: [
-          {
-            id: "gr_models",
-            name: "Data Models",
-            type: "doc_folder",
-            updatedAt: "2026-04-01T10:00:00Z",
-            path: "/API Workspaces/Global Resources/Data Models",
-            children: [
-              {
-                id: "gr_user_model",
-                name: "UserSchema.json",
-                type: "code",
-                updatedAt: "2026-04-01T10:00:00Z",
-                path: "/API Workspaces/Global Resources/Data Models/UserSchema.json",
-                content: '{\n  "type": "object",\n  "properties": {\n    "id": { "type": "string" },\n    "name": { "type": "string" },\n    "email": { "type": "string", "format": "email" }\n  },\n  "required": ["id", "name"]\n}',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+const api = await _.$importVue("@/utils/api.vue");
 
   return {
     props: {
       windowData: Object,
     },
     // system: v1 Desktop Workspace 局部状态（来自 ViewXspace）
-    inject: ["system"],
+    inject: {
+      system: {
+        default: null
+      }
+    },
     data() {
       return {
-        mockApiData: mockApiData,
+        // API Data
+        apiData: null,
         // Global Environment State
         environments: ["Development", "Test", "Staging", "Production"],
         activeEnvironment: "Development",
@@ -381,8 +24,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
         searchQuery: "",
         showPreview: true,
         viewMode: "list", // list | grid
-        expandedFolders: new Set([mockApiData.id]),
-        selectedNodeId: mockApiData.id,
+        expandedFolders: new Set(["personal_space", "groups"]),
+        selectedNodeId: "personal_space",
+        // Loading and Error State
+        isLoading: false,
+        error: null,
         // Sort State
         sortField: "name",
         sortDirection: "asc",
@@ -400,18 +46,53 @@ export default async function ({ PRIVATE_GLOBAL }) {
           y: 0,
           node: null,
         },
+        // Create Project Dialog State
+        showCreateProjectDialog: false,
+        createProjectForm: {
+          name: "",
+          description: "",
+          visibility: "private",
+        },
+        createProjectFormConfigs: {
+          name: {
+            label: '项目名称',
+            value: '',
+            placeholder: '请输入项目名称',
+            rules: [{ required: true, message: '请输入项目名称' }]
+          },
+          description: {
+            label: '项目描述',
+            type: 'textarea',
+            value: '',
+            placeholder: '请输入项目描述'
+          },
+          visibility: {
+            label: '项目可见性',
+            type: 'select',
+            value: 'private',
+            options: [
+              { label: '私有', value: 'private' },
+              { label: '内部', value: 'internal' },
+              { label: '公开', value: 'public' }
+            ]
+          }
+        },
+        creatingProject: false,
       };
     },
     computed: {
       activeNode() {
-        const node = this.windowData || this.mockApiData;
-        this.expandAncestors(node.id);
-        return node;
+        if (this.windowData) {
+          // 避免在计算属性中修改状态，移到mounted或watch中处理
+          return this.windowData;
+        }
+        // 默认返回个人空间
+        return this.apiData?.find(item => item.id === "personal_space");
       },
       filteredAndSortedFiles() {
-        if (!this.isFolderType(this.activeNode.type)) return [];
+        if (!this.isFolderType(this.activeNode?.type)) return [];
 
-        let files = this.activeNode.children || [];
+        let files = this.activeNode?.children || [];
 
         if (this.searchQuery) {
           const lowerQuery = this.searchQuery.toLowerCase();
@@ -449,17 +130,191 @@ export default async function ({ PRIVATE_GLOBAL }) {
         });
       },
       canNavigateUp() {
-        return this.activeNode.id !== this.mockApiData.id;
+        return this.activeNode?.id !== "personal_space" && this.activeNode?.id !== "groups";
       },
     },
+    mounted() {
+      this.loadApiData();
+      // 初始化时处理windowData
+      if (this.windowData) {
+        this.expandAncestors(this.windowData.id);
+      }
+    },
+    watch: {
+      windowData: {
+        handler(newVal) {
+          if (newVal) {
+            this.expandAncestors(newVal.id);
+          }
+        },
+        immediate: false
+      }
+    },
     methods: {
+      // API Data Loading
+      async loadApiData() {
+        this.isLoading = true;
+        this.error = null;
+        try {
+          // 加载群组数据
+          const groups = await api.groupMine();
+          
+          // 构建API数据结构
+          this.apiData = [
+            {
+              id: "personal_space",
+              name: "个人空间",
+              type: "personal",
+              role: "owner",
+              updatedAt: new Date().toISOString(),
+              path: "/个人空间",
+              visibility: "private",
+              children: [
+                {
+                  id: "ps_my_projects",
+                  name: "我的项目",
+                  type: "folder",
+                  updatedAt: new Date().toISOString(),
+                  path: "/个人空间/我的项目",
+                  children: [],
+                },
+                {
+                  id: "ps_followed",
+                  name: "星标项目",
+                  type: "folder",
+                  updatedAt: new Date().toISOString(),
+                  path: "/个人空间/星标项目",
+                  children: [],
+                },
+              ],
+            },
+            {
+              id: "groups",
+              name: "群组",
+              type: "folder",
+              updatedAt: new Date().toISOString(),
+              path: "/群组",
+              children: groups.data?.map(group => ({
+                id: `group_${group.id}`,
+                name: group.name,
+                type: "group",
+                role: group.role,
+                updatedAt: new Date().toISOString(),
+                path: `/群组/${group.name}`,
+                visibility: group.visibility,
+                description: group.desc,
+                createdBy: group.created_by,
+                createdAt: group.created_at,
+                stats: {
+                  projectCount: group.project_count || 0,
+                  docCount: group.doc_count || 0,
+                  memberCount: group.member_count || 0,
+                  activityDays: group.activity_days || 0,
+                },
+                children: [
+                  {
+                    id: `group_${group.id}_projects`,
+                    name: "Projects",
+                    type: "folder",
+                    updatedAt: new Date().toISOString(),
+                    path: `/群组/${group.name}/Projects`,
+                    children: group.projects?.map(project => ({
+                      id: project.id,
+                      name: project.name,
+                      type: "project",
+                      role: project.role,
+                      updatedAt: project.updated_at,
+                      path: `/群组/${group.name}/Projects/${project.name}`,
+                      visibility: project.visibility,
+                      followed: project.follow,
+                      content: {
+                        endpoint: `api/${project.id}/endpoints`,
+                        method: "GET",
+                        description: `API 端点 for ${project.name}`,
+                      },
+                    })) || [],
+                  },
+                  {
+                    id: `group_${group.id}_members`,
+                    name: "Group Members",
+                    type: "member_list",
+                    updatedAt: new Date().toISOString(),
+                    path: `/群组/${group.name}/Group Members`,
+                    content: [] // 后续通过API加载
+                  },
+                  {
+                    id: `group_${group.id}_docs`,
+                    name: "Group Docs",
+                    type: "doc_folder",
+                    updatedAt: new Date().toISOString(),
+                    path: `/群组/${group.name}/Group Docs`,
+                    children: [] // 后续通过API加载
+                  },
+                  {
+                    id: `group_${group.id}_settings`,
+                    name: "Group Settings",
+                    type: "setting",
+                    updatedAt: new Date().toISOString(),
+                    path: `/群组/${group.name}/Group Settings`,
+                    content: {
+                      name: group.name,
+                      description: group.desc,
+                      visibility: group.visibility,
+                      defaultRole: group.default_role || "guest",
+                      allowExternalShare: group.allow_external_share || false,
+                    }
+                  },
+                  {
+                    id: `group_${group.id}_log`,
+                    name: "Activity Log",
+                    type: "log",
+                    updatedAt: new Date().toISOString(),
+                    path: `/群组/${group.name}/Activity Log`,
+                    content: [] // 后续通过API加载
+                  },
+                ],
+              })) || [],
+            },
+          ];
+          
+          // 加载个人项目
+          try {
+            const personalProjects = await api.project_page({ group_id: null, page: 1, size: 1000, name: "" });
+            this.apiData[0].children[0].children = personalProjects.data?.list?.map(project => ({
+              id: project.id,
+              name: project.name,
+              type: "project",
+              role: project.role,
+              updatedAt: project.updated_at,
+              path: `/个人空间/我的项目/${project.name}`,
+              visibility: project.visibility,
+              followed: project.follow,
+              content: {
+                endpoint: `api/${project.id}/endpoints`,
+                method: "GET",
+                description: `API 端点 for ${project.name}`,
+              },
+            })) || [];
+          } catch (error) {
+            console.error("Failed to load personal projects:", error);
+          }
+          
+          // 加载星标项目 - 暂时使用空数组，因为API中没有直接获取星标项目的方法
+          // 后续可以通过遍历所有项目并筛选followed为true的项目来实现
+        } catch (error) {
+          console.error("Failed to load API data:", error);
+          this.error = "加载数据失败，请刷新页面重试";
+        } finally {
+          this.isLoading = false;
+        }
+      },
       // LocalStorage Utils
       loadExpandedFolders() {
         try {
           const saved = localStorage.getItem("apiManager_expandedFolders");
-          return saved ? new Set(JSON.parse(saved)) : new Set([this.mockApiData.id]);
+          return saved ? new Set(JSON.parse(saved)) : new Set(["personal_space", "groups"]);
         } catch {
-          return new Set([this.mockApiData.id]);
+          return new Set(["personal_space", "groups"]);
         }
       },
       saveExpandedFolders() {
@@ -471,9 +326,9 @@ export default async function ({ PRIVATE_GLOBAL }) {
       },
       loadSelectedNodeId() {
         try {
-          return localStorage.getItem("apiManager_selectedNodeId") || this.mockApiData.id;
+          return localStorage.getItem("apiManager_selectedNodeId") || "personal_space";
         } catch {
-          return this.mockApiData.id;
+          return "personal_space";
         }
       },
       saveSelectedNodeId(nodeId) {
@@ -503,6 +358,17 @@ export default async function ({ PRIVATE_GLOBAL }) {
         ].includes(type);
       },
       findParentNode(root, targetId) {
+        // 处理根级别数组
+        if (Array.isArray(root)) {
+          for (const item of root) {
+            if (item.id === targetId) return null; // 根级项目没有父节点
+            const found = this.findParentNode(item, targetId);
+            if (found) return found;
+          }
+          return null;
+        }
+        
+        // 处理普通节点
         if (!root.children) return null;
         for (const child of root.children) {
           if (child.id === targetId) return root;
@@ -514,8 +380,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
       // Auto-expand ancestors of activeNode
       expandAncestors(nodeId) {
         let currentId = nodeId;
-        while (currentId !== this.mockApiData.id) {
-          const parent = this.findParentNode(this.mockApiData, currentId);
+        while (currentId !== "personal_space" && currentId !== "groups") {
+          const parent = this.findParentNode(this.apiData, currentId);
           if (parent) {
             this.expandedFolders.add(parent.id);
             currentId = parent.id;
@@ -532,10 +398,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
         }
       },
       handleNavigateUp() {
-        if (this.activeNode.id === this.mockApiData.id) return;
+        if (this.activeNode?.id === "personal_space" || this.activeNode?.id === "groups") return;
         const parent = this.findParentNode(
-          this.mockApiData,
-          this.activeNode.id,
+          this.apiData,
+          this.activeNode?.id,
         );
         if (parent) {
           this.handleOpenNode(parent);
@@ -607,7 +473,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
       },
       deleteNode(node) {
         if (confirm(`Are you sure you want to delete "${node.name}"?`)) {
-          const parent = this.findParentNode(this.mockApiData, node.id);
+          const parent = this.findParentNode(this.apiData, node.id);
           if (parent && parent.children) {
             parent.children = parent.children.filter((child) => child.id !== node.id);
             _.$msg("Deleted successfully");
@@ -656,13 +522,22 @@ export default async function ({ PRIVATE_GLOBAL }) {
             return "file";
         }
       },
-      getIconColor(type) {
+      getIconColor(type, node) {
         switch (type) {
           case "personal":
             return "api-manager__icon api-manager__icon--personal";
           case "group":
             return "api-manager__icon api-manager__icon--group";
           case "project":
+            if (node && node.path) {
+              if (node.path.includes('/个人空间/我的项目/')) {
+                return "api-manager__icon api-manager__icon--project-personal";
+              } else if (node.path.includes('/个人空间/星标项目/')) {
+                return "api-manager__icon api-manager__icon--project-starred";
+              } else if (node.path.includes('/群组/')) {
+                return "api-manager__icon api-manager__icon--project-group";
+              }
+            }
             return "api-manager__icon api-manager__icon--project";
           case "api_folder":
             return "api-manager__icon api-manager__icon--api-folder";
@@ -775,6 +650,72 @@ export default async function ({ PRIVATE_GLOBAL }) {
           800 + Math.random() * 500,
         );
       },
+      // Create Project Methods
+      openCreateProjectDialog() {
+        this.createProjectForm = {
+          name: "",
+          description: "",
+          visibility: "private",
+        };
+        // 同步表单配置值
+        this.createProjectFormConfigs.name.value = "";
+        this.createProjectFormConfigs.description.value = "";
+        this.createProjectFormConfigs.visibility.value = "private";
+        this.showCreateProjectDialog = true;
+      },
+      closeCreateProjectDialog() {
+        this.showCreateProjectDialog = false;
+      },
+      async createProject() {
+        if (!this.createProjectForm.name.trim()) {
+          _.$msg.error("项目名称不能为空");
+          return;
+        }
+
+        this.creatingProject = true;
+        try {
+          const response = await api.project_add({
+            name: this.createProjectForm.name,
+            desc: this.createProjectForm.description,
+            visibility: this.createProjectForm.visibility,
+          });
+
+          if (response.errcode === 0) {
+            _.$msg.success("项目创建成功");
+            this.showCreateProjectDialog = false;
+            // 重新加载数据
+            this.loadApiData();
+          } else {
+            _.$msg.error(response.errmsg || "项目创建失败");
+          }
+        } catch (error) {
+          console.error("Failed to create project:", error);
+          _.$msg.error("项目创建失败，请重试");
+        } finally {
+          this.creatingProject = false;
+        }
+      },
+      async toggleStarProject(project) {
+        try {
+          const response = await api.project_follow({
+            id: project.id,
+            type: project.followed ? 'unfollow' : 'follow',
+          });
+
+          if (response.errcode === 0) {
+            _.$msg.success(project.followed ? "取消星标成功" : "星标成功");
+            // 更新本地状态
+            project.followed = !project.followed;
+            // 重新加载数据以更新星标项目列表
+            this.loadApiData();
+          } else {
+            _.$msg.error(response.errmsg || "操作失败");
+          }
+        } catch (error) {
+          console.error("Failed to toggle star:", error);
+          _.$msg.error("操作失败，请重试");
+        }
+      },
     },
   };
 
@@ -871,223 +812,302 @@ export default async function ({ PRIVATE_GLOBAL }) {
 
 					<!-- Recursive Tree Component inline simulation -->
 					<div class="api-manager__tree">
-						<!-- Root -->
-						<div
-							class="api-manager__tree-item"
-							:class="{ 'api-manager__tree-item--active': activeNode.id === mockApiData.id }"
-							style="padding-left: 8px"
-							@click.stop="handleOpenNode(mockApiData)"
-							@contextmenu="showContextMenu(mockApiData, $event)">
-							<span
-								class="api-manager__tree-toggle"
-								@click.stop="e => toggleFolder(mockApiData.id, e)">
-								<xIcon 
-													type="chevron-down"
-													v-if="expandedFolders.has(mockApiData.id)"
-													:size="14" />
-												<xIcon 
-													type="chevron-right" 
-													v-else 
-													:size="14" />
-							</span>
-							<span class="api-manager__tree-icon">
-								<xIcon 
-												:type="getIcon(mockApiData.type)"
-												:size="16"
-												:class="getIconColor(mockApiData.type)" />
-							</span>
-							<span class="api-manager__tree-label">{{ mockApiData.name }}</span>
+						<!-- Loading State -->
+						<div v-if="isLoading" class="api-manager__loading">
+							<xIcon type="loader-2" :size="24" class="api-manager__loading-icon" />
+							<span>加载中...</span>
 						</div>
-
-						<!-- Level 1 -->
-						<div v-if="expandedFolders.has(mockApiData.id)">
-							<template v-for="child in mockApiData.children" :key="child.id">
-								<div>
-									<div
-										class="api-manager__tree-item"
-										:class="{ 'api-manager__tree-item--active': activeNode.id === child.id }"
-										style="padding-left: 20px"
-										@click.stop="handleOpenNode(child)"
-										@contextmenu="showContextMenu(child, $event)">
-										<span
-											class="api-manager__tree-toggle"
-											@click.stop="e => toggleFolder(child.id, e)">
-											<template
-												v-if="
-													isFolderType(child.type) &&
-													child.children?.length
-												">
-												<xIcon 
-															type="chevron-down"
-															v-if="expandedFolders.has(child.id)"
-															:size="14" />
-														<xIcon 
-															type="chevron-right" 
-															v-else 
-															:size="14" />
-											</template>
-										</span>
-										<span class="api-manager__tree-icon">
-											<xIcon 
-														:type="getIcon(child.type)"
-														:size="16"
-														:class="getIconColor(child.type)" />
-										</span>
-										<span class="api-manager__tree-label">{{ child.name }}</span>
-									</div>
-
-									<!-- Level 2 -->
-									<div v-if="expandedFolders.has(child.id) && child.children">
+						
+						<!-- Error State -->
+						<div v-else-if="error" class="api-manager__error">
+							<xIcon type="alert-circle" :size="24" class="api-manager__error-icon" />
+							<span>{{ error }}</span>
+							<button @click="loadApiData" class="api-manager__retry-btn">重试</button>
+						</div>
+						
+						<!-- Root Level - Personal Space and Groups -->
+						<template v-else v-for="rootItem in apiData" :key="rootItem.id">
+							<div>
+								<div
+									class="api-manager__tree-item"
+									:class="{ 'api-manager__tree-item--active': activeNode.id === rootItem.id }"
+									style="padding-left: 8px"
+									@click.stop="handleOpenNode(rootItem)"
+									@contextmenu="showContextMenu(rootItem, $event)">
+									<span
+										class="api-manager__tree-toggle"
+										@click.stop="e => toggleFolder(rootItem.id, e)">
 										<template
-											v-for="subchild in child.children"
-											:key="subchild.id">
-											<div>
-												<div
-													class="api-manager__tree-item"
-													:class="{ 'api-manager__tree-item--active': activeNode.id === subchild.id }"
-													style="padding-left: 32px"
-													@click.stop="handleOpenNode(subchild)"
-													@contextmenu="showContextMenu(subchild, $event)">
-													<span
-														class="api-manager__tree-toggle"
-														@click.stop="e => toggleFolder(subchild.id, e)">
-														<template
-															v-if="
-																isFolderType(subchild.type) &&
-																subchild.children?.length
-															">
-															<xIcon 
+											v-if="
+												isFolderType(rootItem.type) &&
+												rootItem.children?.length
+											">
+											<xIcon 
+														type="chevron-down"
+														v-if="expandedFolders.has(rootItem.id)"
+														:size="14" />
+													<xIcon 
+														type="chevron-right" 
+														v-else 
+														:size="14" />
+										</template>
+									</span>
+									<span class="api-manager__tree-icon">
+										<xIcon 
+													:type="getIcon(rootItem.type)"
+													:size="16"
+													:class="getIconColor(rootItem.type)" />
+									</span>
+									<span class="api-manager__tree-label">{{ rootItem.name }}</span>
+								</div>
+
+								<!-- Level 1 -->
+								<div v-if="expandedFolders.has(rootItem.id) && rootItem.children">
+									<template
+										v-for="child in rootItem.children"
+										:key="child.id">
+										<div>
+											<div
+												class="api-manager__tree-item"
+												:class="{ 'api-manager__tree-item--active': activeNode.id === child.id }"
+												style="padding-left: 20px"
+												@click.stop="handleOpenNode(child)"
+												@contextmenu="showContextMenu(child, $event)">
+												<span
+													class="api-manager__tree-toggle"
+													@click.stop="e => toggleFolder(child.id, e)">
+													<template
+														v-if="
+															isFolderType(child.type) &&
+															child.children?.length
+														">
+														<xIcon 
 																	type="chevron-down"
-																	v-if="
-																		expandedFolders.has(subchild.id)
-																	"
+																	v-if="expandedFolders.has(child.id)"
 																	:size="14" />
 																<xIcon 
 																	type="chevron-right" 
 																	v-else 
 																	:size="14" />
-														</template>
-													</span>
-													<span class="api-manager__tree-icon">
-														<xIcon 
-																:type="getIcon(subchild.type)"
+													</template>
+												</span>
+												<span class="api-manager__tree-icon">
+													<xIcon 
+																:type="getIcon(child.type)"
 																:size="16"
-																:class="getIconColor(subchild.type)" />
+																:class="getIconColor(child.type, child)" />
+												</span>
+												<span class="api-manager__tree-label">
+													{{ child.name }}
+													<!-- Personal Project Badge -->
+													<span v-if="child.type === 'project' && child.path.includes('/个人空间/我的项目/')" class="api-manager__project-badge api-manager__project-badge--personal" title="个人项目">
+														个人
 													</span>
-													<span class="api-manager__tree-label">{{ subchild.name }}</span>
-												</div>
+													<!-- Starred Project Badge -->
+													<span v-if="child.type === 'project' && child.path.includes('/个人空间/星标项目/')" class="api-manager__project-badge api-manager__project-badge--starred" title="星标项目">
+														星标
+													</span>
+													<!-- Group Project Badge -->
+													<span v-if="child.type === 'project' && child.path.includes('/群组/')" class="api-manager__project-badge api-manager__project-badge--group" title="群组项目">
+														群组
+													</span>
+												</span>
+												<!-- Add Project Button for Personal Space My Projects -->
+												<span v-if="child.id === 'ps_my_projects'" class="api-manager__tree-actions">
+													<button 
+														@click.stop="openCreateProjectDialog()"
+														class="api-manager__tree-action-btn"
+														title="创建项目">
+														<xIcon icon="plus" :size="14" />
+													</button>
+												</span>
+												<!-- Star Button for Projects -->
+												<span v-if="child.type === 'project'" class="api-manager__tree-actions">
+													<button 
+														@click.stop="toggleStarProject(child)"
+														class="api-manager__tree-action-btn"
+														:title="child.followed ? '取消星标' : '星标'">
+														<xIcon 
+															:type="child.followed ? 'star' : 'star-o'" 
+															:size="14" 
+															:class="child.followed ? 'api-manager__star-icon--active' : ''" />
+													</button>
+												</span>
+											</div>
 
-												<!-- Level 3 -->
-												<div
-													v-if="
-														expandedFolders.has(subchild.id) &&
-														subchild.children
-													">
-													<template
-														v-for="subsubchild in subchild.children"
-														:key="subsubchild.id">
-														<div>
-															<div
-																class="api-manager__tree-item"
-																:class="{ 'api-manager__tree-item--active': activeNode.id === subsubchild.id }"
-																style="padding-left: 44px"
-																@click.stop="handleOpenNode(subsubchild)"
-																@contextmenu="showContextMenu(subsubchild, $event)">
-																<span
-																	class="api-manager__tree-toggle"
-																	@click.stop="e => toggleFolder(subsubchild.id, e)">
-																	<template
-																		v-if="
-																			isFolderType(
-																				subsubchild.type
-																			) &&
-																			subsubchild.children
-																				?.length
-																		">
-																		<xIcon 
+											<!-- Level 2 -->
+											<div v-if="expandedFolders.has(child.id) && child.children">
+												<template
+													v-for="subchild in child.children"
+													:key="subchild.id">
+													<div>
+														<div
+															class="api-manager__tree-item"
+															:class="{ 'api-manager__tree-item--active': activeNode.id === subchild.id }"
+															style="padding-left: 32px"
+															@click.stop="handleOpenNode(subchild)"
+															@contextmenu="showContextMenu(subchild, $event)">
+															<span
+																class="api-manager__tree-toggle"
+																@click.stop="e => toggleFolder(subchild.id, e)">
+																<template
+																	v-if="
+																		isFolderType(subchild.type) &&
+																		subchild.children?.length
+																	">
+																	<xIcon 
 																				type="chevron-down"
 																				v-if="
-																					expandedFolders.has(
-																						subsubchild.id
-																					)
+																					expandedFolders.has(subchild.id)
 																				"
 																				:size="14" />
-																			<xIcon 
-																				type="chevron-right"
-																				v-else
+																		<xIcon 
+																				type="chevron-right" 
+																				v-else 
 																				:size="14" />
-																	</template>
-																</span>
-																<span class="api-manager__tree-icon">
-																	<xIcon 
-																				:type="
-																					getIcon(
-																						subsubchild.type
-																					)
-																				"
-																				:size="16"
-																				:class="
-																					getIconColor(
-																						subsubchild.type
-																					)
-																				" />
-																</span>
-																<span class="api-manager__tree-label">{{ subsubchild.name }}</span>
-															</div>
-
-															<!-- Level 4 -->
-															<div
-																v-if="
-																	expandedFolders.has(
-																		subsubchild.id
-																	) && subsubchild.children
-																">
-																<template
-																	v-for="leaf in subsubchild.children"
-																	:key="leaf.id">
-																	<div>
-																		<div
-																			class="api-manager__tree-item"
-																			:class="{ 'api-manager__tree-item--active': activeNode.id === leaf.id }"
-																			style="
-																				padding-left: 56px;
-																			"
-																			@click.stop="handleOpenNode(leaf)"
-																			@contextmenu="showContextMenu(leaf, $event)">
-																			<span
-																				class="api-manager__tree-toggle api-manager__tree-toggle--spacer"
-																				aria-hidden="true"></span>
-																			<span class="api-manager__tree-icon">
-																				<xIcon 
-																					:type="
-																						getIcon(
-																							leaf.type
-																						)
-																					"
-																					:size="16"
-																					:class="
-																						getIconColor(
-																							leaf.type
-																						)
-																					" />
-																			</span>
-																			<span class="api-manager__tree-label">{{ leaf.name }}</span>
-																		</div>
-																	</div>
 																</template>
-															</div>
+															</span>
+															<span class="api-manager__tree-icon">
+																<xIcon 
+																			:type="getIcon(subchild.type)"
+																			:size="16"
+																			:class="getIconColor(subchild.type)" />
+															</span>
+															<span class="api-manager__tree-label">{{ subchild.name }}</span>
+														</div>
+
+														<!-- Level 3 -->
+														<div
+															v-if="
+																expandedFolders.has(subchild.id) &&
+																subchild.children
+															">
+															<template
+																v-for="subsubchild in subchild.children"
+																:key="subsubchild.id">
+																<div>
+																	<div
+																		class="api-manager__tree-item"
+																		:class="{ 'api-manager__tree-item--active': activeNode.id === subsubchild.id }"
+																		style="padding-left: 44px"
+																		@click.stop="handleOpenNode(subsubchild)"
+																		@contextmenu="showContextMenu(subsubchild, $event)">
+																		<span
+																			class="api-manager__tree-toggle"
+																			@click.stop="e => toggleFolder(subsubchild.id, e)">
+																			<template
+																				v-if="
+																					isFolderType(
+																						subsubchild.type
+																					) &&
+																					subsubchild.children
+																					?.length
+																				">
+																				<xIcon 
+																						type="chevron-down"
+																						v-if="
+																							expandedFolders.has(
+																								subsubchild.id
+																							)
+																						"
+																						:size="14" />
+																					<xIcon 
+																						type="chevron-right"
+																						v-else
+																						:size="14" />
+																			</template>
+																		</span>
+																		<span class="api-manager__tree-icon">
+																			<xIcon 
+																						:type="
+																							getIcon(
+																								subsubchild.type
+																							)
+																						"
+																						:size="16"
+																						:class="
+																							getIconColor(
+																								subsubchild.type
+																							)
+																						" />
+																		</span>
+																		<span class="api-manager__tree-label">{{ subsubchild.name }}</span>
+																	</div>
+
+																	<!-- Level 4 -->
+																	<div
+																		v-if="
+																			expandedFolders.has(
+																				subsubchild.id
+																			) && subsubchild.children
+																		">
+																		<template
+																			v-for="leaf in subsubchild.children"
+																			:key="leaf.id">
+																			<div>
+																				<div
+																					class="api-manager__tree-item"
+																					:class="{ 'api-manager__tree-item--active': activeNode.id === leaf.id }"
+																					style="
+																						padding-left: 56px;
+																					"
+																					@click.stop="handleOpenNode(leaf)"
+																					@contextmenu="showContextMenu(leaf, $event)">
+																					<span
+																						class="api-manager__tree-toggle api-manager__tree-toggle--spacer"
+																						aria-hidden="true"></span>
+																					<span class="api-manager__tree-icon">
+																						<xIcon 
+																							:type="
+																								getIcon(
+																									leaf.type
+																								)
+																							"
+																							:size="16"
+																							:class="
+																								getIconColor(
+																									leaf.type
+																								)
+																							" />
+																					</span>
+																					<span class="api-manager__tree-label">{{ leaf.name }}</span>
+																				</div>
+																			</div>
+																		</template>
+																	</div>
+																</div>
+															</template>
+														</div>
 														</div>
 													</template>
 												</div>
 											</div>
-										</template>
-									</div>
+										</div>
+									</template>
 								</div>
-							</template>
-						</div>
+							</div>
+						</template>
 					</div>
 				</div>
 			</div>
+
+			<!-- Create Project Dialog -->
+			<xDialog v-if="showCreateProjectDialog" title="创建个人项目" @close="closeCreateProjectDialog">
+				<xForm col="1">
+					<xItem :configs="createProjectFormConfigs.name" @input="val => { createProjectForm.name = val; createProjectFormConfigs.name.value = val; }" />
+					<xItem :configs="createProjectFormConfigs.description" @input="val => { createProjectForm.description = val; createProjectFormConfigs.description.value = val; }" />
+					<xItem :configs="createProjectFormConfigs.visibility" @input="val => { createProjectForm.visibility = val; createProjectFormConfigs.visibility.value = val; }" />
+				</xForm>
+				<template #footer>
+					<xBtn @click="closeCreateProjectDialog">取消</xBtn>
+					<xBtn :configs="{
+						label: '创建',
+						preset: 'blue',
+						disabled: creatingProject,
+						onClick: createProject
+					}" />
+				</template>
+			</xDialog>
 
 			<!-- Main Area -->
 			<div class="api-manager__main">
@@ -2697,6 +2717,116 @@ export default async function ({ PRIVATE_GLOBAL }) {
   &__icon--group,
   &__icon--member-list {
     color: var(--el-color-primary);
+  }
+  
+  // Project type specific icons
+  &__icon--project-personal {
+    color: #409EFF;
+  }
+  &__icon--project-starred {
+    color: #E6A23C;
+  }
+  &__icon--project-group {
+    color: #67C23A;
+  }
+  
+  // Project badges
+  &__project-badge {
+    display: inline-block;
+    padding: 0 8px;
+    margin-left: 8px;
+    font-size: 12px;
+    line-height: 18px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  &__project-badge--personal {
+    background-color: #ECF5FF;
+    color: #409EFF;
+  }
+  &__project-badge--starred {
+    background-color: #FDF6EC;
+    color: #E6A23C;
+  }
+  &__project-badge--group {
+    background-color: #F0F9EB;
+    color: #67C23A;
+  }
+  
+  // Star icon active state
+  &__star-icon--active {
+    color: #E6A23C;
+  }
+  
+  // Tree actions
+  &__tree-actions {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  &__tree-item:hover &__tree-actions {
+    opacity: 1;
+  }
+  &__tree-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 4px;
+  }
+  &__tree-action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  // Loading and error states
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: #909399;
+  }
+  &__loading-icon {
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  &__error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: #F56C6C;
+    flex-direction: column;
+  }
+  &__error-icon {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  &__retry-btn {
+    margin-top: 10px;
+    padding: 4px 12px;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    background: #FFFFFF;
+    color: #409EFF;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  &__retry-btn:hover {
+    background: #ECF5FF;
+    border-color: #C6E2FF;
   }
 
   &__method-badge--get {

@@ -105,7 +105,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
       },
       async saveShortcuts() {
         try {
-          await _api.xspace.put('/user/shortcuts', { shortcuts: this.shortcuts });
+          // 检查_api.xspace.put是否存在
+          if (_api && _api.xspace && _api.xspace.put) {
+            await _api.xspace.put('/user/shortcuts', { shortcuts: this.shortcuts });
+          }
         } catch (error) {
           console.error('Failed to save shortcuts:', error);
         }
