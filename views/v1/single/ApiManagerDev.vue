@@ -183,7 +183,7 @@ export default async function () {
 		},
 		template: `
       <div class="api-manager-dev-container">
-        <ApiManager :windowData="null" />
+        <ApiManager :windowData="null" style="height: 100%;" />
       </div>
     `,
 		components: {
@@ -203,9 +203,11 @@ body,
 }
 
 .api-manager-dev-container {
-	height: 100%;
+	height: 100vh;
 	min-height: 100vh;
 	background: #1e1e1e;
+	display: flex;
+	flex-direction: column;
 
 	--color-surface: #1e1e1e;
 	--color-surface-container: #252526;

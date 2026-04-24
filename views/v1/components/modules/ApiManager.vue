@@ -86,8 +86,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					// 避免在计算属性中修改状态，移到mounted或watch中处理
 					return this.windowData;
 				}
-				// 默认返回个人空间
-				return this.apiData?.find(item => item.id === "personal_space");
+				// 默认返回个人空间，如果apiData未加载则返回一个默认对象
+				return this.apiData?.find(item => item.id === "personal_space") || { id: "personal_space", name: "个人空间", type: "personal", path: "/个人空间", children: [] };
 			},
 			filteredAndSortedFiles() {
 				if (!this.isFolderType(this.activeNode?.type)) return [];
@@ -740,7 +740,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					<button
 						class="api-manager__toolbar-btn api-manager__toolbar-btn--disabled"
 						type="button">
-						<xIcon icon="left" :size="20" />
+						<xIcon icon="back" :size="20" />
 					</button>
 					<button
 						class="api-manager__toolbar-btn api-manager__toolbar-btn--disabled"
@@ -844,16 +844,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								<span
 									class="api-manager__tree-toggle"
 									@click.stop="e => toggleFolder(rootItem.id, e)">
-									<template
-										v-if="
-											isFolderType(rootItem.type) && rootItem.children?.length
-										">
-										<xIcon
-											type="chevron-down"
-											v-if="expandedFolders.has(rootItem.id)"
-											:size="14" />
-										<xIcon type="chevron-right" v-else :size="14" />
-									</template>
+									<div v-if=" isFolderType(rootItem.type) && rootItem.children?.length ">
+										<xIcon icon="arrow-down" v-if="expandedFolders.has(rootItem.id)" :size="14" />
+										<xIcon icon="arrow-right" v-else :size="14" />
+									</div>
 								</span>
 								<span class="api-manager__tree-icon">
 									<xIcon
@@ -885,10 +879,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
 													child.children?.length
 												">
 												<xIcon
-													type="chevron-down"
+													icon="arrow-down"
 													v-if="expandedFolders.has(child.id)"
 													:size="14" />
-												<xIcon type="chevron-right" v-else :size="14" />
+												<xIcon icon="arrow-right" v-else :size="14" />
 											</template>
 										</span>
 										<span class="api-manager__tree-icon">
@@ -965,14 +959,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									<div v-if="expandedFolders.has(child.id) && child.children">
 										<div :key="subchild.id" v-for="subchild in child.children">
 											<div
-												class="api-manager__tree-item"
-												:class="{
-													'api-manager__tree-item--active':
-														activeNode.id === subchild.id
-												}"
-												style="padding-left: 32px"
-												@click.stop="handleOpenNode(subchild)"
-												@contextmenu="showContextMenu(subchild, $event)">
+											class="api-manager__tree-item"
+											:class="{
+												'api-manager__tree-item--active':
+													activeNode?.id === subchild.id
+											}"
+											style="padding-left: 32px"
+											@click.stop="handleOpenNode(subchild)"
+											@contextmenu="showContextMenu(subchild, $event)">
 												<span
 													class="api-manager__tree-toggle"
 													@click.stop="e => toggleFolder(subchild.id, e)">
@@ -982,11 +976,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 															subchild.children?.length
 														">
 														<xIcon
-															type="chevron-down"
+															icon="arrow-down"
 															v-if="expandedFolders.has(subchild.id)"
 															:size="14" />
 														<xIcon
-															type="chevron-right"
+															icon="arrow-right"
 															v-else
 															:size="14" />
 													</template>
@@ -1012,16 +1006,16 @@ export default async function ({ PRIVATE_GLOBAL }) {
 													:key="subsubchild.id"
 													v-for="subsubchild in subchild.children">
 													<div
-														class="api-manager__tree-item"
-														:class="{
-															'api-manager__tree-item--active':
-																activeNode.id === subsubchild.id
-														}"
-														style="padding-left: 44px"
-														@click.stop="handleOpenNode(subsubchild)"
-														@contextmenu="
-															showContextMenu(subsubchild, $event)
-														">
+												class="api-manager__tree-item"
+												:class="{
+													'api-manager__tree-item--active':
+														activeNode?.id === subsubchild.id
+												}"
+												style="padding-left: 44px"
+												@click.stop="handleOpenNode(subsubchild)"
+												@contextmenu="
+													showContextMenu(subsubchild, $event)
+												">
 														<span
 															class="api-manager__tree-toggle"
 															@click.stop="
@@ -1035,7 +1029,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 																	subsubchild.children?.length
 																">
 																<xIcon
-																	type="chevron-down"
+																	icon="arrow-down"
 																	v-if="
 																		expandedFolders.has(
 																			subsubchild.id
@@ -1043,7 +1037,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 																	"
 																	:size="14" />
 																<xIcon
-																	type="chevron-right"
+																	icon="arrow-right"
 																	v-else
 																	:size="14" />
 															</template>
@@ -1072,22 +1066,22 @@ export default async function ({ PRIVATE_GLOBAL }) {
 																:key="leaf.id"
 																v-for="leaf in subsubchild.children">
 																<div
-																	class="api-manager__tree-item"
-																	:class="{
-																		'api-manager__tree-item--active':
-																			activeNode.id ===
-																			leaf.id
-																	}"
-																	style="padding-left: 56px"
-																	@click.stop="
-																		handleOpenNode(leaf)
-																	"
-																	@contextmenu="
-																		showContextMenu(
-																			leaf,
-																			$event
-																		)
-																	">
+														class="api-manager__tree-item"
+														:class="{
+															'api-manager__tree-item--active':
+																activeNode?.id ===
+																leaf.id
+														}"
+														style="padding-left: 56px"
+														@click.stop="
+															handleOpenNode(leaf)
+														"
+														@contextmenu="
+															showContextMenu(
+																leaf,
+																$event
+															)
+														">
 																	<span
 																		class="api-manager__tree-toggle api-manager__tree-toggle--spacer"
 																		aria-hidden="true">
@@ -1197,7 +1191,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						</div>
 
 					<!-- Folder View -->
-					<template v-if="isFolderType(activeNode.type)">
+					<template v-if="isFolderType(activeNode?.type)">
 						<!-- Table Header (only for list view) -->
 						<div v-if="viewMode === 'list'" class="api-manager__table-header">
 							<div
@@ -1205,12 +1199,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								@click="handleSort('name')">
 								Name
 								<xIcon
-									type="arrow-up"
+									icon="arrow-up"
 									v-if="sortField === 'name' && sortDirection === 'asc'"
 									:size="12"
 									class="api-manager__sort-icon" />
 								<xIcon
-									type="arrow-down"
+									icon="arrow-down"
 									v-if="sortField === 'name' && sortDirection === 'desc'"
 									:size="12"
 									class="api-manager__sort-icon" />
@@ -1220,12 +1214,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								@click="handleSort('updatedAt')">
 								Date Modified
 								<xIcon
-									type="arrow-up"
+									icon="arrow-up"
 									v-if="sortField === 'updatedAt' && sortDirection === 'asc'"
 									:size="12"
 									class="api-manager__sort-icon" />
 								<xIcon
-									type="arrow-down"
+									icon="arrow-down"
 									v-if="sortField === 'updatedAt' && sortDirection === 'desc'"
 									:size="12"
 									class="api-manager__sort-icon" />
@@ -1235,12 +1229,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								@click="handleSort('type')">
 								Type
 								<xIcon
-									type="arrow-up"
+									icon="arrow-up"
 									v-if="sortField === 'type' && sortDirection === 'asc'"
 									:size="12"
 									class="api-manager__sort-icon" />
 								<xIcon
-									type="arrow-down"
+									icon="arrow-down"
 									v-if="sortField === 'type' && sortDirection === 'desc'"
 									:size="12"
 									class="api-manager__sort-icon" />
@@ -1336,15 +1330,15 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								<div class="api-manager__editor-header">
 									<div class="api-manager__editor-header-left">
 										<xIcon
-											:type="getIcon(activeNode.type)"
+											:type="getIcon(activeNode?.type)"
 											:size="24"
-											:class="getIconColor(activeNode.type)" />
+											:class="getIconColor(activeNode?.type)" />
 										<div class="api-manager__editor-header-copy">
 											<h2 class="api-manager__editor-title">{{
-												activeNode.name
+												activeNode?.name
 											}}</h2>
 											<p class="api-manager__editor-subtitle">{{
-												activeNode.type.replace("_", " ")
+												activeNode?.type?.replace("_", " ")
 											}}</p>
 										</div>
 									</div>
@@ -1376,7 +1370,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								<!-- Editor Content -->
 								<div class="api-manager__editor-body">
 									<!-- Member List Editor -->
-									<template v-if="activeNode.type === 'member_list'">
+									<template v-if="activeNode?.type === 'member_list'">
 										<div class="api-manager__section">
 											<div class="api-manager__section-header">
 												<h3 class="api-manager__section-title">Members</h3>
@@ -1463,13 +1457,13 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									</template>
 
 									<!-- Settings Editor -->
-									<template v-else-if="activeNode.type === 'setting'">
+									<template v-else-if="activeNode?.type === 'setting'">
 										<div class="api-manager__settings">
 											<div
-												v-for="(val, key) in editingContent ||
-												activeNode.content"
-												:key="key"
-												class="api-manager__setting-row">
+										v-for="(val, key) in editingContent ||
+										activeNode?.content"
+										:key="key"
+										class="api-manager__setting-row">
 												<label class="api-manager__setting-label">{{
 													String(key)
 														.replace(/([A-Z])/g, " $1")
@@ -1489,7 +1483,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									</template>
 
 									<!-- API Editor -->
-									<template v-else-if="activeNode.type === 'api'">
+									<template v-else-if="activeNode?.type === 'api'">
 										<div class="api-manager__api-editor">
 											<div class="api-manager__api-row">
 												<select
@@ -1632,7 +1626,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									<!-- Doc Editor -->
 									<template
 										v-else-if="
-											activeNode.type === 'doc' || activeNode.type === 'code'
+											activeNode?.type === 'doc' || activeNode?.type === 'code'
 										">
 										<div class="api-manager__doc-editor">
 											<textarea
@@ -1716,7 +1710,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 
 				<!-- Preview Pane (Only for Folders) -->
 				<div
-					v-if="showPreview && isFolderType(activeNode.type)"
+					v-if="showPreview && isFolderType(activeNode?.type)"
 					class="api-manager__preview">
 					<div v-if="!selectedFile" class="api-manager__preview-empty">
 						<xIcon
