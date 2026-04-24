@@ -181,7 +181,9 @@ export default async function () {
 				return _common_utils.avatar_url(id);
 			},
 			isShow() {
-				return this.$route.query.group_view_tab_name === Vue._xspace_var.TAB_KEY_MEMBER_LIST;
+				return (
+					this.$route.query.group_view_tab_name === Vue._xspace_var.TAB_KEY_MEMBER_LIST
+				);
 			},
 			cptAuth() {
 				return [Vue._xspace_var.OWNER, Vue._xspace_var.ADMIN].includes(

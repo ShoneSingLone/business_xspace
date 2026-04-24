@@ -315,7 +315,9 @@ export default async function () {
 				};
 			},
 			isShow() {
-				return this.$route.query.group_view_tab_name === Vue._xspace_var.TAB_KEY_PROJECT_LIST;
+				return (
+					this.$route.query.group_view_tab_name === Vue._xspace_var.TAB_KEY_PROJECT_LIST
+				);
 			}
 		},
 		methods: {

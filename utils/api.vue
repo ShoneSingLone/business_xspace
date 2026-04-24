@@ -23,30 +23,30 @@ export default async function () {
 			};
 
 			window._api.xspace = {
-			// 获取用户快捷方式
-			async getUserShortcuts() {
-				return _.$ajax.get("/api/user/shortcuts");
-			},
-			// 保存用户快捷方式
-			async saveUserShortcuts(shortcuts) {
-				return _.$ajax.put("/api/user/shortcuts", { data: { shortcuts } });
-			},
-			async system_dicts(typeObject = {}) {
-				const typeArray = Object.keys(typeObject);
-				const _this = window._api.xspace;
-				_this.typesCache = _this.typesCache || {};
-				const needRequest = [];
-				_.each(typeArray, type => {
-					if (!_this.typesCache[type]) {
-						needRequest.push(type);
-					}
-				});
-				const { data } = await _.$ajax.post("/api/system/dicts", {
-					data: { types: needRequest }
-				});
-				_this.typesCache = _.merge(_this.typesCache, data);
-				return _this.typesCache;
-			},
+				// 获取用户快捷方式
+				async getUserShortcuts() {
+					return _.$ajax.get("/api/user/shortcuts");
+				},
+				// 保存用户快捷方式
+				async saveUserShortcuts(shortcuts) {
+					return _.$ajax.put("/api/user/shortcuts", { shortcuts });
+				},
+				async system_dicts(typeObject = {}) {
+					const typeArray = Object.keys(typeObject);
+					const _this = window._api.xspace;
+					_this.typesCache = _this.typesCache || {};
+					const needRequest = [];
+					_.each(typeArray, type => {
+						if (!_this.typesCache[type]) {
+							needRequest.push(type);
+						}
+					});
+					const { data } = await _.$ajax.post("/api/system/dicts", {
+						data: { types: needRequest }
+					});
+					_this.typesCache = _.merge(_this.typesCache, data);
+					return _this.typesCache;
+				},
 
 				i18nTranslate(data) {
 					return _.$ajax.post("/api/i18n/translate", {

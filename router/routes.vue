@@ -12,7 +12,7 @@ export default async function () {
 		} catch {
 			return false;
 		}
-};
+	};
 
 	const routes = [
 		_.$newRoute("/v1", "@/views/v1/ViewXspace.vue"),
@@ -79,7 +79,6 @@ export default async function () {
 			redirect: "/404"
 		}
 	];
-
 
 	return routes;
 }
