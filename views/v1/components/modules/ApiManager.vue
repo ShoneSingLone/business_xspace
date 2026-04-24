@@ -1167,9 +1167,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				</xDialog>
 
 				<!-- Main Area -->
-				<div class="api-manager__main">
-					<!-- Breadcrumb -->
-					<div class="api-manager__breadcrumb">
+				<div class="api-manager__content">
+					<div class="api-manager__main">
+						<!-- Breadcrumb -->
+						<div class="api-manager__breadcrumb">
 							<div
 								v-for="(part, index) in (activeNode?.path || '').split('/').filter(Boolean)"
 								:key="index">
@@ -1865,11 +1866,13 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		display: flex;
 		overflow: hidden;
 		background: var(--color-surface-container-lowest);
+		min-height: 0;
 	}
 
 	&__sidebar {
 		width: 256px;
 		flex-shrink: 0;
+		min-height: 0;
 		border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
 		background: var(--color-surface-container);
 		overflow-y: auto;
@@ -1953,11 +1956,20 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		white-space: nowrap;
 	}
 
+	&__content {
+		flex: 1;
+		display: flex;
+		overflow: hidden;
+		min-height: 0;
+	}
+
 	&__main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+		min-height: 0;
+		min-width: 0;
 		background: var(--color-surface-container-lowest);
 	}
 
@@ -2502,6 +2514,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
+		min-height: 0;
 	}
 
 	&__preview-empty {
