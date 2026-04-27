@@ -20,10 +20,10 @@
 			</div>
 			<div class="flex1-overflow-auto" ref="refTreeScroll">
 				<xTree
-					:data="groupListForShow"
-					:props="props"
-					:contentRender="nodeRender"
-					:expandedKeys="expandedKeys" />
+				:data="groupListForShow"
+				:props="props"
+				:contentRender="nodeRender"
+				:expandedKeys="expandedKeys" />
 			</div>
 		</div>
 		<div class="resize_bar" icon="scroll" v-xmove="resizeOptions" />
@@ -56,19 +56,19 @@ export default async function () {
 				},
 				expandedKeys: ["非分组成员", "分组成员", "开发者", "所有者"],
 				configsSearch: defItem({
-					isSearch: false,
-					value: "",
-					placeholder: "搜索分组",
-					onEmitValue() {
-						vm.searchGroup();
-					},
-					clearable: true
-				}),
+				isSearch: false,
+				value: "",
+				placeholder: "搜索分组和项目",
+				onEmitValue() {
+					vm.searchGroup();
+				},
+				clearable: true
+			}),
 				groupListForShow: []
 			};
 		},
 		methods: {
-			searchGroup: _.debounce(function () {
+			searchGroup: _.debounce(async function () {
 				const vm = this;
 				const { groupList } = vm.APP;
 				const keywords = vm.configsSearch.value;
@@ -122,12 +122,51 @@ export default async function () {
 						}
 					];
 				} else {
-					groupListForShow = _.filter(groupList, group =>
+					// 搜索分组
+					const filteredGroups = _.filter(groupList, group =>
 						new RegExp(keywords, "i").test(group.group_name)
 					).map(i => ({
 						...i,
 						icon: "_icon_group_exclude"
 					}));
+					
+					// 搜索项目
+					try {
+						const { data: { list: projects } } = await _api.xspace.project_page({ page: 0, size: -1 });
+						const filteredProjects = _.filter(projects, project =>
+							new RegExp(keywords, "i").test(project.name)
+						);
+						
+						// 将项目按照所属分组组织
+						const projectGroups = {};
+						filteredProjects.forEach(project => {
+							const groupId = project.group_id;
+							if (!projectGroups[groupId]) {
+								const group = _.find(groupList, { _id: groupId });
+								if (group) {
+									projectGroups[groupId] = {
+										...group,
+										icon: "_icon_group_exclude",
+										children: []
+									};
+								}
+							}
+							if (projectGroups[groupId]) {
+								projectGroups[groupId].children.push({
+									...project,
+									group_name: project.name,
+									icon: "_icon_project"
+								});
+							}
+						});
+						
+						// 合并搜索结果
+						const projectGroupList = Object.values(projectGroups);
+						groupListForShow = [...filteredGroups, ...projectGroupList];
+					} catch (error) {
+						console.error('Failed to search projects:', error);
+						groupListForShow = filteredGroups;
+					}
 				}
 				vm.groupListForShow = groupListForShow;
 			}, 300),

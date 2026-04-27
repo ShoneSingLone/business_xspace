@@ -234,9 +234,9 @@ export default async function () {
 					});
 				},
 				/* project */
-				project_page({ group_id, page, size, name }) {
+				project_page({ group_id, page, size, name, isPersonal }) {
 					return _.$ajax.get("/api/project/page", {
-						data: { group_id, page, size, name: name || "" }
+						data: { group_id, page, size, name: name || "", isPersonal }
 					});
 				},
 				getProjectByGroupId(group_id) {

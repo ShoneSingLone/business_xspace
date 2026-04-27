@@ -104,7 +104,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				selectedFile: null,
 				searchQuery: "",
 				showPreview: true,
-				expandedFolders: new Set([mockFileSystem.id]),
+				expandedFolders: [mockFileSystem.id],
 				// Sort State
 				sortField: "name",
 				sortDirection: "asc"
@@ -188,7 +188,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				}
 				this.selectedFile = null;
 				this.searchQuery = "";
-				this.expandedFolders.add(folder.id);
+				if (this.expandedFolders.indexOf(folder.id) === -1) { this.expandedFolders.push(folder.id); }
 			},
 			handleCloseTab(tabId, e) {
 				e.stopPropagation();
@@ -226,10 +226,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			},
 			toggleFolder(folderId, e) {
 				e.stopPropagation();
-				if (this.expandedFolders.has(folderId)) {
-					this.expandedFolders.delete(folderId);
+				const index = this.expandedFolders.indexOf(folderId);
+				if (index > -1) {
+					this.expandedFolders.splice(index, 1);
 				} else {
-					this.expandedFolders.add(folderId);
+					this.expandedFolders.push(folderId);
 				}
 			},
 			getIcon(type) {
@@ -357,21 +358,21 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								@click="e => toggleFolder(mockFileSystem.id, e)">
 								<xIcon
 									icon="_CaretDownOutlined"
-									v-if="expandedFolders.has(mockFileSystem.id)"
+									v-if="expandedFolders.indexOf(mockFileSystem.id) > -1"
 									:size="14" />
 								<xIcon icon="_CaretRightOutlined" v-else :size="14" />
 							</span>
 							<span class="explore__tree-icon" aria-hidden="true">
 								<xIcon
 									icon="folder-opened"
-									v-if="expandedFolders.has(mockFileSystem.id)"
+									v-if="expandedFolders.indexOf(mockFileSystem.id) > -1"
 									:size="16" />
 								<xIcon icon="folder" v-else :size="16" />
 							</span>
 							<span class="explore__tree-label">{{ mockFileSystem.name }}</span>
 						</div>
 
-						<div v-if="expandedFolders.has(mockFileSystem.id)">
+						<div v-if="expandedFolders.indexOf(mockFileSystem.id) > -1">
 							<template v-for="child in mockFileSystem.children" :key="child.id">
 								<div v-if="child.type === 'folder'">
 									<div
@@ -391,7 +392,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 												">
 												<xIcon
 													icon="_CaretDownOutlined"
-													v-if="expandedFolders.has(child.id)"
+													v-if="expandedFolders.indexOf(child.id) > -1"
 													:size="14" />
 												<xIcon
 													icon="_CaretRightOutlined"
@@ -402,14 +403,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 										<span class="explore__tree-icon" aria-hidden="true">
 											<xIcon
 												icon="folder-opened"
-												v-if="expandedFolders.has(child.id)"
+												v-if="expandedFolders.indexOf(child.id) > -1"
 												:size="16" />
 											<xIcon icon="folder" v-else :size="16" />
 										</span>
 										<span class="explore__tree-label">{{ child.name }}</span>
 									</div>
 
-									<div v-if="expandedFolders.has(child.id) && child.children">
+									<div v-if="expandedFolders.indexOf(child.id) && child.children">
 										<template
 											v-for="subchild in child.children"
 											:key="subchild.id">
@@ -475,12 +476,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						@click="handleSort('name')">
 						Name
 						<xIcon
-							type="arrow-up"
+							icon="arrow-up"
 							v-if="sortField === 'name' && sortDirection === 'asc'"
 							:size="12"
 							class="explore__sort-icon" />
 						<xIcon
-							type="arrow-down"
+							icon="arrow-down"
 							v-if="sortField === 'name' && sortDirection === 'desc'"
 							:size="12"
 							class="explore__sort-icon" />
@@ -490,12 +491,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						@click="handleSort('updatedAt')">
 						Date Modified
 						<xIcon
-							type="arrow-up"
+							icon="arrow-up"
 							v-if="sortField === 'updatedAt' && sortDirection === 'asc'"
 							:size="12"
 							class="explore__sort-icon" />
 						<xIcon
-							type="arrow-down"
+							icon="arrow-down"
 							v-if="sortField === 'updatedAt' && sortDirection === 'desc'"
 							:size="12"
 							class="explore__sort-icon" />
@@ -505,12 +506,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						@click="handleSort('type')">
 						Type
 						<xIcon
-							type="arrow-up"
+							icon="arrow-up"
 							v-if="sortField === 'type' && sortDirection === 'asc'"
 							:size="12"
 							class="explore__sort-icon" />
 						<xIcon
-							type="arrow-down"
+							icon="arrow-down"
 							v-if="sortField === 'type' && sortDirection === 'desc'"
 							:size="12"
 							class="explore__sort-icon" />
@@ -520,12 +521,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						@click="handleSort('size')">
 						Size
 						<xIcon
-							type="arrow-up"
+							icon="arrow-up"
 							v-if="sortField === 'size' && sortDirection === 'asc'"
 							:size="12"
 							class="explore__sort-icon" />
 						<xIcon
-							type="arrow-down"
+							icon="arrow-down"
 							v-if="sortField === 'size' && sortDirection === 'desc'"
 							:size="12"
 							class="explore__sort-icon" />
@@ -550,7 +551,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							}">
 							<div class="explore__file-cell explore__file-cell--name">
 								<xIcon
-									:type="getIcon(file.type)"
+									:icon="getIcon(file.type)"
 									:size="20"
 									:class="getIconColor(file.type)" />
 								<span class="explore__file-name">{{ file.name }}</span>
