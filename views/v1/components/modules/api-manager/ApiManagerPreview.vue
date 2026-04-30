@@ -14,7 +14,7 @@ export default async function () {
 		methods: {
 			openNode() {
 				if (this.selectedFile) {
-					this.$emit("openNode", this.selectedFile);
+					this.$emit("open-node", this.selectedFile);
 				}
 			},
 			formatDate(dateString) {

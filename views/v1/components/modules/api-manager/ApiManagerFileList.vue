@@ -21,10 +21,10 @@ export default async function () {
 		},
 		methods: {
 			selectFile(file) {
-				this.$emit("selectFile", file);
+				this.$emit("select-file", file);
 			},
 			openFile(file) {
-				this.$emit("openFile", file);
+				this.$emit("open-file", file);
 			},
 			handleSort(field) {
 				this.$emit("sort", field);
@@ -52,6 +52,12 @@ export default async function () {
 					case "code": return "api-manager__icon api-manager__icon--code";
 					default: return "api-manager__icon api-manager__icon--folder";
 				}
+			},
+			getFileRowClass(file) {
+				return {
+					'api-manager__file-row': true,
+					'api-manager__file-row--selected': this.selectedFileId === file.id
+				};
 			}
 		}
 	};
@@ -85,12 +91,11 @@ export default async function () {
 			</div>
 			<div v-else class="api-manager__file-list-inner">
 				<div 
-					v-for="file in files" 
-					:key="file.id"
-					@click.stop="selectFile(file)" 
-					@dblclick.stop="openFile(file)"
-					class="api-manager__file-row" 
-					:class="{ 'api-manager__file-row--selected': selectedFileId === file.id }">
+				v-for="file in files" 
+				:key="file.id"
+				@click.stop="selectFile(file)" 
+				@dblclick.stop="openFile(file)"
+				:class="getFileRowClass(file)">
 					<div class="api-manager__file-cell api-manager__file-cell--name">
 						<xIcon :icon="getIcon(file.type)" :size="20" :class="getIconColor(file.type)" />
 						<span class="api-manager__file-name">{{ file.name }}</span>

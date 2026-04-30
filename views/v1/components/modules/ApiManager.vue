@@ -52,7 +52,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		computed: {
 			activeNode() {
 				if (this.windowData) return this.windowData;
-				return this.apiData?.find(item => item.id === this.selectedNodeId) || 
+				return this.apiData?.find(item => item.id === this.selectedNodeId) ||
 					{ id: "personal_space", name: "个人空间", type: "personal", path: "/个人空间", children: [] };
 			},
 			filteredAndSortedFiles() {
@@ -121,7 +121,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									activityDays: group.activity_days || 0
 								},
 								children: [
-									{ id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`,
+									{
+										id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`,
 										children: (group.projects || []).map(project => ({
 											id: project._id || project.id, name: project.name, type: "project", role: project.role,
 											updatedAt: project.up_time || project.updated_at, path: `/群组/${group.group_name}/Projects/${project.name}`,
@@ -131,9 +132,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 									},
 									{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
 									{ id: `group_${group._id}_docs`, name: "Group Docs", type: "doc_folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Docs`, children: [] },
-									{ id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
-										content: { name: group.group_name, description: group.group_desc, visibility: group.type === "private" ? "private" : "public",
-											defaultRole: group.default_role || "guest", allowExternalShare: group.allow_external_share || false }
+									{
+										id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
+										content: {
+											name: group.group_name, description: group.group_desc, visibility: group.type === "private" ? "private" : "public",
+											defaultRole: group.default_role || "guest", allowExternalShare: group.allow_external_share || false
+										}
 									},
 									{ id: `group_${group._id}_log`, name: "Activity Log", type: "log", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Activity Log`, content: [] }
 								]
@@ -262,15 +266,21 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					const endpoint = this.activeNode.content?.endpoint || "";
 					let mockResponse = {};
 					if (endpoint.includes("users") && this.activeNode.content?.method === "GET") {
-						mockResponse = { status: "success", environment: this.activeEnvironment,
+						mockResponse = {
+							status: "success", environment: this.activeEnvironment,
 							data: [{ id: 1, name: "Alice Smith", email: "alice@example.com" },
-								{ id: 2, name: "Bob Jones", email: "bob@example.com" }], meta: { total: 2, page: 1 } };
+							{ id: 2, name: "Bob Jones", email: "bob@example.com" }], meta: { total: 2, page: 1 }
+						};
 					} else if (endpoint.includes("users") && this.activeNode.content?.method === "POST") {
-						mockResponse = { status: "success", environment: this.activeEnvironment,
-							message: "User created successfully", data: { id: 3, name: "New User", email: "new@example.com" } };
+						mockResponse = {
+							status: "success", environment: this.activeEnvironment,
+							message: "User created successfully", data: { id: 3, name: "New User", email: "new@example.com" }
+						};
 					} else {
-						mockResponse = { status: "success", environment: this.activeEnvironment,
-							message: "Request executed successfully", timestamp: new Date().toISOString() };
+						mockResponse = {
+							status: "success", environment: this.activeEnvironment,
+							message: "Request executed successfully", timestamp: new Date().toISOString()
+						};
 					}
 					this.responseData = JSON.stringify(mockResponse, null, 2);
 				}, 800 + Math.random() * 500);
@@ -301,25 +311,25 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				}
 			},
 			async toggleStarProject(project) {
-					try {
-						let response;
-						if (project.followed) {
-							response = await api.projectDelFollow(project.id);
-						} else {
-							response = await api.projectAddFollow({ projectid: project.id, projectname: project.name });
-						}
-						if (response.errcode === 0) {
-							_.msg.success(project.followed ? "取消星标成功" : "星标成功");
-							project.followed = !project.followed;
-							this.loadApiData();
-						} else {
-							_.msg.error(response.errmsg || "操作失败");
-						}
-					} catch (error) {
-						console.error("Failed to toggle star:", error);
-						_.msg.error("操作失败，请重试");
+				try {
+					let response;
+					if (project.followed) {
+						response = await api.projectDelFollow(project.id);
+					} else {
+						response = await api.projectAddFollow({ projectid: project.id, projectname: project.name });
 					}
-				},
+					if (response.errcode === 0) {
+						_.msg.success(project.followed ? "取消星标成功" : "星标成功");
+						project.followed = !project.followed;
+						this.loadApiData();
+					} else {
+						_.msg.error(response.errmsg || "操作失败");
+					}
+				} catch (error) {
+					console.error("Failed to toggle star:", error);
+					_.msg.error("操作失败，请重试");
+				}
+			},
 			isFolderType(type) {
 				return utils.isFolderType(type);
 			}
@@ -341,8 +351,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			@update:active-environment="activeEnvironment = $event"
 			@update:view-mode="viewMode = $event"
 			@update:show-preview="showPreview = $event"
-			@navigate-up="handleNavigateUp"
-		/>
+			@navigate-up="handleNavigateUp" />
 
 		<div class="api-manager__body">
 			<ApiManagerSidebar
@@ -357,12 +366,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				@context-menu="showContextMenu"
 				@create-project="openCreateProjectDialog"
 				@toggle-star="toggleStarProject"
-				@retry="loadApiData"
-			/>
+				@retry="loadApiData" />
 
 			<div class="api-manager__content">
 				<div class="api-manager__main">
-					<ApiManagerBreadcrumb :path="activeNode?.path" @navigate-to="() => {}" />
+					<ApiManagerBreadcrumb :path="activeNode?.path" @navigate-to="() => { }" />
 
 					<template v-if="isFolderType(activeNode?.type)">
 						<ApiManagerFileList
@@ -373,57 +381,33 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							:sort-direction="sortDirection"
 							@select-file="selectedFile = $event"
 							@open-file="handleOpenNode"
-							@sort="handleSort"
-						/>
+							@sort="handleSort" />
 						<ApiManagerFileGrid
 							v-else
 							:files="filteredAndSortedFiles"
 							:selected-file-id="selectedFile?.id"
 							@select-file="selectedFile = $event"
-							@open-file="handleOpenNode"
-						/>
+							@open-file="handleOpenNode" />
 					</template>
 
-					<ApiManagerEditor
-						v-else
-						:node="activeNode"
-						:editing-content="editingContent"
+					<ApiManagerEditor v-else :node="activeNode" :editing-content="editingContent"
 						:is-requesting="isRequesting"
-						:response-data="responseData"
-						:response-status="responseStatus"
-						:response-time="responseTime"
-						:active-environment="activeEnvironment"
-						@start-edit="startEditing"
-						@save-edit="saveEditing"
-						@cancel-edit="cancelEditing"
-						@send-request="sendRequest"
-					/>
+						:response-data="responseData" :response-status="responseStatus" :response-time="responseTime"
+						:active-environment="activeEnvironment" @start-edit="startEditing" @save-edit="saveEditing"
+						@cancel-edit="cancelEditing" @send-request="sendRequest" />
 				</div>
 
-				<ApiManagerPreview
-					v-if="showPreview && isFolderType(activeNode?.type)"
-					:selected-file="selectedFile"
+				<ApiManagerPreview v-if="showPreview && isFolderType(activeNode?.type)" :selected-file="selectedFile"
 					:is-folder-type="selectedFile ? isFolderType(selectedFile.type) : false"
-					@open-node="handleOpenNode"
-				/>
+					@open-node="handleOpenNode" />
 			</div>
 		</div>
 
-		<ApiManagerContextMenu
-			:show="contextMenu.show"
-			:x="contextMenu.x"
-			:y="contextMenu.y"
-			:node="contextMenu.node"
-			@action="handleContextMenuAction"
-			@hide="hideContextMenu"
-		/>
+		<ApiManagerContextMenu :show="contextMenu.show" :x="contextMenu.x" :y="contextMenu.y" :node="contextMenu.node"
+			@action="handleContextMenuAction" @hide="hideContextMenu" />
 
-		<ApiManagerCreateProjectDialog
-			:show="showCreateProjectDialog"
-			:creating-project="creatingProject"
-			@close="closeCreateProjectDialog"
-			@create="createProject"
-		/>
+		<ApiManagerCreateProjectDialog :show="showCreateProjectDialog" :creating-project="creatingProject"
+			@close="closeCreateProjectDialog" @create="createProject" />
 	</div>
 </template>
 
@@ -868,12 +852,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		letter-spacing: 0.06em;
 	}
 
-	&__th, &__td {
+	&__th,
+	&__td {
 		padding: 12px 16px;
 		text-align: left;
 	}
 
-	&__th--right, &__td--right {
+	&__th--right,
+	&__td--right {
 		text-align: right;
 	}
 
@@ -979,8 +965,13 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	}
 
 	@keyframes api-manager-spin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
+		from {
+			transform: rotate(0deg);
+		}
+
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	&__field {
@@ -1071,7 +1062,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		padding: 24px;
 	}
 
-	&__state-panel--loading, &__state-panel--dashed {
+	&__state-panel--loading,
+	&__state-panel--dashed {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -1662,23 +1654,73 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	}
 
 	&__icon {
-		&--personal { color: var(--color-primary); }
-		&--group { color: var(--color-secondary); }
-		&--project-personal { color: var(--color-primary); }
-		&--project-starred { color: var(--color-warning); }
-		&--project-group { color: var(--color-secondary); }
-		&--project { color: var(--color-on-surface-variant); }
-		&--api-folder { color: var(--color-primary); }
-		&--doc-folder { color: var(--color-secondary); }
-		&--folder { color: var(--color-on-surface-variant); }
-		&--api { color: var(--color-primary); }
-		&--doc { color: var(--color-secondary); }
-		&--code { color: var(--color-warning); }
-		&--member-list { color: var(--color-secondary); }
-		&--setting { color: var(--color-on-surface-variant); }
-		&--cicd { color: var(--color-success); }
-		&--log { color: var(--color-on-surface-variant); }
-		&--default { color: var(--color-on-surface-variant); }
+		&--personal {
+			color: var(--color-primary);
+		}
+
+		&--group {
+			color: var(--color-secondary);
+		}
+
+		&--project-personal {
+			color: var(--color-primary);
+		}
+
+		&--project-starred {
+			color: var(--color-warning);
+		}
+
+		&--project-group {
+			color: var(--color-secondary);
+		}
+
+		&--project {
+			color: var(--color-on-surface-variant);
+		}
+
+		&--api-folder {
+			color: var(--color-primary);
+		}
+
+		&--doc-folder {
+			color: var(--color-secondary);
+		}
+
+		&--folder {
+			color: var(--color-on-surface-variant);
+		}
+
+		&--api {
+			color: var(--color-primary);
+		}
+
+		&--doc {
+			color: var(--color-secondary);
+		}
+
+		&--code {
+			color: var(--color-warning);
+		}
+
+		&--member-list {
+			color: var(--color-secondary);
+		}
+
+		&--setting {
+			color: var(--color-on-surface-variant);
+		}
+
+		&--cicd {
+			color: var(--color-success);
+		}
+
+		&--log {
+			color: var(--color-on-surface-variant);
+		}
+
+		&--default {
+			color: var(--color-on-surface-variant);
+		}
 	}
 }
 </style>

@@ -33,16 +33,16 @@ export default async function () {
 		},
 		methods: {
 			startEdit() {
-				this.$emit("startEdit");
+				this.$emit("start-edit");
 			},
 			saveEdit() {
-				this.$emit("saveEdit");
+				this.$emit("save-edit");
 			},
 			cancelEdit() {
-				this.$emit("cancelEdit");
+				this.$emit("cancel-edit");
 			},
 			sendRequest() {
-				this.$emit("sendRequest");
+				this.$emit("send-request");
 			},
 			handlePlainTextInput(event) {
 				this.$emit("update:editingContent", event.target.value);

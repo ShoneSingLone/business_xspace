@@ -13,10 +13,10 @@ export default async function () {
 		},
 		methods: {
 			selectFile(file) {
-				this.$emit("selectFile", file);
+				this.$emit("select-file", file);
 			},
 			openFile(file) {
-				this.$emit("openFile", file);
+				this.$emit("open-file", file);
 			},
 			formatDate(dateString) {
 				try {
@@ -41,6 +41,12 @@ export default async function () {
 					case "code": return "api-manager__icon api-manager__icon--code";
 					default: return "api-manager__icon api-manager__icon--folder";
 				}
+			},
+			getFileCardClass(file) {
+				return {
+					'api-manager__file-card': true,
+					'api-manager__file-card--selected': this.selectedFileId === file.id
+				};
 			}
 		}
 	};
@@ -59,8 +65,7 @@ export default async function () {
 				:key="file.id"
 				@click.stop="selectFile(file)" 
 				@dblclick.stop="openFile(file)"
-				class="api-manager__file-card" 
-				:class="{ 'api-manager__file-card--selected': selectedFileId === file.id }">
+				:class="getFileCardClass(file)">
 				<div class="api-manager__file-card-icon">
 					<xIcon :icon="getIcon(file.type)" :size="32" :class="getIconColor(file.type)" />
 				</div>

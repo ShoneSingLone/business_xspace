@@ -70,21 +70,21 @@ export default async function () {
 		},
 		methods: {
 			toggleFolder(folderId) {
-				this.$emit("toggleFolder", folderId);
+				this.$emit("toggle-folder", folderId);
 			},
 			openNode(node) {
-				this.$emit("openNode", node);
+				this.$emit("open-node", node);
 			},
 			showContextMenu(node, event) {
 				event.preventDefault();
 				event.stopPropagation();
-				this.$emit("contextMenu", node, event);
+				this.$emit("context-menu", node, event);
 			},
 			createProject() {
-				this.$emit("createProject");
+				this.$emit("create-project");
 			},
 			toggleStarProject(project) {
-				this.$emit("toggleStar", project);
+				this.$emit("toggle-star", project);
 			},
 			retryLoad() {
 				this.$emit("retry");
@@ -132,10 +132,10 @@ export default async function () {
 					case "api": return "code";
 					case "doc": return "file-text";
 					case "code": return "code";
-					case "member_list": return "users";
-					case "setting": return "settings";
+					case "member_list": return "_member_list";
+					case "setting": return "_configs";
 					case "cicd": return "activity";
-					case "log": return "history";
+					case "log": return "_article";
 					default: return "file";
 				}
 			},
@@ -166,6 +166,15 @@ export default async function () {
 					case "log": return "api-manager__icon api-manager__icon--log";
 					default: return "api-manager__icon api-manager__icon--default";
 				}
+			},
+			getTreeItemClass(node) {
+				return {
+					'api-manager__tree-item': true,
+					'api-manager__tree-item--active': this.activeNodeId === node.id
+				};
+			},
+			getStarIconClass(node) {
+				return node.followed ? 'api-manager__star-icon--active' : '';
 			}
 		}
 	};
@@ -203,8 +212,7 @@ export default async function () {
 				<template v-else>
 					<div v-for="rootItem in filteredApiData" :key="rootItem.id">
 						<div 
-							class="api-manager__tree-item" 
-							:class="{ 'api-manager__tree-item--active': activeNodeId === rootItem.id }"
+							:class="getTreeItemClass(rootItem)"
 							style="padding-left: 8px" 
 							@click.stop="openNode(rootItem)"
 							@contextmenu="showContextMenu(rootItem, $event)">
@@ -223,8 +231,7 @@ export default async function () {
 						<div v-if="expandedFolders.indexOf(rootItem.id) > -1 && rootItem.children">
 							<div :key="child.id" v-for="child in rootItem.children">
 								<div 
-									class="api-manager__tree-item" 
-									:class="{ 'api-manager__tree-item--active': activeNodeId === child.id }"
+									:class="getTreeItemClass(child)"
 									style="padding-left: 20px" 
 									@click.stop="openNode(child)"
 									@contextmenu="showContextMenu(child, $event)">
@@ -260,7 +267,7 @@ export default async function () {
 										<button @click.stop="toggleStarProject(child)" class="api-manager__tree-action-btn"
 											:title="child.followed ? '取消星标' : '星标'">
 											<xIcon :icon="child.followed ? 'star' : 'star-o'" :size="14" 
-												:class="child.followed ? 'api-manager__star-icon--active' : ''" />
+												:class="getStarIconClass(child)" />
 										</button>
 									</span>
 								</div>
@@ -268,11 +275,10 @@ export default async function () {
 								<div v-if="expandedFolders.indexOf(child.id) > -1 && child.children">
 									<div :key="subchild.id" v-for="subchild in child.children">
 										<div 
-											class="api-manager__tree-item" 
-											:class="{ 'api-manager__tree-item--active': activeNodeId === subchild.id }"
-											style="padding-left: 32px" 
-											@click.stop="openNode(subchild)"
-											@contextmenu="showContextMenu(subchild, $event)">
+										:class="getTreeItemClass(subchild)"
+										style="padding-left: 32px" 
+										@click.stop="openNode(subchild)"
+										@contextmenu="showContextMenu(subchild, $event)">
 											<span class="api-manager__tree-toggle">
 												<template v-if="isFolderType(subchild.type) && subchild.children?.length">
 													<div @click.stop="toggleFolder(subchild.id)" style="cursor: pointer; padding: 4px;">
@@ -290,8 +296,7 @@ export default async function () {
 										<div v-if="expandedFolders.indexOf(subchild.id) > -1 && subchild.children">
 											<div :key="subsubchild.id" v-for="subsubchild in subchild.children">
 												<div 
-													class="api-manager__tree-item" 
-													:class="{ 'api-manager__tree-item--active': activeNodeId === subsubchild.id }"
+													:class="getTreeItemClass(subsubchild)"
 													style="padding-left: 44px" 
 													@click.stop="openNode(subsubchild)"
 													@contextmenu="showContextMenu(subsubchild, $event)">
@@ -312,8 +317,7 @@ export default async function () {
 												<div v-if="expandedFolders.indexOf(subsubchild.id) > -1 && subsubchild.children">
 													<div :key="leaf.id" v-for="leaf in subsubchild.children">
 														<div 
-															class="api-manager__tree-item" 
-															:class="{ 'api-manager__tree-item--active': activeNodeId === leaf.id }"
+															:class="getTreeItemClass(leaf)"
 															style="padding-left: 56px" 
 															@click.stop="openNode(leaf)"
 															@contextmenu="showContextMenu(leaf, $event)">

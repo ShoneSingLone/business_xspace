@@ -15,7 +15,13 @@ export default async function () {
 		methods: {
 			navigateTo(index) {
 				const selectedPath = this.pathParts.slice(0, index + 1).join("/");
-				this.$emit("navigateTo", "/" + selectedPath);
+				this.$emit("navigate-to", "/" + selectedPath);
+			},
+			getBreadcrumbPartClass(index) {
+				return {
+					'api-manager__breadcrumb-part': true,
+					'api-manager__breadcrumb-part--current': index === this.pathParts.length - 1
+				};
 			}
 		}
 	};
@@ -26,8 +32,7 @@ export default async function () {
 	<div class="api-manager__breadcrumb">
 		<div v-for="(part, index) in pathParts" :key="index">
 			<span 
-				class="api-manager__breadcrumb-part" 
-				:class="{ 'api-manager__breadcrumb-part--current': index === pathParts.length - 1 }"
+				:class="getBreadcrumbPartClass(index)"
 				@click="navigateTo(index)">
 				{{ part }}
 			</span>
