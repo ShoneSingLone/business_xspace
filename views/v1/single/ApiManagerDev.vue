@@ -1,5 +1,7 @@
 <script lang="ts">
 export default async function () {
+	const utils = await _.$importVue("@/utils/api-manager.vue");
+
 	const mockApiData = {
 		id: "root",
 		name: "API Workspaces",
@@ -181,9 +183,22 @@ export default async function () {
 				mockData: mockApiData
 			};
 		},
+		computed: {
+			windowData() {
+				const params = new URLSearchParams(window.location.search);
+				const nodeId = params.get('nodeId');
+				if (nodeId) {
+					const node = utils.findNode(this.mockData, nodeId);
+					if (node) {
+						return node;
+					}
+				}
+				return null;
+			}
+		},
 		template: `
       <div class="api-manager-dev-container">
-        <ApiManager :windowData="null" style="height: 100%;" />
+        <ApiManager :windowData="windowData" style="height: 100%;" />
       </div>
     `,
 		components: {
@@ -200,27 +215,32 @@ body,
 	height: 100%;
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
+}
+
+.api-manager-dev {
+	display: flex;
+	height: 100vh;
+	width: 100%;
+	background: var(--el-bg-color-page, #f2f3f5);
+	--color-surface: #ffffff;
+	--color-surface-container: #f7fafc;
+	--color-surface-container-lowest: #ffffff;
+	--color-surface-container-low: #f0f2f5;
+	--color-surface-variant: #e2e8f0;
+	--color-on-surface: #1f2937;
+	--color-on-surface-variant: #6b7280;
+	--color-outline-variant: #e5e7eb;
+	--color-primary: #3182ce;
+	--color-primary-container: #3182ce;
+	--color-error: #f66f6a;
+	--color-success: #67c23a;
+	--color-warning: #e6a23c;
 }
 
 .api-manager-dev-container {
-	height: 100vh;
-	min-height: 100vh;
-	background: #1e1e1e;
 	display: flex;
-	flex-direction: column;
-
-	--color-surface: #1e1e1e;
-	--color-surface-container: #252526;
-	--color-surface-container-lowest: #1e1e1e;
-	--color-surface-container-low: #2d2d30;
-	--color-surface-variant: #3c3c3c;
-	--color-on-surface: #cccccc;
-	--color-on-surface-variant: #9d9d9d;
-	--color-outline-variant: #4a4a4a;
-	--color-primary: #007acc;
-	--color-primary-container: #007acc;
-	--color-error: #f14c4c;
-	--color-success: #6a9955;
-	--color-warning: #ce9178;
+	height: 100%;
+	width: 100%;
 }
 </style>

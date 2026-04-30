@@ -10,6 +10,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			ApiManagerBreadcrumb: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerBreadcrumb.vue"),
 			ApiManagerFileList: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerFileList.vue"),
 			ApiManagerFileGrid: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerFileGrid.vue"),
+			ApiManagerProjectList: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerProjectList.vue"),
 			ApiManagerEditor: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerEditor.vue"),
 			ApiManagerPreview: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerPreview.vue"),
 			ApiManagerContextMenu: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerContextMenu.vue"),
@@ -26,8 +27,6 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		data() {
 			return {
 				apiData: null,
-				environments: ["Development", "Test", "Staging", "Production"],
-				activeEnvironment: "Development",
 				selectedFile: null,
 				searchQuery: "",
 				showPreview: true,
@@ -38,7 +37,6 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				error: null,
 				sortField: "name",
 				sortDirection: "asc",
-				treeSearchQuery: "",
 				isRequesting: false,
 				responseData: null,
 				responseStatus: null,
@@ -46,18 +44,37 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				editingContent: null,
 				contextMenu: { show: false, x: 0, y: 0, node: null },
 				showCreateProjectDialog: false,
-				creatingProject: false
+				creatingProject: false,
+				searchResults: [],
+				isSearchLoading: false,
+				searchTimeout: null
 			};
 		},
 		computed: {
 			activeNode() {
 				if (this.windowData) return this.windowData;
-				return this.apiData?.find(item => item.id === this.selectedNodeId) ||
+				const findNode = (nodes, targetId) => {
+					for (const node of nodes) {
+						if (node.id === targetId) return node;
+						if (node.children && node.children.length > 0) {
+							const found = findNode(node.children, targetId);
+							if (found) return found;
+						}
+					}
+					return null;
+				};
+				return findNode(this.apiData || [], this.selectedNodeId) ||
 					{ id: "personal_space", name: "个人空间", type: "personal", path: "/个人空间", children: [] };
 			},
 			filteredAndSortedFiles() {
+				console.log("activeNode:", this.activeNode);
+				console.log("activeNode type:", this.activeNode?.type);
+				console.log("activeNode id:", this.activeNode?.id);
+				console.log("isFolderType:", utils.isFolderType(this.activeNode?.type));
 				if (!utils.isFolderType(this.activeNode?.type)) return [];
 				let files = this.activeNode?.children || [];
+				console.log("activeNode children count:", files.length);
+				console.log("activeNode children:", files);
 				if (this.searchQuery) {
 					const lowerQuery = this.searchQuery.toLowerCase();
 					files = files.filter(f => f.name.toLowerCase().includes(lowerQuery));
@@ -82,7 +99,6 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		},
 		mounted() {
 			this.loadApiData();
-			if (this.windowData) this.expandAncestors(this.windowData.id);
 		},
 		watch: {
 			windowData: {
@@ -93,11 +109,33 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			}
 		},
 		methods: {
+			handleUrlParams() {
+				const params = new URLSearchParams(window.location.search);
+				const nodeId = params.get('nodeId');
+				if (nodeId) {
+					this.selectedNodeId = nodeId;
+					utils.saveSelectedNodeId(nodeId);
+				}
+				if (this.windowData) {
+					this.expandAncestors(this.windowData.id);
+				} else if (nodeId) {
+					this.$nextTick(() => {
+						this.expandAncestors(nodeId);
+					});
+				}
+			},
 			async loadApiData() {
 				this.isLoading = true;
 				this.error = null;
 				try {
 					const groups = await api.groupMine();
+					console.log("Groups data loaded:", groups);
+					console.log("Groups data array:", groups.data);
+					
+					const groupList = (groups.data || []).filter(group => group._id && !group.is_personal && group.group_name !== '个人空间');
+					console.log("Filtered groups count:", groupList.length);
+					console.log("Filtered groups:", groupList);
+					
 					this.apiData = [
 						{
 							id: "personal_space", name: "个人空间", type: "personal", role: "owner",
@@ -109,64 +147,83 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						},
 						{
 							id: "groups", name: "群组", type: "folder", updatedAt: new Date().toISOString(), path: "/群组",
-							children: (groups.data || []).filter(group => group._id).map(group => ({
-								id: `group_${group._id}`, name: group.group_name, type: "group", role: group.role,
-								updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}`,
-								visibility: group.type === "private" ? "private" : "public", description: group.group_desc,
-								createdBy: group.uid, createdAt: group.add_time,
-								stats: {
-									projectCount: group.project_count || 0,
-									docCount: group.doc_count || 0,
-									memberCount: group.member_count || 0,
-									activityDays: group.activity_days || 0
-								},
-								children: [
-									{
-										id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`,
-										children: (group.projects || []).map(project => ({
-											id: project._id || project.id, name: project.name, type: "project", role: project.role,
-											updatedAt: project.up_time || project.updated_at, path: `/群组/${group.group_name}/Projects/${project.name}`,
-											visibility: project.project_type || project.visibility, followed: project.follow,
-											content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
-										}))
+							children: groupList.map(group => {
+								const groupProjects = group.projects || [];
+								console.log(`Group ${group.group_name} projects count:`, groupProjects.length);
+								console.log(`Group ${group.group_name} projects:`, groupProjects);
+								
+								return {
+									id: `group_${group._id}`, name: group.group_name, type: "group", role: group.role,
+									updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}`,
+									visibility: group.type === "private" ? "private" : "public", description: group.group_desc,
+									createdBy: group.uid, createdAt: group.add_time,
+									stats: {
+										projectCount: group.project_count || 0,
+										docCount: group.doc_count || 0,
+										memberCount: group.member_count || 0,
+										activityDays: group.activity_days || 0
 									},
-									{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
-									{ id: `group_${group._id}_docs`, name: "Group Docs", type: "doc_folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Docs`, children: [] },
-									{
-										id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
-										content: {
-											name: group.group_name, description: group.group_desc, visibility: group.type === "private" ? "private" : "public",
-											defaultRole: group.default_role || "guest", allowExternalShare: group.allow_external_share || false
-										}
-									},
-									{ id: `group_${group._id}_log`, name: "Activity Log", type: "log", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Activity Log`, content: [] }
-								]
-							}))
+									children: [
+										{
+											id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`,
+											children: groupProjects.map(project => ({
+												id: project._id || project.id, name: project.name, type: "project", role: project.role,
+												updatedAt: project.up_time || project.updated_at, path: `/群组/${group.group_name}/Projects/${project.name}`,
+												visibility: project.project_type || project.visibility, followed: project.follow,
+												content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
+											}))
+										},
+										{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
+										{ id: `group_${group._id}_docs`, name: "Group Docs", type: "doc_folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Docs`, children: [] },
+										{
+											id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
+											content: {
+												name: group.group_name, description: group.group_desc, visibility: group.type === "private" ? "private" : "public",
+												defaultRole: group.default_role || "guest", allowExternalShare: group.allow_external_share || false
+											}
+										},
+										{ id: `group_${group._id}_log`, name: "Activity Log", type: "log", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Activity Log`, content: [] }
+									]
+								};
+							})
 						}
 					];
+					
+					console.log("API data structure after groups:", JSON.stringify(this.apiData, null, 2));
+					
 					const personalProjects = await api.project_page({ page: 1, size: 1000, name: "", isPersonal: true });
 					const allPersonalProjects = personalProjects.data?.list || [];
-					this.apiData[0].children[0].children = allPersonalProjects
-						.filter(project => !project.follow)
-						.map(project => ({
-							id: project._id || project.id, name: project.name, type: "project", role: project.role,
-							updatedAt: project.up_time || project.updated_at, path: `/个人空间/我的项目/${project.name}`,
-							visibility: project.project_type || project.visibility, followed: project.follow,
-							content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
-						}));
-					this.apiData[0].children[1].children = allPersonalProjects
-						.filter(project => project.follow)
-						.map(project => ({
-							id: project._id || project.id, name: project.name, type: "project", role: project.role,
-							updatedAt: project.up_time || project.updated_at, path: `/个人空间/星标项目/${project.name}`,
-							visibility: project.project_type || project.visibility, followed: project.follow,
-							content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
-						}));
+					console.log("Personal projects loaded:", allPersonalProjects);
+					console.log("Personal projects count:", allPersonalProjects.length);
+					
+					const myProjects = allPersonalProjects.filter(project => !project.follow);
+					const starredProjects = allPersonalProjects.filter(project => project.follow);
+					
+					console.log("My projects count:", myProjects.length);
+					console.log("Starred projects count:", starredProjects.length);
+					
+					this.apiData[0].children[0].children = myProjects.map(project => ({
+						id: project._id || project.id, name: project.name, type: "project", role: project.role,
+						updatedAt: project.up_time || project.updated_at, path: `/个人空间/我的项目/${project.name}`,
+						visibility: project.project_type || project.visibility, followed: project.follow,
+						content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
+					}));
+					
+					this.apiData[0].children[1].children = starredProjects.map(project => ({
+						id: project._id || project.id, name: project.name, type: "project", role: project.role,
+						updatedAt: project.up_time || project.updated_at, path: `/个人空间/星标项目/${project.name}`,
+						visibility: project.project_type || project.visibility, followed: project.follow,
+						content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
+					}));
+					
+					console.log("Final API data structure:", JSON.stringify(this.apiData, null, 2));
+					
 				} catch (error) {
 					console.error("Failed to load API data:", error);
 					this.error = "加载数据失败，请刷新页面重试";
 				} finally {
 					this.isLoading = false;
+					this.handleUrlParams();
 				}
 			},
 			toggleFolder(folderId) {
@@ -198,6 +255,20 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				}
 				const appId = node.type === "api" ? "api_endpoint" : node.type;
 				if (this.system?.openApp) this.system.openApp(appId, true, node);
+			},
+			openNewWindow(node) {
+				const vm = this;
+				_.$ModalManager.open({
+					title: node.name,
+					url: "@/views/v1/components/modules/api-manager/ApiManagerWindow.dialog.vue",
+					parent: this,
+					width: 800,
+					height: 600,
+					node: node,
+					onClose() {
+						console.log('Window closed');
+					}
+				});
 			},
 			handleNavigateUp() {
 				if (!this.canNavigateUp) return;
@@ -238,8 +309,16 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						break;
 					}
 					case "openNewTab": {
-						const link = `${window.location.origin}${window.location.pathname}?nodeId=${node.id}`;
+						const params = new URLSearchParams();
+						params.set('nodeId', node.id);
+						if (node.path) params.set('path', node.path);
+						if (node.type) params.set('type', node.type);
+						const link = `${window.location.origin}/v1/api-manager?${params.toString()}`;
 						window.open(link, "_blank");
+						break;
+					}
+					case "openNewWindow": {
+						this.openNewWindow(node);
 						break;
 					}
 				}
@@ -332,6 +411,52 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			},
 			isFolderType(type) {
 				return utils.isFolderType(type);
+			},
+			isProjectFolderType(type, nodeId) {
+				console.log("isProjectFolderType - type:", type, "nodeId:", nodeId);
+				const result = type === "folder" && (
+					["ps_my_projects", "ps_followed"].includes(nodeId) || nodeId?.endsWith("_projects")
+				);
+				console.log("isProjectFolderType result:", result);
+				return result;
+			},
+			performSearch(query) {
+				if (!query.trim()) {
+					this.searchResults = [];
+					return;
+				}
+
+				if (this.searchTimeout) {
+					clearTimeout(this.searchTimeout);
+				}
+
+				this.isSearchLoading = true;
+
+				this.searchTimeout = setTimeout(() => {
+					const results = this.searchInTree(this.apiData, query.toLowerCase());
+					this.searchResults = results;
+					this.isSearchLoading = false;
+				}, 300);
+			},
+			searchInTree(nodes, query) {
+				if (!nodes || !nodes.length) return [];
+
+				let results = [];
+
+				for (const node of nodes) {
+					if (node.name?.toLowerCase().includes(query)) {
+						results.push({ ...node });
+					}
+
+					if (node.children && node.children.length > 0) {
+						results = results.concat(this.searchInTree(node.children, query));
+					}
+				}
+
+				return results.slice(0, 50);
+			},
+			handleSelectSearchResult(result) {
+				this.handleOpenNode(result);
 			}
 		}
 	};
@@ -342,15 +467,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	<div class="api-manager" @click="hideContextMenu">
 		<ApiManagerToolbar
 			:search-query="searchQuery"
-			:active-environment="activeEnvironment"
-			:view-mode="viewMode"
-			:show-preview="showPreview"
 			:can-navigate-up="canNavigateUp"
-			:environments="environments"
-			@update:search-query="searchQuery = $event"
-			@update:active-environment="activeEnvironment = $event"
-			@update:view-mode="viewMode = $event"
-			@update:show-preview="showPreview = $event"
+			:search-results="searchResults"
+			:is-search-loading="isSearchLoading"
+			@update:search-query="searchQuery = $event; performSearch($event)"
+			@select-search-result="handleSelectSearchResult"
 			@navigate-up="handleNavigateUp" />
 
 		<div class="api-manager__body">
@@ -360,7 +481,6 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				:active-node-id="selectedNodeId"
 				:is-loading="isLoading"
 				:error="error"
-				:tree-search-query.sync="treeSearchQuery"
 				@toggle-folder="toggleFolder"
 				@open-node="handleOpenNode"
 				@context-menu="showContextMenu"
@@ -369,37 +489,78 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				@retry="loadApiData" />
 
 			<div class="api-manager__content">
-				<div class="api-manager__main">
+				<div class="api-manager__content-header">
 					<ApiManagerBreadcrumb :path="activeNode?.path" @navigate-to="() => { }" />
-
-					<template v-if="isFolderType(activeNode?.type)">
-						<ApiManagerFileList
-							v-if="viewMode === 'list'"
-							:files="filteredAndSortedFiles"
-							:selected-file-id="selectedFile?.id"
-							:sort-field="sortField"
-							:sort-direction="sortDirection"
-							@select-file="selectedFile = $event"
-							@open-file="handleOpenNode"
-							@sort="handleSort" />
-						<ApiManagerFileGrid
-							v-else
-							:files="filteredAndSortedFiles"
-							:selected-file-id="selectedFile?.id"
-							@select-file="selectedFile = $event"
-							@open-file="handleOpenNode" />
-					</template>
-
-					<ApiManagerEditor v-else :node="activeNode" :editing-content="editingContent"
-						:is-requesting="isRequesting"
-						:response-data="responseData" :response-status="responseStatus" :response-time="responseTime"
-						:active-environment="activeEnvironment" @start-edit="startEditing" @save-edit="saveEditing"
-						@cancel-edit="cancelEditing" @send-request="sendRequest" />
+					<div class="api-manager__content-actions">
+						<div class="api-manager__view-toggle">
+							<button 
+								@click="viewMode = 'list'" 
+								:class="{ 'api-manager__view-toggle-btn': true, 'api-manager__view-toggle-btn--active': viewMode === 'list' }"
+								title="List View">
+								<xIcon icon="list" :size="18" />
+							</button>
+							<button 
+								@click="viewMode = 'grid'" 
+								:class="{ 'api-manager__view-toggle-btn': true, 'api-manager__view-toggle-btn--active': viewMode === 'grid' }"
+								title="Grid View">
+								<xIcon icon="grid" :size="18" />
+							</button>
+						</div>
+						<button 
+							@click="showPreview = !showPreview" 
+							:class="{ 'api-manager__toggle-btn': true, 'api-manager__toggle-btn--active': showPreview }"
+							title="Toggle Preview Pane">
+							<xIcon icon="view" :size="20" />
+						</button>
+					</div>
 				</div>
+				<div class="api-manager__main-wrapper">
+					<div class="api-manager__main">
 
-				<ApiManagerPreview v-if="showPreview && isFolderType(activeNode?.type)" :selected-file="selectedFile"
-					:is-folder-type="selectedFile ? isFolderType(selectedFile.type) : false"
-					@open-node="handleOpenNode" />
+						<template v-if="isFolderType(activeNode?.type)">
+							<ApiManagerProjectList
+								v-if="isProjectFolderType(activeNode?.type, activeNode?.id)"
+								:projects="filteredAndSortedFiles"
+								:selected-project-id="selectedFile?.id"
+								:sort-field="sortField"
+								:sort-direction="sortDirection"
+								:view-mode="viewMode"
+								:search-query="searchQuery"
+								@select-project="selectedFile = $event"
+								@open-project="handleOpenNode"
+								@sort="handleSort"
+								@toggle-star="toggleStarProject"
+								@context-menu="showContextMenu" />
+							<template v-else>
+								<ApiManagerFileList
+									v-if="viewMode === 'list'"
+									:files="filteredAndSortedFiles"
+									:selected-file-id="selectedFile?.id"
+									:sort-field="sortField"
+									:sort-direction="sortDirection"
+									@select-file="selectedFile = $event"
+									@open-file="handleOpenNode"
+									@sort="handleSort" />
+								<ApiManagerFileGrid
+									v-else
+									:files="filteredAndSortedFiles"
+									:selected-file-id="selectedFile?.id"
+									@select-file="selectedFile = $event"
+									@open-file="handleOpenNode" />
+							</template>
+						</template>
+
+						<ApiManagerEditor v-else :node="activeNode" :editing-content="editingContent"
+							:is-requesting="isRequesting"
+							:response-data="responseData" :response-status="responseStatus" :response-time="responseTime"
+							:active-environment="activeEnvironment" @start-edit="startEditing" @save-edit="saveEditing"
+							@cancel-edit="cancelEditing" @send-request="sendRequest" />
+					</div>
+
+					<ApiManagerPreview v-if="showPreview && isFolderType(activeNode?.type)" :selected-file="selectedFile"
+						:is-folder-type="selectedFile ? isFolderType(selectedFile.type) : false"
+						@open-node="handleOpenNode" />
+				</div>
 			</div>
 		</div>
 
@@ -414,6 +575,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 <style lang="less">
 .api-manager {
 	height: 100%;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -460,7 +622,46 @@ export default async function ({ PRIVATE_GLOBAL }) {
 
 	&__search-input {
 		width: 100%;
-		padding: 6px 12px 6px 40px;
+		padding: 6px 32px 6px 40px;
+		border: 1px solid color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
+		border-radius: 8px;
+		font-size: 14px;
+		outline: none;
+		background: var(--color-surface-container-low);
+		color: var(--color-on-surface);
+
+		&:focus {
+			border-color: var(--color-primary);
+			box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+		}
+
+		&::placeholder {
+			color: var(--color-on-surface-variant);
+		}
+	}
+
+	&__search-clear {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		margin: auto;
+		padding: 0;
+		border: none;
+		background: transparent;
+		color: var(--color-on-surface-variant);
+		cursor: pointer;
+		border-radius: 6px;
+
+		&:hover {
+			color: var(--color-on-surface);
+			background: var(--color-surface-variant);
+		}
 	}
 
 	&__toolbar-right {
@@ -501,21 +702,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		min-height: 0;
 		border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
 		background: var(--color-surface-container);
-		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
 	}
 
 	&__sidebar-inner {
+		flex: 1;
+		overflow-y: auto;
 		padding: 8px;
-	}
-
-	&__sidebar-title {
-		padding: 0 8px;
-		margin: 0 0 8px;
-		font-size: 12px;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--color-on-surface-variant);
 	}
 
 	&__tree {
@@ -601,7 +795,6 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		display: flex;
 		align-items: center;
 		padding: 8px 16px;
-		border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
 		background: var(--color-surface-container);
 		font-size: 14px;
 		color: var(--color-on-surface-variant);
@@ -1721,6 +1914,37 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		&--default {
 			color: var(--color-on-surface-variant);
 		}
+	}
+
+	&__content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		min-height: 0;
+	}
+
+	&__main-wrapper {
+		flex: 1;
+		display: flex;
+		overflow: hidden;
+		min-height: 0;
+	}
+
+	&__content-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 8px 16px;
+		border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
+		background: var(--color-surface-container);
+		flex-shrink: 0;
+	}
+
+	&__content-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
 	}
 }
 </style>

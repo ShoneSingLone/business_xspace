@@ -154,6 +154,9 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			},
 			canNavigateUp() {
 				return this.activeFolder.id !== this.mockFileSystem.id;
+			},
+			activeFolderPathParts() {
+				return this.activeFolder.path.split("/").filter(Boolean);
 			}
 		},
 		methods: {
@@ -264,6 +267,48 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					default:
 						return "explore__icon explore__icon--default";
 				}
+			},
+			getTabClass(tab) {
+				return {
+					'explore__tab': true,
+					'explore__tab--active': this.activeTabId === tab.id
+				};
+			},
+			getTabCloseClass(tab) {
+				return {
+					'explore__tab-close': true,
+					'explore__tab-close--visible': this.activeTabId === tab.id
+				};
+			},
+			getNavBtnClass() {
+				return {
+					'explore__toolbar-btn': true,
+					'explore__toolbar-btn--disabled': !this.canNavigateUp
+				};
+			},
+			getPreviewToggleClass() {
+				return {
+					'explore__toggle-btn': true,
+					'explore__toggle-btn--active': this.showPreview
+				};
+			},
+			getTreeItemClass(node) {
+				return {
+					'explore__tree-item': true,
+					'explore__tree-item--active': this.activeFolder.id === node.id
+				};
+			},
+			getFileRowClass(file) {
+				return {
+					'explore__file-row': true,
+					'explore__file-row--selected': this.selectedFile?.id === file.id
+				};
+			},
+			getBreadcrumbPartClass(index, pathArray) {
+				return {
+					'explore__breadcrumb-part': true,
+					'explore__breadcrumb-part--current': index === pathArray.length - 1
+				};
 			}
 		}
 	};
@@ -280,13 +325,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					v-for="tab in tabs"
 					:key="tab.id"
 					@click="activeTabId = tab.id"
-					class="explore__tab"
-					:class="{ 'explore__tab--active': activeTabId === tab.id }">
+					:class="getTabClass(tab)">
 					<span class="explore__tab-title">{{ tab.name }}</span>
 					<button
 						@click="e => handleCloseTab(tab.id, e)"
-						class="explore__tab-close"
-						:class="{ 'explore__tab-close--visible': activeTabId === tab.id }">
+						:class="getTabCloseClass(tab)">
 						<xIcon icon="close" :size="14" />
 					</button>
 				</div>
@@ -308,8 +351,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					<button
 						@click="handleNavigateUp"
 						:disabled="!canNavigateUp"
-						class="explore__toolbar-btn"
-						:class="{ 'explore__toolbar-btn--disabled': !canNavigateUp }"
+						:class="getNavBtnClass()"
 						title="Up">
 						<xIcon icon="top" :size="20" />
 					</button>
@@ -329,8 +371,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				<div class="explore__toolbar-right">
 					<button
 						@click="showPreview = !showPreview"
-						class="explore__toggle-btn"
-						:class="{ 'explore__toggle-btn--active': showPreview }"
+						:class="getPreviewToggleClass()"
 						title="Toggle Preview Pane">
 						<xIcon icon="view" :size="20" />
 					</button>
@@ -347,10 +388,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					<!-- Recursive Tree Component inline simulation -->
 					<div class="explore__tree">
 						<div
-							class="explore__tree-item"
-							:class="{
-								'explore__tree-item--active': activeFolder.id === mockFileSystem.id
-							}"
+							:class="getTreeItemClass(mockFileSystem)"
 							style="padding-left: 8px"
 							@click="handleOpenFolder(mockFileSystem)">
 							<span
@@ -376,11 +414,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							<template v-for="child in mockFileSystem.children" :key="child.id">
 								<div v-if="child.type === 'folder'">
 									<div
-										class="explore__tree-item"
-										:class="{
-											'explore__tree-item--active':
-												activeFolder.id === child.id
-										}"
+										:class="getTreeItemClass(child)"
 										style="padding-left: 20px"
 										@click="handleOpenFolder(child)">
 										<span
@@ -416,11 +450,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 											:key="subchild.id">
 											<div v-if="subchild.type === 'folder'">
 												<div
-													class="explore__tree-item"
-													:class="{
-														'explore__tree-item--active':
-															activeFolder.id === subchild.id
-													}"
+													:class="getTreeItemClass(subchild)"
 													style="padding-left: 32px"
 													@click="handleOpenFolder(subchild)">
 													<span
@@ -450,19 +480,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				<!-- Breadcrumb -->
 				<div class="explore__breadcrumb">
 					<template
-						v-for="(part, index) in activeFolder.path.split('/').filter(Boolean)"
+						v-for="(part, index) in activeFolderPathParts"
 						:key="index">
 						<span
-							class="explore__breadcrumb-part"
-							:class="{
-								'explore__breadcrumb-part--current':
-									index ===
-									activeFolder.path.split('/').filter(Boolean).length - 1
-							}">
+							:class="getBreadcrumbPartClass(index, activeFolderPathParts)">
 							{{ part }}
 						</span>
 						<span
-							v-if="index < activeFolder.path.split('/').filter(Boolean).length - 1"
+							v-if="index < activeFolderPathParts.length - 1"
 							class="explore__breadcrumb-sep"
 							>/</span
 						>
@@ -545,10 +570,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							:key="file.id"
 							@click.stop="selectedFile = file"
 							@dblclick.stop="file.type === 'folder' ? handleOpenFolder(file) : null"
-							class="explore__file-row"
-							:class="{
-								'explore__file-row--selected': selectedFile?.id === file.id
-							}">
+							:class="getFileRowClass(file)">
 							<div class="explore__file-cell explore__file-cell--name">
 								<xIcon
 									:icon="getIcon(file.type)"

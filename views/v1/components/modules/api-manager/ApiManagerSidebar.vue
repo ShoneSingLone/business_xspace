@@ -21,51 +21,6 @@ export default async function () {
 			error: {
 				type: String,
 				default: null
-			},
-			treeSearchQuery: {
-				type: String,
-				default: ""
-			}
-		},
-		data() {
-			return {
-				localSearchQuery: "",
-				searchTimeout: null
-			};
-		},
-		computed: {
-			filteredApiData() {
-				const query = this.treeSearchQuery || this.localSearchQuery;
-				if (!query) return this.apiData;
-				
-				const lowerQuery = query.toLowerCase();
-				
-				const filterNode = (node) => {
-					if (!node) return null;
-					
-					const nameMatch = node.name?.toLowerCase().includes(lowerQuery);
-					const typeMatch = node.type?.toLowerCase().includes(lowerQuery);
-					
-					if (nameMatch || typeMatch) return node;
-					
-					if (node.children && node.children.length > 0) {
-						const filteredChildren = node.children
-							.map(child => filterNode(child))
-							.filter(child => child !== null);
-						
-						if (filteredChildren.length > 0) {
-							return { ...node, children: filteredChildren };
-						}
-					}
-					
-					return null;
-				};
-				
-				const result = this.apiData
-					.map(node => filterNode(node))
-					.filter(node => node !== null);
-				
-				return result;
 			}
 		},
 		methods: {
@@ -88,28 +43,6 @@ export default async function () {
 			},
 			retryLoad() {
 				this.$emit("retry");
-			},
-			updateSearch(event) {
-				const value = event.target.value;
-				this.localSearchQuery = value;
-				
-				// 清除之前的定时器
-				if (this.searchTimeout) {
-					clearTimeout(this.searchTimeout);
-				}
-				
-				// 300ms 防抖
-				this.searchTimeout = setTimeout(() => {
-					this.$emit("update:treeSearchQuery", value);
-				}, 300);
-			},
-			clearSearch() {
-				if (this.searchTimeout) {
-					clearTimeout(this.searchTimeout);
-					this.searchTimeout = null;
-				}
-				this.localSearchQuery = "";
-				this.$emit("update:treeSearchQuery", "");
 			},
 			isFolderType(type) {
 				return [
@@ -184,22 +117,9 @@ export default async function () {
 <template>
 	<div class="api-manager__sidebar">
 		<div class="api-manager__sidebar-inner">
-			<h2 class="api-manager__sidebar-title">API Explorer</h2>
-			<div class="api-manager__search-box">
-				<input
-					type="text"
-					class="api-manager__search-input"
-					placeholder="搜索分组和项目..."
-					:value="localSearchQuery"
-					@input="updateSearch"
-				/>
-				<button v-if="localSearchQuery" @click="clearSearch" class="api-manager__search-clear">
-					<xIcon icon="x" :size="14" />
-				</button>
-			</div>
 			<div class="api-manager__tree">
 				<div v-if="isLoading" class="api-manager__loading">
-					<xIcon icon="loader-2" :size="24" class="api-manager__loading-icon" />
+					<xIcon icon="_loader-2" :size="24" class="api-manager__loading-icon" />
 					<span>加载中...</span>
 				</div>
 
@@ -210,7 +130,7 @@ export default async function () {
 				</div>
 
 				<template v-else>
-					<div v-for="rootItem in filteredApiData" :key="rootItem.id">
+					<div v-for="rootItem in apiData" :key="rootItem.id">
 						<div 
 							:class="getTreeItemClass(rootItem)"
 							style="padding-left: 8px" 
@@ -343,47 +263,22 @@ export default async function () {
 </template>
 
 <style lang="less">
-.api-manager__search-box {
-	display: flex;
-	align-items: center;
-	padding: 8px;
-	border-bottom: 1px solid #e8e8e8;
+.api-manager__sidebar-header {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background: var(--color-surface-container);
+	border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
 }
 
-.api-manager__search-input {
-	flex: 1;
-	padding: 6px 10px;
-	border: 1px solid #d9d9d9;
-	border-radius: 4px;
-	font-size: 13px;
-	outline: none;
-	
-	&:focus {
-		border-color: #40a9ff;
-		box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-	}
-	
-	&::placeholder {
-		color: #bfbfbf;
-	}
-}
-
-.api-manager__search-clear {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 20px;
-	height: 20px;
-	margin-left: 8px;
-	padding: 0;
-	border: none;
-	background: transparent;
-	color: #999;
-	cursor: pointer;
-	
-	&:hover {
-		color: #666;
-	}
+.api-manager__sidebar-title {
+	padding: 12px 8px;
+	margin: 0;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--color-on-surface-variant);
 }
 
 .api-manager__tree-toggle {

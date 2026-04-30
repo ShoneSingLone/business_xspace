@@ -189,7 +189,7 @@ export default async function () {
 							<span v-else class="api-manager__endpoint-text">{{ node.content?.endpoint }}</span>
 
 							<button v-if="!editingContent" @click="sendRequest" :disabled="isRequesting" class="api-manager__action-btn api-manager__action-btn--primary api-manager__action-btn--with-icon">
-								<xIcon icon="loader-2" v-if="isRequesting" :size="16" class="api-manager__spinner" />
+								<xIcon icon="_loader-2" v-if="isRequesting" :size="16" class="api-manager__spinner" />
 								<xIcon icon="video-play" v-else :size="16" />
 								Send
 							</button>
@@ -225,7 +225,7 @@ export default async function () {
 							</div>
 
 							<div v-if="isRequesting" class="api-manager__state-panel api-manager__state-panel--loading">
-								<xIcon icon="loader-2" class="api-manager__spinner api-manager__spinner--lg" />
+								<xIcon icon="_loader-2" class="api-manager__spinner api-manager__spinner--lg" />
 								<p class="api-manager__state-text">Sending request to {{ activeEnvironment }}...</p>
 							</div>
 							<div v-else-if="responseData" class="api-manager__state-panel api-manager__state-panel--code">
