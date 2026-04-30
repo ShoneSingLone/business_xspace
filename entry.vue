@@ -487,12 +487,12 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				this.groupProjectList = groupProjectList;
 			},
 			async updateGroupMemberList() {
-				const { data: groupMemberList } = await _api.xspace.groupGetMemberListBy(
-					this.cptGroupId
-				);
-				this.groupMemberList = groupMemberList;
-			}
-		},
+					const { data: groupMemberList } = await _api.xspace.groupGetMemberListBy(
+						this.cptGroupId
+					);
+					this.groupMemberList = groupMemberList;
+				}
+			},
 		computed: {
 			cptGroupId: {
 				get() {

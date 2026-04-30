@@ -40,8 +40,19 @@ async ${camelCase(path)}(data) {
 					const _url = new URL(String(url).replace("#", ""), location.origin);
 					const tokenArray = _.map(_.$lStorage.x_token, (v, k) => ({ v, k }));
 					const tokenArraySorted = tokenArray.sort((a, b) => a.k - b.k);
-					/*转换为prop尽量保持一致*/
+					
 					_.each(tokenArraySorted, ({ v, k }) => _url.searchParams.set(k, v));
+					
+					const xspaceToken = _.$lStorage._xspace_token || _.$lStorage["_xspace_token"] || localStorage.getItem('_xspace_token');
+					const xspaceUid = _.$lStorage._xspace_uid || _.$lStorage["_xspace_uid"] || localStorage.getItem('_xspace_uid');
+					
+					if (xspaceToken) {
+						_url.searchParams.set('_xspace_token', xspaceToken);
+					}
+					if (xspaceUid) {
+						_url.searchParams.set('_xspace_uid', xspaceUid);
+					}
+					
 					const { href } = _url;
 					return href;
 				} catch (e) {

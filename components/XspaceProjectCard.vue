@@ -15,7 +15,7 @@
 <script lang="ts">
 export default async function () {
 	return defineComponent({
-		inject: ["APP"],
+		inject: ["APP", "_onProjectFollowChange"],
 		props: ["projectData", "isShow", "index"],
 		data() {
 			return {};
@@ -32,7 +32,9 @@ export default async function () {
 							title: this.followIconTitle
 						},
 						staticClass: "pointer icon-item-wrapper",
-						onClick: this.followIconClickHandler
+						onClick: () => {
+							this.isFollowStatus ? this.unfollow() : this.follow();
+						}
 					},
 					[
 						h("xIcon", {
@@ -75,9 +77,6 @@ export default async function () {
 			},
 			followIconIcon() {
 				return this.isFollowStatus ? "twrap_done" : "twrap_un";
-			},
-			followIconClickHandler() {
-				return this.isFollowStatus ? this.unfollow : this.follow;
 			},
 			logo() {
 				return h(
@@ -124,6 +123,8 @@ export default async function () {
 						color: projectData.color
 					};
 					await _api.xspace.projectAddFollow(param);
+					this.projectData.follow = true;
+					this.updateTreeDataFollowStatus(true);
 				} catch (error) {
 					_.$msgError(error);
 				} finally {
@@ -134,12 +135,43 @@ export default async function () {
 				try {
 					const id = this.projectData._id;
 					await _api.xspace.projectDelFollow(id);
+					this.projectData.follow = false;
+					this.updateTreeDataFollowStatus(false);
 				} catch (error) {
 					_.$msgError(error);
 				} finally {
 					this.$emit("change");
 				}
-			}, 300)
+			}, 300),
+			updateTreeDataFollowStatus(isFollow) {
+				if (this.APP && this.APP.groupProjectList) {
+					const projectIndex = this.APP.groupProjectList.findIndex(
+						item => item._id === this.projectData._id
+					);
+					if (projectIndex !== -1) {
+						this.APP.groupProjectList[projectIndex].follow = isFollow;
+					}
+				}
+
+				if (this.APP && this.APP.apiData) {
+					const updateNode = (nodes) => {
+						for (const node of nodes) {
+							if (node.id === this.projectData._id) {
+								node.followed = isFollow;
+								return true;
+							}
+							if (node.children && node.children.length > 0 && updateNode(node.children)) {
+								return true;
+							}
+						}
+						return false;
+					};
+					updateNode(this.APP.apiData);
+				}
+				if (this._onProjectFollowChange) {
+					this._onProjectFollowChange(this.projectData._id, isFollow);
+				}
+			}
 		}
 	});
 }

@@ -16,11 +16,21 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			ApiManagerContextMenu: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerContextMenu.vue"),
 			ApiManagerCreateProjectDialog: () => _.$importVue("@/views/v1/components/modules/api-manager/ApiManagerCreateProjectDialog.vue")
 		},
+		provide() {
+			return {
+				_onProjectFollowChange: (projectId, isFollow) => {
+					this.handleFollowChange(projectId, isFollow);
+				}
+			};
+		},
 		props: {
 			windowData: Object
 		},
 		inject: {
 			system: {
+				default: null
+			},
+			APP: {
 				default: null
 			}
 		},
@@ -29,7 +39,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				apiData: null,
 				selectedFile: null,
 				searchQuery: "",
-				showPreview: true,
+				showPreview: false,
 				viewMode: "list",
 				expandedFolders: utils.loadExpandedFolders(),
 				selectedNodeId: utils.loadSelectedNodeId(),
@@ -118,10 +128,30 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				}
 				if (this.windowData) {
 					this.expandAncestors(this.windowData.id);
+					this.loadProjectFolderDataIfNeeded(this.windowData);
 				} else if (nodeId) {
 					this.$nextTick(() => {
 						this.expandAncestors(nodeId);
+						const node = this.findNodeById(this.apiData, nodeId);
+						if (node) {
+							this.loadProjectFolderDataIfNeeded(node);
+						}
 					});
+				}
+			},
+			findNodeById(nodes, targetId) {
+				for (const node of nodes) {
+					if (node.id === targetId) return node;
+					if (node.children && node.children.length > 0) {
+						const found = this.findNodeById(node.children, targetId);
+						if (found) return found;
+					}
+				}
+				return null;
+			},
+			loadProjectFolderDataIfNeeded(node) {
+				if (this.isProjectFolderType(node.type, node.id)) {
+					this.loadProjectFolderData(node);
 				}
 			},
 			async loadApiData() {
@@ -147,56 +177,42 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						},
 						{
 							id: "groups", name: "群组", type: "folder", updatedAt: new Date().toISOString(), path: "/群组",
-							children: groupList.map(group => {
-								const groupProjects = group.projects || [];
-								console.log(`Group ${group.group_name} projects count:`, groupProjects.length);
-								console.log(`Group ${group.group_name} projects:`, groupProjects);
-								
-								return {
-									id: `group_${group._id}`, name: group.group_name, type: "group", role: group.role,
-									updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}`,
-									visibility: group.type === "private" ? "private" : "public", description: group.group_desc,
-									createdBy: group.uid, createdAt: group.add_time,
-									stats: {
-										projectCount: group.project_count || 0,
-										docCount: group.doc_count || 0,
-										memberCount: group.member_count || 0,
-										activityDays: group.activity_days || 0
+							children: groupList.map(group => ({
+								id: `group_${group._id}`, name: group.group_name, type: "group", role: group.role,
+								updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}`,
+								visibility: group.type === "private" ? "private" : "public", description: group.group_desc,
+								createdBy: group.uid, createdAt: group.add_time,
+								stats: {
+									projectCount: group.project_count || 0,
+									docCount: group.doc_count || 0,
+									memberCount: group.member_count || 0,
+									activityDays: group.activity_days || 0
+								},
+								children: [
+									{ id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`, children: [] },
+									{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
+									{ id: `group_${group._id}_docs`, name: "Group Docs", type: "doc_folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Docs`, children: [] },
+									{
+										id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
+										content: {
+											name: group.group_name, description: group.group_desc, visibility: group.type === "private" ? "private" : "public",
+											defaultRole: group.default_role || "guest", allowExternalShare: group.allow_external_share || false
+										}
 									},
-									children: [
-										{
-											id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`,
-											children: groupProjects.map(project => ({
-												id: project._id || project.id, name: project.name, type: "project", role: project.role,
-												updatedAt: project.up_time || project.updated_at, path: `/群组/${group.group_name}/Projects/${project.name}`,
-												visibility: project.project_type || project.visibility, followed: project.follow,
-												content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
-											}))
-										},
-										{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
-										{ id: `group_${group._id}_docs`, name: "Group Docs", type: "doc_folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Docs`, children: [] },
-										{
-											id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
-											content: {
-												name: group.group_name, description: group.group_desc, visibility: group.type === "private" ? "private" : "public",
-												defaultRole: group.default_role || "guest", allowExternalShare: group.allow_external_share || false
-											}
-										},
-										{ id: `group_${group._id}_log`, name: "Activity Log", type: "log", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Activity Log`, content: [] }
-									]
-								};
-							})
+									{ id: `group_${group._id}_log`, name: "Activity Log", type: "log", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Activity Log`, content: [] }
+								]
+							}))
 						}
 					];
 					
 					console.log("API data structure after groups:", JSON.stringify(this.apiData, null, 2));
 					
-					const personalProjects = await api.project_page({ page: 1, size: 1000, name: "", isPersonal: true });
+					const personalProjects = await api.getProjectByGroupId("personal");
 					const allPersonalProjects = personalProjects.data?.list || [];
 					console.log("Personal projects loaded:", allPersonalProjects);
 					console.log("Personal projects count:", allPersonalProjects.length);
 					
-					const myProjects = allPersonalProjects.filter(project => !project.follow);
+					const myProjects = allPersonalProjects.filter(project => !project.group_id);
 					const starredProjects = allPersonalProjects.filter(project => project.follow);
 					
 					console.log("My projects count:", myProjects.length);
@@ -206,14 +222,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						id: project._id || project.id, name: project.name, type: "project", role: project.role,
 						updatedAt: project.up_time || project.updated_at, path: `/个人空间/我的项目/${project.name}`,
 						visibility: project.project_type || project.visibility, followed: project.follow,
-						content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
+						content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API endpoints for ${project.name}` }
 					}));
 					
 					this.apiData[0].children[1].children = starredProjects.map(project => ({
 						id: project._id || project.id, name: project.name, type: "project", role: project.role,
 						updatedAt: project.up_time || project.updated_at, path: `/个人空间/星标项目/${project.name}`,
 						visibility: project.project_type || project.visibility, followed: project.follow,
-						content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API 端点 for ${project.name}` }
+						content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API endpoints for ${project.name}` }
 					}));
 					
 					console.log("Final API data structure:", JSON.stringify(this.apiData, null, 2));
@@ -253,8 +269,168 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					this.expandedFolders.push(node.id);
 					utils.saveExpandedFolders(this.expandedFolders);
 				}
+				this.loadProjectFolderData(node);
 				const appId = node.type === "api" ? "api_endpoint" : node.type;
 				if (this.system?.openApp) this.system.openApp(appId, true, node);
+			},
+			async loadProjectFolderData(node) {
+				if (this.isPersonalSpace(node.type, node.id)) {
+					console.log("Loading personal space data for node:", node.id, node.type);
+					await this.loadPersonalSpaceProjects();
+					return;
+				}
+				
+				if (!this.isProjectFolderType(node.type, node.id)) {
+					console.log("Not a project folder type:", node.type, node.id);
+					return;
+				}
+				console.log("Loading project folder data for node:", node.id, node.type);
+				
+				if (node.id === "ps_my_projects") {
+					if (this.apiData[0]?.children[0]?.children?.length === 0) {
+						await this.loadPersonalSpaceProjects();
+					}
+					return;
+				}
+				
+				if (node.id === "ps_followed") {
+					if (this.apiData[0]?.children[1]?.children?.length === 0) {
+						await this.loadPersonalSpaceProjects();
+					}
+					return;
+				}
+				
+				const groupIdMatch = node.id.match(/group_([^_]+)_projects/);
+				console.log("groupIdMatch:", groupIdMatch);
+				if (groupIdMatch) {
+					const groupId = groupIdMatch[1];
+					console.log("Extracted groupId:", groupId);
+					if (!groupId) {
+						console.error("Invalid groupId extracted:", groupIdMatch[1]);
+						return;
+					}
+					try {
+						console.log("Calling api.getProjectByGroupId with groupId:", groupId);
+						const projectData = await api.getProjectByGroupId(groupId);
+						console.log("API response:", projectData);
+						if (!projectData) {
+							console.error("API returned null/undefined");
+							return;
+						}
+						const projects = projectData.data?.list || [];
+						console.log(`Loaded ${projects.length} projects for group ${groupId}`);
+						const updateNode = (nodes) => {
+							for (const n of nodes) {
+								if (n.id === node.id) {
+									n.children = projects.map(project => ({
+										id: project._id || project.id, name: project.name, type: "project", role: project.role,
+										updatedAt: project.up_time || project.updated_at, path: `${node.path}/${project.name}`,
+										visibility: project.project_type || project.visibility, followed: project.follow,
+										content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API endpoints for ${project.name}` }
+									}));
+									return true;
+								}
+								if (n.children && n.children.length > 0 && updateNode(n.children)) {
+									return true;
+								}
+							}
+							return false;
+						};
+						updateNode(this.apiData);
+						console.log("Node updated successfully");
+					} catch (error) {
+						console.error(`Failed to load projects for group ${groupId}:`, error);
+						console.error("Error details:", error.message, error.stack);
+					}
+				} else {
+					console.error("Could not extract groupId from node.id:", node.id);
+				}
+			},
+			async loadPersonalProjects(type) {
+				try {
+					console.log(`Loading ${type} projects...`);
+					console.log("Calling api.getProjectByGroupId with params:", "personal");
+					const personalProjects = await api.getProjectByGroupId("personal");
+					console.log("API response:", personalProjects);
+					console.log("Response data:", personalProjects.data);
+					
+					const allPersonalProjects = personalProjects.data?.list || [];
+					console.log(`Personal projects loaded: ${allPersonalProjects.length}`);
+					console.log("Project sample:", allPersonalProjects[0]);
+					
+					let projects;
+					let nodeId;
+					if (type === "myProjects") {
+						projects = allPersonalProjects.filter(p => !p.group_id);
+						nodeId = "ps_my_projects";
+					} else {
+						projects = allPersonalProjects.filter(p => p.follow);
+						nodeId = "ps_followed";
+					}
+					
+					console.log(`${type} count:`, projects.length);
+					
+					const updateNode = (nodes) => {
+						for (const n of nodes) {
+							if (n.id === nodeId) {
+								n.children = projects.map(project => ({
+									id: project._id || project.id, name: project.name, type: "project", role: project.role,
+									updatedAt: project.up_time || project.updated_at, path: `/个人空间/${type === 'myProjects' ? '我的项目' : '星标项目'}/${project.name}`,
+									visibility: project.project_type || project.visibility, followed: project.follow,
+									content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API endpoints for ${project.name}` }
+								}));
+								return true;
+							}
+							if (n.children && n.children.length > 0 && updateNode(n.children)) {
+								return true;
+							}
+						}
+						return false;
+					};
+					updateNode(this.apiData);
+					console.log(`${type} projects updated successfully`);
+				} catch (error) {
+					console.error(`Failed to load ${type} projects:`, error);
+					console.error("Error details:", error.message, error.stack);
+				}
+			},
+			async loadPersonalSpaceProjects() {
+				try {
+					console.log("Loading personal space projects...");
+					const personalProjects = await api.getProjectByGroupId("personal");
+					console.log("Personal space API response:", personalProjects);
+					console.log("Personal space response data:", personalProjects.data);
+					
+					const allPersonalProjects = personalProjects.data?.list || [];
+					console.log("All personal projects count:", allPersonalProjects.length);
+					
+					const myProjects = allPersonalProjects.filter(project => !project.group_id);
+					const starredProjects = allPersonalProjects.filter(project => project.follow);
+					
+					console.log("My projects count:", myProjects.length);
+					console.log("Starred projects count:", starredProjects.length);
+					
+					if (this.apiData[0] && this.apiData[0].children) {
+						this.apiData[0].children[0].children = myProjects.map(project => ({
+							id: project._id || project.id, name: project.name, type: "project", role: project.role,
+							updatedAt: project.up_time || project.updated_at, path: `/个人空间/我的项目/${project.name}`,
+							visibility: project.project_type || project.visibility, followed: project.follow,
+							content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API endpoints for ${project.name}` }
+						}));
+						
+						this.apiData[0].children[1].children = starredProjects.map(project => ({
+							id: project._id || project.id, name: project.name, type: "project", role: project.role,
+							updatedAt: project.up_time || project.updated_at, path: `/个人空间/星标项目/${project.name}`,
+							visibility: project.project_type || project.visibility, followed: project.follow,
+							content: { endpoint: `api/${project._id || project.id}/endpoints`, method: "GET", description: `API endpoints for ${project.name}` }
+						}));
+					}
+					
+					console.log("Personal space projects updated successfully");
+				} catch (error) {
+					console.error("Failed to load personal space projects:", error);
+					console.error("Error details:", error.message, error.stack);
+				}
 			},
 			openNewWindow(node) {
 				const vm = this;
@@ -371,20 +547,20 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				this.showCreateProjectDialog = false;
 			},
 			async createProject(formData) {
-				if (!formData.name.trim()) { _.msg.error("项目名称不能为空"); return; }
+				if (!formData.name.trim()) { _.$msgError("项目名称不能为空"); return; }
 				this.creatingProject = true;
 				try {
 					const response = await api.project_add({ name: formData.name, desc: formData.description, visibility: formData.visibility });
 					if (response.errcode === 0) {
-						_.msg.success("项目创建成功");
+						_.$msgSuccess("项目创建成功");
 						this.showCreateProjectDialog = false;
 						this.loadApiData();
 					} else {
-						_.msg.error(response.errmsg || "项目创建失败");
+						_.$msgError(response.errmsg || "项目创建失败");
 					}
 				} catch (error) {
 					console.error("Failed to create project:", error);
-					_.msg.error("项目创建失败，请重试");
+					_.$msgError("项目创建失败，请重试");
 				} finally {
 					this.creatingProject = false;
 				}
@@ -398,15 +574,15 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						response = await api.projectAddFollow({ projectid: project.id, projectname: project.name });
 					}
 					if (response.errcode === 0) {
-						_.msg.success(project.followed ? "取消星标成功" : "星标成功");
+						_.$msgSuccess(project.followed ? "取消星标成功" : "星标成功");
 						project.followed = !project.followed;
 						this.loadApiData();
 					} else {
-						_.msg.error(response.errmsg || "操作失败");
+						_.$msgError(response.errmsg || "操作失败");
 					}
 				} catch (error) {
 					console.error("Failed to toggle star:", error);
-					_.msg.error("操作失败，请重试");
+					_.$msgError("操作失败，请重试");
 				}
 			},
 			isFolderType(type) {
@@ -419,6 +595,9 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				);
 				console.log("isProjectFolderType result:", result);
 				return result;
+			},
+			isPersonalSpace(type, nodeId) {
+				return type === "personal" && nodeId === "personal_space";
 			},
 			performSearch(query) {
 				if (!query.trim()) {
@@ -457,6 +636,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			},
 			handleSelectSearchResult(result) {
 				this.handleOpenNode(result);
+			},
+			handleFollowChange(projectId, isFollow) {
+				console.log(`Follow status changed for project ${projectId}: ${isFollow}`);
+				this.loadPersonalSpaceProjects();
 			}
 		}
 	};

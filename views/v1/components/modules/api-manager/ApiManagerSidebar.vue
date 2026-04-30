@@ -186,7 +186,7 @@ export default async function () {
 									<span v-if="child.type === 'project'" class="api-manager__tree-actions">
 										<button @click.stop="toggleStarProject(child)" class="api-manager__tree-action-btn"
 											:title="child.followed ? '取消星标' : '星标'">
-											<xIcon :icon="child.followed ? 'star' : 'star-o'" :size="14" 
+											<xIcon :icon="child.followed ? 'star-filled' : 'star'" :size="14" 
 												:class="getStarIconClass(child)" />
 										</button>
 									</span>

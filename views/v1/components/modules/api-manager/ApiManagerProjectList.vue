@@ -178,7 +178,7 @@ export default async function () {
 							@click.stop="toggleStar(project)"
 							:title="project.followed ? '取消星标' : '添加星标'">
 							<xIcon 
-								:icon="project.followed ? 'star' : 'star-o'" 
+								:icon="project.followed ? 'star-filled' : 'star'" 
 								:size="14" 
 								:class="{ 'api-manager__star-icon--active': project.followed }" />
 						</button>
@@ -186,7 +186,7 @@ export default async function () {
 							class="api-manager__project-action-btn" 
 							@click.stop="handleContextMenu(project, $event)"
 							title="更多操作">
-							<xIcon icon="more-horizontal" :size="14" />
+							<xIcon icon="_more-horizontal" :size="14" />
 						</button>
 					</div>
 				</div>
@@ -226,7 +226,7 @@ export default async function () {
 							@click.stop="toggleStar(project)"
 							:title="project.followed ? '取消星标' : '添加星标'">
 							<xIcon 
-								:icon="project.followed ? 'star' : 'star-o'" 
+								:icon="project.followed ? 'star-filled' : 'star'" 
 								:size="14" 
 								:class="{ 'api-manager__star-icon--active': project.followed }" />
 						</button>
@@ -294,12 +294,11 @@ export default async function () {
 .api-manager__project-list {
 	flex: 1;
 	overflow-y: auto;
-	display: flex;
-	justify-content: center;
 }
 
 .api-manager__project-list-inner {
 	padding: 4px 0;
+	width: 100%;
 }
 
 .api-manager__project-row {
