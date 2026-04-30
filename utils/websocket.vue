@@ -12,8 +12,14 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		async initWebsocket({ vm, user }) {
 			const uid = user._id;
 			return new Promise(async resolve => {
+				const currentHost = window.location.host;
+				let socketHost = currentHost;
+				if (currentHost === "shonesinglone.github.io") {
+					socketHost = "www.singlone.work";
+				}
 				const wsOptions = {
 					TRIGGER_EVENT_NAME: $$io_val.event_id,
+					hostname: socketHost,
 					onConnection: ({ ws, id, current_online_user }) => {
 						/* ws:连接之后通知所有人用户登录 */
 						ws.emit("all", {
