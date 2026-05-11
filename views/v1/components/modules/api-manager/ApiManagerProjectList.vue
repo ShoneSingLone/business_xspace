@@ -76,6 +76,8 @@ export default async function () {
 				this.$emit("toggle-star", project);
 			},
 			handleContextMenu(project, event) {
+				event.preventDefault();
+				event.stopPropagation();
 				this.$emit("context-menu", project, event);
 			},
 			formatDate(dateString) {
@@ -89,12 +91,6 @@ export default async function () {
 				} catch (e) {
 					return dateString;
 				}
-			},
-			getProjectCardClass(project) {
-				return {
-					'api-manager__project-card': true,
-					'api-manager__project-card--selected': this.selectedProjectId === project.id
-				};
 			},
 			getProjectRowClass(project) {
 				return {
@@ -200,38 +196,40 @@ export default async function () {
 				<p class="api-manager__empty-hint">点击右上角按钮创建新项目</p>
 			</div>
 			<div v-else class="api-manager__project-grid-inner">
-				<div 
-					v-for="project in filteredAndSortedProjects" 
+				<XspaceExplorerCard
+					v-for="project in filteredAndSortedProjects"
 					:key="project.id"
-					@click.stop="selectProject(project)" 
+					:selected="selectedProjectId === project.id"
+					@click.stop="selectProject(project)"
 					@dblclick.stop="openProject(project)"
-					@contextmenu="handleContextMenu(project, $event)"
-					:class="getProjectCardClass(project)">
-					<div class="api-manager__project-card-icon">
-						<xIcon icon="folder" :size="32" class="api-manager__project-card-icon-inner" />
-					</div>
-					<div class="api-manager__project-card-content">
-						<h4 class="api-manager__project-card-name">{{ project.name }}</h4>
-						<p class="api-manager__project-card-meta">
-							<span :class="getVisibilityBadgeClass(project.visibility)">
-								{{ project.visibility === "private" ? "私有" : "公开" }}
-							</span>
-							<span v-if="project.role" class="api-manager__project-card-role">{{ project.role }}</span>
-						</p>
-						<p class="api-manager__project-card-date">{{ formatDate(project.updatedAt) }}</p>
-					</div>
-					<div class="api-manager__project-card-actions">
-						<button 
-							class="api-manager__project-card-action-btn" 
+					@contextmenu="handleContextMenu(project, $event)">
+					<template #icon>
+						<xIcon icon="folder" :size="18" class="api-manager__project-card-icon-inner" />
+					</template>
+					<template #title>
+						{{ project.name }}
+					</template>
+					<template #meta>
+						<span :class="getVisibilityBadgeClass(project.visibility)">
+							{{ project.visibility === "private" ? "私有" : "公开" }}
+						</span>
+						<span v-if="project.role" class="api-manager__project-card-role">{{ project.role }}</span>
+					</template>
+					<template #date>
+						{{ formatDate(project.updatedAt) }}
+					</template>
+					<template #actions>
+						<button
+							class="api-manager__project-action-btn"
 							@click.stop="toggleStar(project)"
 							:title="project.followed ? '取消星标' : '添加星标'">
-							<xIcon 
-								:icon="project.followed ? 'star-filled' : 'star'" 
-								:size="14" 
+							<xIcon
+								:icon="project.followed ? 'star-filled' : 'star'"
+								:size="14"
 								:class="{ 'api-manager__star-icon--active': project.followed }" />
 						</button>
-					</div>
-				</div>
+					</template>
+				</XspaceExplorerCard>
 			</div>
 		</div>
 	</div>
@@ -439,106 +437,25 @@ export default async function () {
 	flex: 1;
 	overflow-y: auto;
 	padding: 16px;
-	display: flex;
-	justify-content: center;
 }
 
 .api-manager__project-grid-inner {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-	gap: 12px;
-}
-
-.api-manager__project-card {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	padding: 12px;
-	background: var(--color-surface-container);
-	border: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
-	border-radius: 14px;
-	cursor: pointer;
-	transition: all 0.15s ease;
-
-	&:hover {
-		background: color-mix(in srgb, var(--color-surface-variant) 30%, transparent);
-		border-color: color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
-	}
-
-	&--selected {
-		background: color-mix(in srgb, var(--color-primary-container) 30%, transparent);
-		border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
-	}
-}
-
-.api-manager__project-card-icon {
-	display: flex;
-	justify-content: center;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 16px;
+	width: 100%;
 }
 
 .api-manager__project-card-icon-inner {
-	color: var(--color-on-surface-variant);
-}
-
-.api-manager__project-card-content {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-
-.api-manager__project-card-name {
-	margin: 0;
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--color-on-surface);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.api-manager__project-card-meta {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	margin: 0;
+	color: var(--color-primary);
 }
 
 .api-manager__project-card-role {
-	font-size: 11px;
-	font-weight: 600;
-	padding: 2px 6px;
-	border-radius: 4px;
+	font-size: 10px;
+	font-weight: 500;
+	padding: 1px 4px;
+	border-radius: 3px;
 	background: color-mix(in srgb, var(--color-secondary) 15%, transparent);
 	color: var(--color-secondary);
-}
-
-.api-manager__project-card-date {
-	margin: 0;
-	font-size: 12px;
-	color: var(--color-on-surface-variant);
-}
-
-.api-manager__project-card-actions {
-	display: flex;
-	justify-content: flex-end;
-}
-
-.api-manager__project-card-action-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 24px;
-	height: 24px;
-	border: 0;
-	background: transparent;
-	border-radius: 6px;
-	cursor: pointer;
-	color: var(--color-on-surface-variant);
-	transition: all 0.15s ease;
-
-	&:hover {
-		background: var(--color-surface-variant);
-		color: var(--color-on-surface);
-	}
 }
 </style>

@@ -127,7 +127,12 @@ export default async function () {
 		loadExpandedFolders() {
 			try {
 				const saved = localStorage.getItem("apiManager_expandedFolders");
-				return saved ? JSON.parse(saved) : ["personal_space", "groups"];
+				let folders = saved ? JSON.parse(saved) : ["personal_space", "groups"];
+				return folders.filter(folderId => 
+					folderId !== "ps_my_projects" && 
+					folderId !== "ps_followed" && 
+					!folderId.endsWith("_projects")
+				);
 			} catch {
 				return ["personal_space", "groups"];
 			}

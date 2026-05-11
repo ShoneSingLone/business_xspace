@@ -328,23 +328,16 @@ export default async function () {
 					return _.$ajax.get("/api/group/mine");
 				},
 				groupGetMyGroupBy(group_id) {
-					let id;
-					try {
-						id = Number(group_id);
-					} catch (error) {
-						return;
-					}
-
 					return _.$ajax.get("/api/group/get", {
 						data: {
-							id
+							id: String(group_id)
 						}
 					});
 				},
 				groupGetMemberListBy(group_id) {
 					return _.$ajax.get("/api/group/get_member_list", {
 						data: {
-							id: Number(group_id)
+							id: String(group_id)
 						}
 					});
 				},

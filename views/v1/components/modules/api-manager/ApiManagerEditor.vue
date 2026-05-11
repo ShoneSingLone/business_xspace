@@ -1,10 +1,25 @@
 <script lang="ts">
 export default async function () {
 	return {
+		components: {
+			MemberListPanel: () => _.$importVue("@/views/v1/components/organisms/MemberListPanel.vue")
+		},
 		props: {
 			node: {
 				type: Object,
 				default: null
+			},
+			members: {
+				type: Array,
+				default: null
+			},
+			membersLoading: {
+				type: Boolean,
+				default: false
+			},
+			canManageMembers: {
+				type: Boolean,
+				default: false
 			},
 			editingContent: {
 				type: [Object, String],
@@ -43,6 +58,15 @@ export default async function () {
 			},
 			sendRequest() {
 				this.$emit("send-request");
+			},
+			addMember() {
+				this.$emit("add-member");
+			},
+			removeMember(member) {
+				this.$emit("remove-member", member);
+			},
+			changeMemberRole(member, role) {
+				this.$emit("change-member-role", { member, role });
 			},
 			handlePlainTextInput(event) {
 				this.$emit("update:editingContent", event.target.value);
@@ -83,7 +107,7 @@ export default async function () {
 
 <template>
 	<div class="api-manager__editor-wrap">
-		<div class="api-manager__editor-card api-manager__editor-card--wide">
+		<div :class="['api-manager__editor-card', node?.type !== 'member_list' ? 'api-manager__editor-card--wide' : '']">
 			<div class="api-manager__editor-header">
 				<div class="api-manager__editor-header-left">
 					<xIcon :icon="getIcon(node?.type)" :size="24" :class="getIconColor(node?.type)" />
@@ -92,7 +116,7 @@ export default async function () {
 						<p class="api-manager__editor-subtitle">{{ node?.type?.replace("_", " ") }}</p>
 					</div>
 				</div>
-				<div class="api-manager__editor-header-actions">
+				<div class="api-manager__editor-header-actions" v-if="node?.type !== 'member_list'">
 					<template v-if="editingContent">
 						<button @click="cancelEdit" class="api-manager__action-btn api-manager__action-btn--ghost">Cancel</button>
 						<button @click="saveEdit" class="api-manager__action-btn api-manager__action-btn--primary api-manager__action-btn--with-icon">
@@ -111,53 +135,14 @@ export default async function () {
 
 			<div class="api-manager__editor-body">
 				<template v-if="node?.type === 'member_list'">
-					<div class="api-manager__section">
-						<div class="api-manager__section-header">
-							<h3 class="api-manager__section-title">Members</h3>
-							<button v-if="editingContent" class="api-manager__link-btn api-manager__link-btn--with-icon">
-								<xIcon icon="plus" :size="16" />
-								Add Member
-							</button>
-						</div>
-						<div class="api-manager__table-shell">
-							<table class="api-manager__table">
-								<thead class="api-manager__table-head">
-									<tr>
-										<th class="api-manager__th">Name</th>
-										<th class="api-manager__th">Role</th>
-										<th class="api-manager__th">Email</th>
-										<th v-if="editingContent" class="api-manager__th api-manager__th--right">Actions</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr v-for="(member, idx) in (editingContent || node?.content)" :key="idx" class="api-manager__tr">
-										<td class="api-manager__td api-manager__td--strong">
-											<input v-if="editingContent" v-model="member.name" class="api-manager__field-input api-manager__field-input--inline" />
-											<span v-else>{{ member.name }}</span>
-										</td>
-										<td class="api-manager__td">
-											<select v-if="editingContent" v-model="member.role" class="api-manager__field-input api-manager__field-input--inline">
-												<option>Admin</option>
-												<option>Developer</option>
-												<option>Viewer</option>
-												<option>Owner</option>
-											</select>
-											<span v-else class="api-manager__inline-badge">{{ member.role }}</span>
-										</td>
-										<td class="api-manager__td api-manager__td--muted">
-											<input v-if="editingContent" v-model="member.email" class="api-manager__field-input api-manager__field-input--inline" />
-											<span v-else>{{ member.email || "--" }}</span>
-										</td>
-										<td v-if="editingContent" class="api-manager__td api-manager__td--right">
-											<button class="api-manager__icon-action">
-												<xIcon icon="delete" :size="16" />
-											</button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
+					<MemberListPanel
+						:groupName="node?.groupName"
+						:members="members || node?.content || []"
+						:loading="membersLoading"
+						:canManage="canManageMembers"
+						@add-member="addMember"
+						@remove-member="removeMember"
+						@change-member-role="changeMemberRole" />
 				</template>
 
 				<template v-else-if="node?.type === 'setting'">

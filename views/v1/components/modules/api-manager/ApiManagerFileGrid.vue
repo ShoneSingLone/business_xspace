@@ -41,12 +41,6 @@ export default async function () {
 					case "code": return "api-manager__icon api-manager__icon--code";
 					default: return "api-manager__icon api-manager__icon--folder";
 				}
-			},
-			getFileCardClass(file) {
-				return {
-					'api-manager__file-card': true,
-					'api-manager__file-card--selected': this.selectedFileId === file.id
-				};
 			}
 		}
 	};
@@ -60,21 +54,25 @@ export default async function () {
 			<p>This folder is empty</p>
 		</div>
 		<div v-else class="api-manager__file-grid-inner">
-			<div 
-				v-for="file in files" 
+			<XspaceExplorerCard
+				v-for="file in files"
 				:key="file.id"
-				@click.stop="selectFile(file)" 
-				@dblclick.stop="openFile(file)"
-				:class="getFileCardClass(file)">
-				<div class="api-manager__file-card-icon">
-					<xIcon :icon="getIcon(file.type)" :size="32" :class="getIconColor(file.type)" />
-				</div>
-				<div class="api-manager__file-card-content">
-					<h4 class="api-manager__file-card-name">{{ file.name }}</h4>
-					<p class="api-manager__file-card-meta">{{ file.type.replace("_", " ") }}</p>
-					<p class="api-manager__file-card-date">{{ formatDate(file.updatedAt) }}</p>
-				</div>
-			</div>
+				:selected="selectedFileId === file.id"
+				@click.stop="selectFile(file)"
+				@dblclick.stop="openFile(file)">
+				<template #icon>
+					<xIcon :icon="getIcon(file.type)" :size="18" :class="getIconColor(file.type)" />
+				</template>
+				<template #title>
+					{{ file.name }}
+				</template>
+				<template #meta>
+					{{ file.type.replace("_", " ") }}
+				</template>
+				<template #date>
+					{{ formatDate(file.updatedAt) }}
+				</template>
+			</XspaceExplorerCard>
 		</div>
 	</div>
 </template>

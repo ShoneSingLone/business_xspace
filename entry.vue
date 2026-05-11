@@ -23,6 +23,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			XspaceItemKeyValTable: "@/components/XspaceItemKeyValTable.vue",
 			XspaceItemPathParams: "@/components/XspaceItemPathParams.vue",
 			XspaceProjectCard: "@/components/XspaceProjectCard.vue",
+			XspaceExplorerCard: "@/components/XspaceExplorerCard.vue",
 			XspacePlaceholderView: "@/components/XspacePlaceholderView.vue",
 			ProjectInterfaceSectionInterfaceDetailEditorDesc:
 				"@/views/Api/Project/Section/ProjectInterfaceSectionInterfaceDetailEditorDesc.vue"
@@ -59,13 +60,44 @@ export default async function ({ PRIVATE_GLOBAL }) {
 	_.$xspaceRouter = router;
 
 	router.beforeEach(function (to, from, next) {
-		// 提取并存储 URL 参数
+		const normalizeKey = k => {
+			try {
+				return decodeURIComponent(String(k || "")).replace(/^\?/, "");
+			} catch (e) {
+				return String(k || "").replace(/^\?/, "");
+			}
+		};
+
+
+		const parseHashQuery = () => {
+			try {
+				const hash = String(window.location.hash || "");
+				const qIndex = hash.indexOf("?");
+				if (qIndex === -1) return {};
+				const queryStr = hash.slice(qIndex + 1);
+				if (!queryStr) return {};
+				const params = new URLSearchParams(queryStr);
+				const res = {};
+				params.forEach((v, k) => {
+					res[normalizeKey(k)] = v;
+				});
+				return res;
+			} catch (e) {
+				return {};
+			}
+		};
+
 		const { query } = to;
+		const normalizedRouteQuery = {};
+		_.each(query, (v, k) => {
+			normalizedRouteQuery[normalizeKey(k)] = v;
+		});
+		const mergedQuery = Object.assign({}, parseHashQuery(), normalizedRouteQuery);
 		const paramsToStore = ["isDev", "_xspace_token", "_xspace_uid"];
 
 		paramsToStore.forEach(param => {
-			if (query[param]) {
-				_.$lStorage[param] = query[param];
+			if (mergedQuery && mergedQuery[param]) {
+				_.$lStorage[param] = mergedQuery[param];
 			}
 		});
 
@@ -461,7 +493,10 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					const { data } = await _api.xspace.userLogout();
 					if (data === "ok") {
 						_.$lStorage.x_token = "";
+						_.$lStorage._xspace_token = "";
+						_.$lStorage._xspace_uid = "";
 						await this._setUser({
+							_id: null,
 							isLogin: false,
 							loginState: GUEST_STATUS,
 							username: null,
@@ -469,7 +504,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							role: "",
 							type: ""
 						});
-						this.$router.push("/login");
+						this.$router.replace({ path: "/login", query: {} });
 						_.$msg(i18n("退出成功! "));
 					}
 				} catch (error) {

@@ -57,7 +57,8 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				creatingProject: false,
 				searchResults: [],
 				isSearchLoading: false,
-				searchTimeout: null
+				searchTimeout: null,
+				memberListLoading: {}
 			};
 		},
 		computed: {
@@ -105,10 +106,32 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			},
 			canNavigateUp() {
 				return this.activeNode?.id !== "personal_space" && this.activeNode?.id !== "groups";
+			},
+			activeGroupIdForMembers() {
+				const node = this.activeNode;
+				if (!node || node.type !== "member_list") return null;
+				if (node.groupId) return String(node.groupId);
+				const match = String(node.id || "").match(/^group_(.+?)_members$/);
+				return match ? match[1] : null;
+			},
+			canManageActiveMembers() {
+				if (this.activeNode?.type !== "member_list") return false;
+				return [Vue._xspace_var.OWNER, Vue._xspace_var.ADMIN].includes(this.activeNode?.role);
+			},
+			activeMembersLoading() {
+				const groupId = this.activeGroupIdForMembers;
+				if (!groupId) return false;
+				return Boolean(this.memberListLoading[groupId]);
 			}
 		},
 		mounted() {
 			this.loadApiData();
+			this.$nextTick(() => {
+				document.addEventListener('contextmenu', this.globalContextMenuHandler);
+			});
+		},
+		beforeUnmount() {
+			document.removeEventListener('contextmenu', this.globalContextMenuHandler);
 		},
 		watch: {
 			windowData: {
@@ -116,15 +139,193 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					if (newVal) this.expandAncestors(newVal.id);
 				},
 				immediate: false
+			},
+			$route: {
+				handler() {
+					if (this.apiData) {
+						this.handleUrlParams();
+					}
+				}
 			}
 		},
 		methods: {
+			getGroupIdFromMemberNode(node) {
+				if (!node || node.type !== "member_list") return null;
+				if (node.groupId) return String(node.groupId);
+				const match = String(node.id || "").match(/^group_(.+?)_members$/);
+				return match ? match[1] : null;
+			},
+			async loadGroupMemberList(node, { force = false } = {}) {
+				const groupId = this.getGroupIdFromMemberNode(node);
+				if (!groupId) return;
+				if (!force && Array.isArray(node.content) && node.content.length > 0) return;
+
+				this.$set(this.memberListLoading, groupId, true);
+				try {
+					const res = await api.groupGetMemberListBy(groupId);
+					if (res?.errcode !== 0) {
+						_.$msgError(res?.errmsg || "加载成员列表失败");
+						node.content = [];
+						return;
+					}
+					node.content = res?.data || [];
+				} catch (error) {
+					console.error("Failed to load group members:", error);
+					_.$msgError("加载成员列表失败");
+					node.content = node.content || [];
+				} finally {
+					this.$set(this.memberListLoading, groupId, false);
+				}
+			},
+			openAddMemberDialog() {
+				const node = this.activeNode;
+				const groupId = this.getGroupIdFromMemberNode(node);
+				if (!groupId) return;
+
+				const vm = this;
+				_.$openModal({
+					title: i18n("添加成员"),
+					url: "@/views/Api/Group/Section/MemberList/GroupSectionMemberList.AddMember.vue",
+					parent: vm,
+					async onOk({ member_uids, role, dialogVm }) {
+						try {
+							const { data } = await api.groupAddMember({
+								id: String(groupId),
+								member_uids,
+								role
+							});
+							const { add_members = [], exist_members = [] } = data || {};
+							_.$msg(`新增 ${add_members.length} 人， ${exist_members.length} 人已存在`);
+							await vm.loadGroupMemberList(node, { force: true });
+							dialogVm.closeModal();
+						} catch (error) {
+							console.error("Failed to add member:", error);
+							_.$msgError("添加成员失败");
+						}
+					}
+				});
+			},
+			async removeMember(member) {
+				const node = this.activeNode;
+				const groupId = this.getGroupIdFromMemberNode(node);
+				if (!groupId) return;
+				const uid = member?.uid;
+				if (!uid) return;
+				try {
+					await _.$confirm(i18n("确认移除该成员？"));
+				} catch (e) {
+					return;
+				}
+				try {
+					await api.group_del_member({
+						id: String(groupId),
+						member_uid: uid
+					});
+					_.$msg(i18n("移除成功"));
+					await this.loadGroupMemberList(node, { force: true });
+				} catch (error) {
+					console.error("Failed to remove member:", error);
+					_.$msgError(i18n("移除失败"));
+				}
+			},
+			async changeMemberRole({ member, role }) {
+				const node = this.activeNode;
+				const groupId = this.getGroupIdFromMemberNode(node);
+				if (!groupId) return;
+				const uid = member?.uid;
+				if (!uid) return;
+				if (member.role === role) return;
+				try {
+					await _.$confirm(i18n("确认修改该成员权限？"));
+				} catch (e) {
+					return;
+				}
+				_.$loading(true);
+				try {
+					await api.groupChangeMemberRole({
+						id: String(groupId),
+						member_uid: uid,
+						role
+					});
+					member.role = role;
+				} catch (error) {
+					console.error("Failed to change member role:", error);
+					_.$msgError(i18n("修改权限失败"));
+				} finally {
+					_.$loading(false);
+				}
+			},
+			getNodeRouteLocation(node) {
+				if (node?.id) {
+					const match = String(node.id).match(/^group_(.+)_(projects|docs|members|settings|log)$/);
+					if (match) {
+						const groupId = match[1];
+						const suffix = match[2];
+						const viewMap = {
+							projects: "projects",
+							docs: "docs",
+							members: "members",
+							settings: "settings",
+							log: "activity-log"
+						};
+						return {
+							path: `/v1/api-manager/group/${groupId}/${viewMap[suffix]}`,
+							query: {}
+						};
+					}
+				}
+
+				const query = { nodeId: node?.id };
+				if (node?.path) query.path = node.path;
+				if (node?.type) query.type = node.type;
+				return { path: "/v1/api-manager", query };
+			},
+			getNodeRouteHref(node) {
+				const { path, query } = this.getNodeRouteLocation(node);
+				return _.$aHashLink(path, query);
+			},
+			getNodeRouteHrefWithAuth(node) {
+				const { path, query } = this.getNodeRouteLocation(node);
+				const authQuery = {
+					...query,
+					_xspace_token: _.$lStorage._xspace_token || "",
+					_xspace_uid: _.$lStorage._xspace_uid || ""
+				};
+				return _.$aHashLink(path, authQuery);
+			},
 			handleUrlParams() {
-				const params = new URLSearchParams(window.location.search);
-				const nodeId = params.get('nodeId');
+				let nodeId = null;
+				try {
+					const routeNodeId = this.$route?.query?.nodeId;
+					if (routeNodeId) {
+						nodeId = String(routeNodeId);
+					}
+
+					if (!nodeId) {
+						const groupId = this.$route?.params?.groupId;
+						const view = this.$route?.params?.view;
+						const viewSuffixMap = {
+							projects: "projects",
+							docs: "docs",
+							members: "members",
+							settings: "settings",
+							"activity-log": "log"
+						};
+						const suffix = viewSuffixMap[String(view || "")];
+						if (groupId && suffix) {
+							nodeId = `group_${groupId}_${suffix}`;
+						}
+					}
+
+					if (!nodeId) {
+						const params = new URLSearchParams(window.location.search);
+						const idFromSearch = params.get("nodeId");
+						if (idFromSearch) nodeId = idFromSearch;
+					}
+				} catch (e) {}
+
 				if (nodeId) {
 					this.selectedNodeId = nodeId;
-					utils.saveSelectedNodeId(nodeId);
 				}
 				if (this.windowData) {
 					this.expandAncestors(this.windowData.id);
@@ -139,6 +340,21 @@ export default async function ({ PRIVATE_GLOBAL }) {
 					});
 				}
 			},
+			openProjectWindow(project) {
+				_.$ModalManager.open({
+					title: `${project.name} - 项目详情`,
+					url: "@/views/v1/components/modules/api-manager/ProjectDetail.dialog.vue",
+					parent: this,
+					windowId: `project_${project.id}`,
+					project: project,
+					modalConfigs: {
+						fullscreen: true
+					},
+					onClose() {
+						console.log('Project window closed');
+					}
+				});
+			},
 			findNodeById(nodes, targetId) {
 				for (const node of nodes) {
 					if (node.id === targetId) return node;
@@ -152,6 +368,9 @@ export default async function ({ PRIVATE_GLOBAL }) {
 			loadProjectFolderDataIfNeeded(node) {
 				if (this.isProjectFolderType(node.type, node.id)) {
 					this.loadProjectFolderData(node);
+				}
+				if (node.type === "member_list") {
+					this.loadGroupMemberList(node);
 				}
 			},
 			async loadApiData() {
@@ -190,7 +409,7 @@ export default async function ({ PRIVATE_GLOBAL }) {
 								},
 								children: [
 									{ id: `group_${group._id}_projects`, name: "Projects", type: "folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Projects`, children: [] },
-									{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
+									{ id: `group_${group._id}_members`, name: "Group Members", type: "member_list", role: group.role, groupId: group._id, groupName: group.group_name, updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Members`, content: [] },
 									{ id: `group_${group._id}_docs`, name: "Group Docs", type: "doc_folder", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Docs`, children: [] },
 									{
 										id: `group_${group._id}_settings`, name: "Group Settings", type: "setting", updatedAt: new Date().toISOString(), path: `/群组/${group.group_name}/Group Settings`,
@@ -262,9 +481,27 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				}
 			},
 			handleOpenNode(node) {
+				this.selectedFile = null;
+				
+				if (node.type === "project") {
+					this.openProjectWindow(node);
+					return;
+				}
+				
 				this.selectedNodeId = node.id;
 				utils.saveSelectedNodeId(node.id);
-				this.selectedFile = null;
+				
+				if (node.type === "folder" && node.id?.endsWith("_projects")) {
+					this.loadProjectFolderData(node);
+					const appId = node.type === "api" ? "api_endpoint" : node.type;
+					if (this.system?.openApp) this.system.openApp(appId, true, node);
+					return;
+				}
+				
+				if (node.type === "member_list") {
+					this.loadGroupMemberList(node);
+				}
+				
 				if (utils.isFolderType(node.type) && this.expandedFolders.indexOf(node.id) === -1) {
 					this.expandedFolders.push(node.id);
 					utils.saveExpandedFolders(this.expandedFolders);
@@ -455,7 +692,11 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				this.sortDirection = this.sortField === field ? (this.sortDirection === "asc" ? "desc" : "asc") : "asc";
 				this.sortField = field;
 			},
+			globalContextMenuHandler(e) {
+				console.log("🌍 Global contextmenu event captured!", e.target.tagName, e.target.className);
+			},
 			showContextMenu(node, e) {
+				console.log("ApiManager: showContextMenu called", node?.name, e.clientX, e.clientY);
 				this.contextMenu = { show: true, x: e.clientX, y: e.clientY, node };
 			},
 			hideContextMenu() {
@@ -480,16 +721,17 @@ export default async function ({ PRIVATE_GLOBAL }) {
 						break;
 					}
 					case "copyLink": {
-						const link = `${window.location.origin}${window.location.pathname}?nodeId=${node.id}`;
+						const link = this.getNodeRouteHref(node);
 						navigator.clipboard.writeText(link).then(() => _.msg("Link copied to clipboard"));
 						break;
 					}
 					case "openNewTab": {
-						const params = new URLSearchParams();
-						params.set('nodeId', node.id);
-						if (node.path) params.set('path', node.path);
-						if (node.type) params.set('type', node.type);
-						const link = `${window.location.origin}/v1/api-manager?${params.toString()}`;
+						const link = this.getNodeRouteHref(node);
+						window.open(link, "_blank");
+						break;
+					}
+					case "openNewTabWithAuth": {
+						const link = this.getNodeRouteHrefWithAuth(node);
 						window.open(link, "_blank");
 						break;
 					}
@@ -733,11 +975,21 @@ export default async function ({ PRIVATE_GLOBAL }) {
 							</template>
 						</template>
 
-						<ApiManagerEditor v-else :node="activeNode" :editing-content="editingContent"
+						<ApiManagerEditor
+							v-else
+							:node="activeNode"
+							:members="activeNode?.type === 'member_list' ? activeNode.content : null"
+							:members-loading="activeMembersLoading"
+							:can-manage-members="canManageActiveMembers"
+							:editing-content="editingContent"
 							:is-requesting="isRequesting"
 							:response-data="responseData" :response-status="responseStatus" :response-time="responseTime"
 							:active-environment="activeEnvironment" @start-edit="startEditing" @save-edit="saveEditing"
-							@cancel-edit="cancelEditing" @send-request="sendRequest" />
+							@cancel-edit="cancelEditing"
+							@send-request="sendRequest"
+							@add-member="openAddMemberDialog"
+							@remove-member="removeMember"
+							@change-member-role="changeMemberRole" />
 					</div>
 
 					<ApiManagerPreview v-if="showPreview && isFolderType(activeNode?.type)" :selected-file="selectedFile"
@@ -1654,61 +1906,6 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 		gap: 12px;
-	}
-
-	&__file-card {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		padding: 12px;
-		background: var(--color-surface-container);
-		border: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
-		border-radius: 14px;
-		cursor: pointer;
-		transition: all 0.15s ease;
-
-		&:hover {
-			background: color-mix(in srgb, var(--color-surface-variant) 30%, transparent);
-			border-color: color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
-		}
-	}
-
-	&__file-card--selected {
-		background: color-mix(in srgb, var(--color-primary-container) 30%, transparent);
-		border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
-	}
-
-	&__file-card-icon {
-		display: flex;
-		justify-content: center;
-	}
-
-	&__file-card-content {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	&__file-card-name {
-		margin: 0;
-		font-size: 14px;
-		font-weight: 600;
-		color: var(--color-on-surface);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	&__file-card-meta {
-		margin: 0;
-		font-size: 12px;
-		color: var(--color-on-surface-variant);
-	}
-
-	&__file-card-date {
-		margin: 0;
-		font-size: 12px;
-		color: var(--color-on-surface-variant);
 	}
 
 	&__tree-actions {

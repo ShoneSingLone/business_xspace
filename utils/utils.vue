@@ -40,19 +40,51 @@ async ${camelCase(path)}(data) {
 					const _url = new URL(String(url).replace("#", ""), location.origin);
 					const tokenArray = _.map(_.$lStorage.x_token, (v, k) => ({ v, k }));
 					const tokenArraySorted = tokenArray.sort((a, b) => a.k - b.k);
-					
+
 					_.each(tokenArraySorted, ({ v, k }) => _url.searchParams.set(k, v));
-					
-					const xspaceToken = _.$lStorage._xspace_token || _.$lStorage["_xspace_token"] || localStorage.getItem('_xspace_token');
-					const xspaceUid = _.$lStorage._xspace_uid || _.$lStorage["_xspace_uid"] || localStorage.getItem('_xspace_uid');
-					
+
+					const parseHashQuery = () => {
+						try {
+							const hash = String(window.location.hash || "");
+							const qIndex = hash.indexOf("?");
+							if (qIndex === -1) return {};
+							const queryStr = hash.slice(qIndex + 1);
+							const params = new URLSearchParams(queryStr);
+							const token =
+								params.get("_xspace_token") ||
+								params.get("?_xspace_token") ||
+								params.get(encodeURIComponent("_xspace_token"));
+							const uid =
+								params.get("_xspace_uid") ||
+								params.get("?_xspace_uid") ||
+								params.get(encodeURIComponent("_xspace_uid"));
+							return { token, uid };
+						} catch (e) {
+							return {};
+						}
+					};
+
+					let xspaceToken = _.$lStorage._xspace_token;
+					let xspaceUid = _.$lStorage._xspace_uid;
+					if (!xspaceToken || !xspaceUid) {
+						const { token, uid } = parseHashQuery();
+						if (!xspaceToken && token) {
+							xspaceToken = token;
+							_.$lStorage._xspace_token = token;
+						}
+						if (!xspaceUid && uid) {
+							xspaceUid = uid;
+							_.$lStorage._xspace_uid = uid;
+						}
+					}
+
 					if (xspaceToken) {
-						_url.searchParams.set('_xspace_token', xspaceToken);
+						_url.searchParams.set("_xspace_token", xspaceToken);
 					}
 					if (xspaceUid) {
-						_url.searchParams.set('_xspace_uid', xspaceUid);
+						_url.searchParams.set("_xspace_uid", xspaceUid);
 					}
-					
+
 					const { href } = _url;
 					return href;
 				} catch (e) {

@@ -19,10 +19,27 @@
 		</div>
 
 		<div class="top-bar__right">
-			<div class="top-bar__user" :title="userDisplayName">
-				<span class="top-bar__user-avatar">{{ userInitial }}</span>
-				<span class="top-bar__user-name">{{ userDisplayName }}</span>
-			</div>
+			<xDropdown class="top-bar__user-dropdown">
+				<div class="top-bar__user" :title="userDisplayName">
+					<span class="top-bar__user-avatar">{{ userInitial }}</span>
+					<span class="top-bar__user-name">{{ userDisplayName }}</span>
+					<xIcon icon="arrow-down" size="10" class="top-bar__user-arrow" />
+				</div>
+				<xDropdownMenu slot="dropdown" class="top-bar__dropdown-menu">
+					<xDropdownItem>
+						<span class="flex middle" @click="showUserProfileDialog">
+							<xIcon icon="_icon_user" size="14" />
+							<span class="ml4">个人中心</span>
+						</span>
+					</xDropdownItem>
+					<xDropdownItem>
+						<span class="flex middle" @click="APP.logoutActions">
+							<xIcon icon="_logout" size="14" />
+							<span class="ml4">退出登录</span>
+						</span>
+					</xDropdownItem>
+				</xDropdownMenu>
+			</xDropdown>
 			<div class="top-bar__datetime">
 				<span class="top-bar__date">{{ dateLabel }}</span>
 				<span class="top-bar__time">{{ time }}</span>
@@ -34,8 +51,6 @@
 <script lang="ts">
 export default async function ({ PRIVATE_GLOBAL }) {
 	return {
-		// APP: 全局状态（来自 entry.vue）
-		// system: v1 Desktop Workspace 局部状态（来自 ViewXspace）
 		inject: ["APP", "system"],
 		data() {
 			return {
@@ -61,6 +76,19 @@ export default async function ({ PRIVATE_GLOBAL }) {
 				this.dateLabel = now.toLocaleDateString([], {
 					month: "2-digit",
 					day: "2-digit"
+				});
+			},
+			async showUserProfileDialog() {
+				const vm = this;
+				_.$openModal({
+					title: i18n("个人中心"),
+					url: "@/views/User/UserProfile.Dialog.vue",
+					parent: vm,
+					userId: vm.APP.user._id,
+					canModifyAvatar: true,
+					onOk() {
+						vm.APP.updateGroupMemberList();
+					}
 				});
 			}
 		},
@@ -215,6 +243,28 @@ export default async function ({ PRIVATE_GLOBAL }) {
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		color: var(--v1-shell-text-secondary, var(--el-text-color-regular));
+	}
+
+	&__user-arrow {
+		transition: transform 0.2s ease;
+	}
+
+	&__user-dropdown {
+		:deep(.el-dropdown-menu) {
+			min-width: 140px;
+			padding: 4px 0;
+		}
+
+		:deep(.el-dropdown-item) {
+			padding: 8px 12px;
+			font-size: 0.75rem;
+			color: var(--v1-shell-text-secondary, var(--el-text-color-regular));
+
+			&:hover {
+				background: var(--v1-shell-hover, var(--el-bg-color-hover));
+				color: var(--v1-shell-text, var(--el-text-color-primary));
+			}
+		}
 	}
 
 	&__datetime {

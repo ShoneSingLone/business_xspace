@@ -21,6 +21,7 @@ export default async function () {
 		},
 		methods: {
 			handleAction(action) {
+				console.log("ApiManagerContextMenu: handleAction called", action, this.node?.name);
 				this.$emit("action", action, this.node);
 			},
 			hide() {
@@ -57,6 +58,10 @@ export default async function () {
 		<div class="api-manager__context-menu-item" @click="handleAction('openNewTab')">
 			<xIcon icon="_external-link" :size="14" />
 			<span>Open in New Tab</span>
+		</div>
+		<div class="api-manager__context-menu-item" @click="handleAction('openNewTabWithAuth')">
+			<xIcon icon="_lockStrok" :size="14" />
+			<span>Open in New Tab (with Auth)</span>
 		</div>
 		<div class="api-manager__context-menu-item" @click="handleAction('openNewWindow')">
 			<xIcon icon="_window-maximize" :size="14" />

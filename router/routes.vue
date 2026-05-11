@@ -19,6 +19,12 @@ export default async function () {
 		_.$newRoute("/v1/api-manager", "@/views/v1/single/ApiManagerDev.vue", {
 			name: "v1-api-manager"
 		}),
+		_.$newRoute("/v1/design-system", "@/views/v1/single/DesignSystemDev.vue", {
+			name: "v1-design-system"
+		}),
+		_.$newRoute("/v1/api-manager/group/:groupId/:view", "@/views/v1/single/ApiManagerDev.vue", {
+			name: "v1-api-manager-group-view"
+		}),
 		_.$newRoute("/demo_test", "@/views/demo/test.vue"),
 		_.$newRoute("/cicd", "@/views/CiCd/ViewCiCd.vue", {
 			redirect: "/cicd/task_list",

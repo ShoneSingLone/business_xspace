@@ -31,6 +31,8 @@ export default async function () {
 				this.$emit("open-node", node);
 			},
 			showContextMenu(node, event) {
+				console.log("🖱️ ApiManagerSidebar: showContextMenu called, node:", node?.name, "event type:", event.type);
+				console.log("🖱️ Event clientX:", event.clientX, "clientY:", event.clientY);
 				event.preventDefault();
 				event.stopPropagation();
 				this.$emit("context-menu", node, event);
@@ -53,6 +55,9 @@ export default async function () {
 					"doc_folder",
 					"folder"
 				].includes(type);
+			},
+			isProjectFolder(node) {
+				return node.id === "ps_my_projects" || node.id === "ps_followed" || node.id?.endsWith("_projects");
 			},
 			getIcon(type) {
 				switch (type) {
@@ -156,7 +161,7 @@ export default async function () {
 									@click.stop="openNode(child)"
 									@contextmenu="showContextMenu(child, $event)">
 									<span class="api-manager__tree-toggle">
-										<template v-if="isFolderType(child.type) && child.children?.length">
+										<template v-if="isFolderType(child.type) && child.children?.length && !isProjectFolder(child)">
 											<div @click.stop="toggleFolder(child.id)" style="cursor: pointer; padding: 4px;">
 												<xIcon icon="arrow-down" v-if="expandedFolders.indexOf(child.id) > -1" :size="14" />
 												<xIcon icon="arrow-right" v-else :size="14" />
@@ -200,7 +205,7 @@ export default async function () {
 										@click.stop="openNode(subchild)"
 										@contextmenu="showContextMenu(subchild, $event)">
 											<span class="api-manager__tree-toggle">
-												<template v-if="isFolderType(subchild.type) && subchild.children?.length">
+												<template v-if="isFolderType(subchild.type) && subchild.children?.length && !isProjectFolder(subchild)">
 													<div @click.stop="toggleFolder(subchild.id)" style="cursor: pointer; padding: 4px;">
 														<xIcon icon="arrow-down" v-if="expandedFolders.indexOf(subchild.id) > -1" :size="14" />
 														<xIcon icon="arrow-right" v-else :size="14" />

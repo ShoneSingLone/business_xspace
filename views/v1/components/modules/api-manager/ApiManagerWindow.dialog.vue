@@ -18,7 +18,8 @@ export default async function ({ node, closeModal }) {
 				viewMode: "list",
 				sortField: "name",
 				sortDirection: "asc",
-				searchQuery: ""
+				searchQuery: "",
+				utils: utils
 			};
 		},
 		computed: {
